@@ -29,24 +29,44 @@ de9cfdf7d1330534731e8354ec5927db99e06365850a8fe1d07c6bf8dec97ad0   # /tmp/.p, 10
 # Confidence: HIGH — direct honeypot capture (telnet) AND hardcoded payload host
 94.154.43.123   # dropper delivery + serves /ohshit.sh and //bot.<arch>
 
-# [DOMAINS — INCOMPLETE, DO NOT TREAT AS "NONE"]
-# The loader chain (stages 1 and 2) uses bare IPs exclusively — no domains.
+# [DOMAINS — none blockable; one benign string identified, two unresolved]
+# The loader chain (stages 1 and 2) uses bare IPs exclusively.
 #
-# The ELF payloads are a different matter. Domain-shaped strings ARE present
-# in them and have NOT been extracted:
-#   //bot.arm7   — 2 x .com, 2 x .net, plus one further TLD
-#   //bot.x86_64 — 3 matching lines
-#   //bot.ppc    — 3 matching lines
+# The ELF payloads do contain domain-shaped strings. These were recovered by
+# constraint-narrowing against the raw bytes rather than string extraction,
+# because the analysis host could not execute a strings tool.
 #
-# Their existence and TLDs are confirmed by pattern match against the raw
-# bytes. The literal domain names are NOT known: extracting them requires
-# running a strings tool against the binaries, which the analysis host was
-# blocked from doing.
+# IDENTIFIED — benign, DO NOT BLOCK:
+#   openssh.com   present in //bot.arm7 and //bot.x86_64
 #
-# These may be C2 domains or may be artefacts of the statically linked libc.
-# Until someone runs `tools/binstrings.py` over these payloads and reads the
-# result, THIS FEED IS INCOMPLETE for domain indicators. Do not cite it as
-# evidence that this family is IP-only.
+# This is an SSH protocol string, not a C2 domain. OpenSSH algorithm names
+# carry an @openssh.com suffix (chacha20-poly1305@openssh.com,
+# hmac-sha2-256-etm@openssh.com). Corroborated: the same payloads contain
+# ssh-ed25519, curve25519 and chacha20 algorithm strings.
+#
+# *** This is itself a capability finding — see [SSH PROPAGATION] below. ***
+#
+# RULED OUT — zero matches when anchored on a word boundary:
+#   .xyz  .top  .onion  .ru  .su  .io  .cc  .org
+# An earlier revision reported hits on these. That was wrong: the pattern
+# lacked a leading word-boundary anchor and was matching inside longer byte
+# sequences. Properly anchored, all return zero.
+#
+# UNRESOLVED — 2 occurrences, //bot.arm7 and //bot.x86_64:
+#   a two-label .net name of the form <label>.<label>.net
+# Not identified. Given openssh.com resolved to a protocol string, this is
+# plausibly also library boilerplate, but that is NOT established. Confirm
+# with `tools/binstrings.py` before treating this family as domain-free.
+
+# [SSH PROPAGATION — capability, not previously documented]
+# The payloads embed a full SSH client: ssh-ed25519, curve25519, chacha20,
+# aes128-ctr and hmac-sha2 algorithm strings are all present, alongside the
+# @openssh.com suffix strings.
+#
+# This family therefore propagates over SSH as well as telnet. The loader
+# chain is telnet-only, so anyone scoping containment from the dropper alone
+# will miss the SSH vector entirely. Audit SSH auth logs on affected hosts,
+# not just telnet.
 
 # [PORTS]
 80    # HTTP — payload retrieval from 94.154.43.123

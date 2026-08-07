@@ -23,18 +23,25 @@ Author: **AfterPacket** · Site: <https://afterpacket.github.io/drosera-threat-i
 | 2026-08-04 | [BOTKILL_PROCWIPE](#botkill_procwipe) | `2733d565138186645...` | Shell | 🟠 HIGH | IOC · Firewalla |
 | 2026-08-05 | [WEBROOT_PROBE](#webroot_probe) | `af77b643964afd79...` | Shell | 🟠 HIGH | Suricata · IOC · Firewalla |
 
-**34 IPs added to the blocklist. Zero domains — but that is a gap, not a finding.**
+**34 IPs added to the blocklist. Zero domains — mostly confirmed, one loose end.**
 
-Every domain found in the *script* samples is legitimate shared infrastructure
-(see [Do not block](#do-not-block)). The **ELF payloads were not searched**, and
-they do contain domain-shaped strings: `bot.arm7` alone holds two `.com` and two
-`.net` matches, and every other payload sampled across both Mirai families matched
-too. The literal names could not be extracted — that needs a strings tool run
-against the binaries, which the analysis host was blocked from doing.
+Every domain in the *script* samples is legitimate shared infrastructure (see
+[Do not block](#do-not-block)). The ELF payloads were searched separately, by
+constraint-narrowing against the raw bytes rather than string extraction, since
+the analysis host could not execute a strings tool.
 
-**The domain feed for this capture is therefore incomplete.** Treat the ELF
-payloads as having unenumerated domain indicators until
-[`tools/binstrings.py`](tools/binstrings.py) has been run over them.
+- **`openssh.com`** in the MIRAI_OHSHIT payloads is an SSH *protocol* string
+  (`chacha20-poly1305@openssh.com`), not C2. It is not blocked, and it should
+  not be. It did surface a real capability — see [SSH propagation](#mirai_ohshit).
+- **`.xyz`, `.top`, `.onion`, `.ru`, `.su`, `.io`, `.cc`, `.org`** all return
+  zero when anchored on a word boundary.
+- **Unresolved:** one two-label `.net` string in the OHSHIT payloads, and one
+  unidentified string in each MIRAI_TELNETCURL payload. The TELNETCURL one is
+  *not* `openssh.com` — that was checked and is absent — so it has no benign
+  explanation yet and could be C2.
+
+**MIRAI_TELNETCURL must not be described as IP-only** until
+[`tools/binstrings.py`](tools/binstrings.py) has been run over its payloads.
 
 ---
 
@@ -45,6 +52,12 @@ recovered: a 104-byte fetcher written to `/tmp/.p` over telnet pulls `ohshit.sh`
 which loops 16 architectures, `cat`s each payload into a file named `WTF`, runs
 `chmod +x *`, and executes. Seven of the sixteen architecture builds were captured.
 The doubled slash in `http://94.154.43.123//bot.<arch>` is a reliable detection string.
+
+**SSH propagation.** The payloads embed a full SSH client — `ssh-ed25519`,
+`curve25519`, `chacha20`, `aes128-ctr` and `hmac-sha2` algorithm strings are all
+present. The loader chain is telnet-only, so scoping containment from the dropper
+alone misses the SSH vector entirely. Audit SSH auth logs on affected hosts, not
+just telnet. This was found while chasing down the `openssh.com` string.
 
 ### MIRAI_TELNETCURL
 

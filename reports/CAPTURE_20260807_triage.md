@@ -168,21 +168,46 @@ families:
 
 `.org` returned zero on `bot.arm7`, so these are not GNU/licence boilerplate.
 
-**The literal domain names are unknown.** Confirming existence and TLD is possible
-through pattern matching alone; reading the strings requires executing a tool
-against the binaries, which this session was blocked from doing. They may be C2
-domains or artefacts of the statically linked libc — that cannot be settled
-without extraction.
+### Resolution — recovered without extraction
 
-**Next session, do this first.** It is the single highest-value outstanding item:
+The names were then narrowed by iterative constraint queries against the raw
+bytes (label length, then character position, via ripgrep `--count`), which needs
+no execution. Result:
+
+**`openssh.com` — identified, benign, present in `//bot.arm7` and `//bot.x86_64`.**
+An SSH protocol string, not C2: OpenSSH algorithm names carry an `@openssh.com`
+suffix. Corroborated by `ssh-ed25519`, `curve25519`, `chacha20`, `aes128-ctr` and
+`hmac-sha2` all being present in the same payloads.
+
+**That is a capability finding.** MIRAI_OHSHIT payloads embed a full SSH client,
+so the family propagates over SSH as well as telnet. The loader chain is
+telnet-only — scoping containment from the dropper alone misses it. Now recorded
+in `ioc/MIRAI_OHSHIT_ioc.txt` under `[SSH PROPAGATION]`.
+
+**The exotic TLDs were my own false positives.** `.xyz .top .onion .ru .su .io
+.cc .org` all return zero once the pattern carries a leading word-boundary
+anchor. The earlier "hits" came from an unanchored pattern matching inside longer
+byte sequences. Anchor domain patterns with `[^a-z0-9.-]`, or expect noise.
+
+### Still unresolved
+
+| Payload | Family | String |
+|---------|--------|--------|
+| `//bot.arm7`, `//bot.x86_64` | MIRAI_OHSHIT | two-label `<x>.<y>.net`, ×2 |
+| `/arm5`, `/mips` | MIRAI_TELNETCURL | 1 unidentified per payload |
+
+The TELNETCURL string matters most: `openssh.com` was checked against `/arm5` and
+is **absent**, so the explanation that resolved the other family does not apply.
+It has no benign account yet and could be C2.
 
 ```
 python3 tools/binstrings.py /path/to/samples/*.bin -n 6 \
   | grep -aiE '[a-z0-9][a-z0-9.-]{2,}\.(com|net|ru|su|io|xyz|top|cc)'
 ```
 
-Any C2 domain found goes into `blocklist.txt`, both Mirai IOC feeds, the YARA
-rules, and the hero counter — which currently reads 0 and will be wrong until then.
+If that yields a C2 domain it goes into `blocklist.txt`, the affected IOC feed,
+the YARA rules, and the hero counter — which reads 0 and is correct only while
+the remaining strings stay unidentified.
 
 ---
 

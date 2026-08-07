@@ -206,8 +206,10 @@ footer p{margin:0 0 6px}
           <code>ohshit.sh</code>, which loops 16 architectures, cats each payload into a file named
           <code>WTF</code>, and executes it. Seven of the sixteen builds were captured; the doubled slash
           in <code>//bot.&lt;arch&gt;</code> makes a reliable detection string.
-          <strong>Domain indicators are incomplete:</strong> the ELF payloads contain domain strings that
-          could not be extracted, so this family is not IP-only despite the loader chain being so.</p>
+          <strong>The payloads also embed a full SSH client</strong> — <code>ssh-ed25519</code>,
+          <code>curve25519</code>, <code>chacha20</code> — so this family propagates over SSH as well as
+          telnet. The loader chain is telnet-only, so containment scoped from the dropper alone misses
+          that vector.</p>
 
         <ul class="tags">
           <li>Mirai-derived</li><li>16 architectures</li><li>telnet propagation</li><li>busybox staging</li>
@@ -248,8 +250,9 @@ footer p{margin:0 0 6px}
           <code>curl</code> and a <code>busybox wget</code> dropper. Uses fixed non-dictionary output
           filenames per architecture and the exec argument <code>telnet.curl</code>. The five filenames
           served by 205.237.110.232 match those dropped by 60.185.49.73 exactly — one kit, two hosts.
-          <strong>Domain indicators are incomplete:</strong> the ELF payloads contain unextracted domain
-          strings.</p>
+          <strong>Domain indicators are incomplete:</strong> each ELF payload holds one unidentified
+          domain string. It is not the benign <code>openssh.com</code> seen in the other Mirai family —
+          that was checked and is absent here — so it has no innocent explanation yet.</p>
 
         <ul class="tags">
           <li>Mirai-derived</li><li>5 architectures</li><li>fixed payload names</li><li>two-host infra</li>
