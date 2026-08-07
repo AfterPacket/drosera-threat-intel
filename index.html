@@ -115,8 +115,8 @@ footer p{margin:0 0 6px}
 
     <div class="stats-row">
       <div class="stat"><span class="stat-value" id="stat-families">7</span><span class="stat-label">Families</span></div>
-      <div class="stat"><span class="stat-value" id="stat-ips">34</span><span class="stat-label">IPs blocked</span></div>
-      <div class="stat"><span class="stat-value" id="stat-domains">0</span><span class="stat-label">Domains blocked</span></div>
+      <div class="stat"><span class="stat-value" id="stat-ips">41</span><span class="stat-label">IPs blocked</span></div>
+      <div class="stat"><span class="stat-value" id="stat-domains">5</span><span class="stat-label">Domains blocked</span></div>
       <div class="stat"><span class="stat-value" id="stat-ports">0</span><span class="stat-label">Backdoor ports</span></div>
     </div>
   </div>
@@ -217,9 +217,9 @@ footer p{margin:0 0 6px}
 
         <dl class="iocs">
           <div class="ioc-stat"><span class="ioc-num">9</span><span class="ioc-cap">Samples</span></div>
-          <div class="ioc-stat"><span class="ioc-num">1</span><span class="ioc-cap">IP blocked</span></div>
+          <div class="ioc-stat"><span class="ioc-num">7</span><span class="ioc-cap">IPs blocked</span></div>
+          <div class="ioc-stat"><span class="ioc-num">5</span><span class="ioc-cap">C2 domains</span></div>
           <div class="ioc-stat"><span class="ioc-num">7/16</span><span class="ioc-cap">Arches captured</span></div>
-          <div class="ioc-stat"><span class="ioc-num">none</span><span class="ioc-cap">VT at capture</span></div>
         </dl>
 
         <div class="dl">
@@ -250,9 +250,9 @@ footer p{margin:0 0 6px}
           <code>curl</code> and a <code>busybox wget</code> dropper. Uses fixed non-dictionary output
           filenames per architecture and the exec argument <code>telnet.curl</code>. The five filenames
           served by 205.237.110.232 match those dropped by 60.185.49.73 exactly — one kit, two hosts.
-          <strong>Domain indicators are incomplete:</strong> each ELF payload holds one unidentified
-          domain string. It is not the benign <code>openssh.com</code> seen in the other Mirai family —
-          that was checked and is absent here — so it has no innocent explanation yet.</p>
+          Extraction confirms this family is <strong>genuinely IP-only</strong>: the payloads carry no
+          compiled-in C2 domains, just <code>www.ikindalikemenbutonlyontuesday.com</code> — the decoy
+          domain from the leaked Mirai source, useful for lineage attribution but not infrastructure.</p>
 
         <ul class="tags">
           <li>Mirai-derived</li><li>5 architectures</li><li>fixed payload names</li><li>two-host infra</li>

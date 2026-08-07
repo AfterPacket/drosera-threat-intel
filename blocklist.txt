@@ -32,3 +32,15 @@
 193.32.162.34
 193.32.162.15
 193.32.162.27
+213.177.179.11
+45.61.161.207
+45.83.140.28
+5.101.221.87
+51.15.68.114
+94.130.53.201
+195.201.24.6
+api-relay-3.metrics-collector.io
+cdn-edge-updates.hostcloud-eu.net
+mgmt-panel.serverstats-daemon.com
+sync.softwaremirror.workers.dev
+glibc.malloc.top

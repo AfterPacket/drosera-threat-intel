@@ -55,3 +55,39 @@ rule MIRAI_TELNETCURL_dropper
             (any of ($c2_*) and any of ($name*) and any of ($cap*))
         )
 }
+
+
+rule MIRAI_TELNETCURL_payload
+{
+    meta:
+        description  = "Mirai-lineage ELF payload carrying the leaked-source decoy domain"
+        author       = "AfterPacket"
+        date         = "2026-08-07"
+        hash_sha256  = "9cbe35b1d10f55d712738644c60c2cc47eac13e06f23ba849abb1bbdbdfdc5f2"
+        hash_sha256_2 = "3afa3a117915cf21b105ea9c8aae346af4f733556e6a6fe62e1352901d2b4831"
+        family       = "MIRAI_TELNETCURL"
+        tlp          = "TLP:WHITE"
+        reference    = "https://github.com/Afterpacket/drosera-threat-intel"
+        status       = "PRODUCTION"
+        note         = "Lineage marker, not a family discriminator — see condition"
+
+    strings:
+        /* The decoy domain from the leaked Mirai source, present in all five
+         * captured builds. It is a LINEAGE marker: any Mirai descendant that
+         * kept the original resolver code carries it, so this rule identifies
+         * Mirai-derived payloads generally, NOT this campaign specifically.
+         * Attribute to the family only with corroborating infrastructure. */
+        $decoy = "www.ikindalikemenbutonlyontuesday.com" ascii
+
+        /* Scanner range constants that accompany it in these builds */
+        $r1 = "119.0.0.0" ascii
+        $r2 = "120.0.0.0" ascii
+        $r3 = "121.0.0.0" ascii
+
+    condition:
+        uint32be(0) == 0x7F454C46 and
+        (
+            $decoy or
+            2 of ($r*)
+        )
+}

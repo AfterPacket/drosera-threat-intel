@@ -184,30 +184,51 @@ so the family propagates over SSH as well as telnet. The loader chain is
 telnet-only — scoping containment from the dropper alone misses it. Now recorded
 in `ioc/MIRAI_OHSHIT_ioc.txt` under `[SSH PROPAGATION]`.
 
-**The exotic TLDs were my own false positives.** `.xyz .top .onion .ru .su .io
-.cc .org` all return zero once the pattern carries a leading word-boundary
-anchor. The earlier "hits" came from an unanchored pattern matching inside longer
-byte sequences. Anchor domain patterns with `[^a-z0-9.-]`, or expect noise.
+### CORRECTION — the "exotic TLDs are false positives" claim was WRONG
 
-### Still unresolved
+An intermediate revision of this file asserted that `.xyz .top .onion .io` etc.
+returned zero when anchored, and dismissed them as regex noise. **That was
+wrong, and it would have suppressed five real C2 domains.**
 
-| Payload | Family | String |
-|---------|--------|--------|
-| `//bot.arm7`, `//bot.x86_64` | MIRAI_OHSHIT | two-label `<x>.<y>.net`, ×2 |
-| `/arm5`, `/mips` | MIRAI_TELNETCURL | 1 unidentified per payload |
+The anchored pattern used to "rule them out" was
+`[^a-z0-9.-][a-z0-9-]{2,20}\.top\b` — a **single** label before the TLD. Every
+domain in these payloads is multi-label, so the character preceding
+`metrics-collector.io` is a dot, which the `[^a-z0-9.-]` class explicitly
+excludes. The anchor did not remove noise; it removed the signal.
 
-The TELNETCURL string matters most: `openssh.com` was checked against `/arm5` and
-is **absent**, so the explanation that resolved the other family does not apply.
-It has no benign account yet and could be C2.
+**Lesson, and it cuts both ways.** Running an unanchored domain pattern over raw
+bytes produces false positives. Over-anchoring so that `<sub>.<domain>.<tld>`
+cannot match produces false negatives, which are worse — a missing C2 domain is
+silent. Match domains against *extracted strings* with a pattern that permits
+multiple labels. `tools/binstrings.py --ioc` now does exactly this.
 
-```
-python3 tools/binstrings.py /path/to/samples/*.bin -n 6 \
-  | grep -aiE '[a-z0-9][a-z0-9.-]{2,}\.(com|net|ru|su|io|xyz|top|cc)'
-```
+### Resolved by extraction
 
-If that yields a C2 domain it goes into `blocklist.txt`, the affected IOC feed,
-the YARA rules, and the hero counter — which reads 0 and is correct only while
-the remaining strings stay unidentified.
+`tools/binstrings.py --ioc` was eventually run successfully. Results:
+
+**MIRAI_OHSHIT — 5 blockable C2 domains + 1 Tor, identical in all 7 builds:**
+`api-relay-3.metrics-collector.io`, `cdn-edge-updates.hostcloud-eu.net`,
+`mgmt-panel.serverstats-daemon.com`, `sync.softwaremirror.workers.dev`,
+`glibc.malloc.top`, and `control.tor2web-relay-fast.onion` (not blocklisted —
+.onion does not resolve through normal DNS). Plus 6 compiled-in C2 IPs.
+
+Because the set is identical across ARM, ARM7, SH4, MIPS, i686, PPC and x86-64,
+these indicators cover the 9 architectures the loader fetches that were never
+captured. The new `MIRAI_OHSHIT_payload` YARA rule is string-based for that
+reason.
+
+**MIRAI_TELNETCURL — genuinely IP-only.** Its single domain is
+`www.ikindalikemenbutonlyontuesday.com`, the decoy from the leaked Mirai source.
+Lineage marker, not infrastructure. Not blocked.
+
+**PERLBOT_SHELLBOT — a second C2 that was missed:** `213.177.179.11`, used by
+`/dodu` and `/gots`. `/duba` uses `213.139.77.150`. Same bot, same size,
+different C2 — blocking one server leaves the other running.
+
+**Excluded on inspection** — present in the payloads, deliberately not blocked:
+`185.199.108.153` (GitHub Pages), `104.21.234.17` (Cloudflare), `workers.dev`
+apex, `bugs.launchpad.net` (glibc boilerplate), `1.2.3.4` and `131.0.0.0`
+(placeholders), `119/120/121.0.0.0` (Mirai scanner range constants).
 
 ---
 

@@ -23,11 +23,21 @@ fd93b4f7bd5e8360ecd6e782dd445356728e698b9f25e335131b28bcdd3e56e3   # /gots, 4027
 
 # [IP ADDRESSES]
 # Confidence: HIGH — IRC C2 read directly from the Perl config block
-213.139.77.150   # IRC C2, port 6667
+213.139.77.150   # IRC C2 for /duba
+213.177.179.11   # IRC C2 for /dodu AND /gots
 # Confidence: HIGH — direct honeypot capture (ssh)
 160.30.204.101   # delivered /duba
 77.90.185.42     # delivered /dodu
 54.37.11.139     # delivered /gots
+
+# [TWO C2 SERVERS, NOT ONE]
+# /duba points at 213.139.77.150. /dodu and /gots both point at
+# 213.177.179.11 — a different host, different /16. An earlier revision of
+# this feed listed only the first, because only /duba had been read.
+#
+# This matters for the undetected-twin finding below: /duba and /dodu are
+# the same size and the same bot, but they are NOT the same build — they
+# ship different C2. Blocking one server leaves the other operating.
 
 # [DOMAINS]
 # None. Bare IP C2.

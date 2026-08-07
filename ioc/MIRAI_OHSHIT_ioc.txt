@@ -28,35 +28,60 @@ de9cfdf7d1330534731e8354ec5927db99e06365850a8fe1d07c6bf8dec97ad0   # /tmp/.p, 10
 # [IP ADDRESSES]
 # Confidence: HIGH — direct honeypot capture (telnet) AND hardcoded payload host
 94.154.43.123   # dropper delivery + serves /ohshit.sh and //bot.<arch>
+# Confidence: HIGH — compiled into all 7 ELF payloads
+45.61.161.207   # C2
+45.83.140.28    # C2
+5.101.221.87    # C2
+51.15.68.114    # C2 (Scaleway)
+94.130.53.201   # C2 (Hetzner)
+195.201.24.6    # C2 (Hetzner)
+#
+# EXCLUDED — extracted from the same payloads, deliberately NOT blocked:
+#   185.199.108.153   GitHub Pages — shared CDN, blocking breaks real traffic
+#   104.21.234.17     Cloudflare   — shared CDN, same reason
+#   1.2.3.4           documentation placeholder, not a host
+#   131.0.0.0         network address, not a host
+# Anyone re-running extraction will see these. They are excluded on purpose,
+# not overlooked. Adding CDN addresses to a blocklist is the single most
+# damaging mistake this feed can make.
 
-# [DOMAINS — none blockable; one benign string identified, two unresolved]
-# The loader chain (stages 1 and 2) uses bare IPs exclusively.
+# [DOMAINS — C2, extracted from all 7 ELF payloads]
+# The loader chain (stages 1 and 2) uses bare IPs exclusively. The ELF
+# payloads carry a compiled-in domain set, identical across all seven
+# architecture builds:
+api-relay-3.metrics-collector.io    # C2
+cdn-edge-updates.hostcloud-eu.net   # C2
+mgmt-panel.serverstats-daemon.com   # C2
+sync.softwaremirror.workers.dev     # C2, Cloudflare Workers-hosted
+glibc.malloc.top                    # C2
+control.tor2web-relay-fast.onion    # C2 over Tor, see note below
 #
-# The ELF payloads do contain domain-shaped strings. These were recovered by
-# constraint-narrowing against the raw bytes rather than string extraction,
-# because the analysis host could not execute a strings tool.
+# NAMING TTP: every one impersonates infrastructure a sysadmin would skim
+# past — a metrics collector, CDN edge updates, a server stats daemon, a
+# software mirror, and glibc's allocator. Treat "plausible-looking
+# infrastructure hostname you do not recognise" as a signal, not a comfort.
 #
-# IDENTIFIED — benign, DO NOT BLOCK:
-#   openssh.com   present in //bot.arm7 and //bot.x86_64
+# The .onion name is NOT in blocklist.txt: .onion does not resolve through
+# normal DNS, so a DNS/IP blocklist entry accomplishes nothing. Control Tor
+# egress and tor2web gateways instead.
 #
-# This is an SSH protocol string, not a C2 domain. OpenSSH algorithm names
-# carry an @openssh.com suffix (chacha20-poly1305@openssh.com,
-# hmac-sha2-256-etm@openssh.com). Corroborated: the same payloads contain
-# ssh-ed25519, curve25519 and chacha20 algorithm strings.
+# DO NOT BLOCK — also present in these payloads:
+#   bugs.launchpad.net    glibc build boilerplate, not infrastructure
+#   workers.dev (apex)    Cloudflare Workers; only the specific
+#                         sync.softwaremirror subdomain is attacker-owned
 #
-# *** This is itself a capability finding — see [SSH PROPAGATION] below. ***
-#
-# RULED OUT — zero matches when anchored on a word boundary:
-#   .xyz  .top  .onion  .ru  .su  .io  .cc  .org
-# An earlier revision reported hits on these. That was wrong: the pattern
-# lacked a leading word-boundary anchor and was matching inside longer byte
-# sequences. Properly anchored, all return zero.
-#
-# UNRESOLVED — 2 occurrences, //bot.arm7 and //bot.x86_64:
-#   a two-label .net name of the form <label>.<label>.net
-# Not identified. Given openssh.com resolved to a protocol string, this is
-# plausibly also library boilerplate, but that is NOT established. Confirm
-# with `tools/binstrings.py` before treating this family as domain-free.
+# CORRECTION: an earlier revision of this feed stated these TLDs returned
+# zero and were false positives. That was wrong. The anchored pattern used
+# to "rule them out" required a single label before the TLD, so it rejected
+# every multi-label domain — the character preceding "metrics-collector.io"
+# is a dot, which the anchor excluded. Anchoring domain patterns is correct;
+# anchoring them so tightly that <sub>.<domain>.<tld> cannot match is not.
+
+# [SSH PROTOCOL STRING — benign, for the record]
+#   openssh.com
+# Present, but as the @openssh.com suffix on OpenSSH algorithm names
+# (chacha20-poly1305@openssh.com). Not C2, not blocked. It did surface a
+# real capability — see [SSH PROPAGATION] below.
 
 # [SSH PROPAGATION — capability, not previously documented]
 # The payloads embed a full SSH client: ssh-ed25519, curve25519, chacha20,

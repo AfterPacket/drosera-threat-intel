@@ -92,11 +92,67 @@
 193.32.162.15
 193.32.162.27
 
+# ══════════════════════════════════════════════════════════════
+# ELF PAYLOAD EXTRACTION — added after string extraction
+# ══════════════════════════════════════════════════════════════
+
+# ── MIRAI_OHSHIT — C2 domains (HIGH — hardcoded in all 7 ELF payloads) ──
+# Every one is named to impersonate legitimate infrastructure. Identical
+# set across all seven architecture builds, so this is compiled-in config.
+api-relay-3.metrics-collector.io
+cdn-edge-updates.hostcloud-eu.net
+mgmt-panel.serverstats-daemon.com
+sync.softwaremirror.workers.dev
+glibc.malloc.top
+#
+# Also present, NOT listed above — cannot be blocked at DNS/IP layer:
+#   control.tor2web-relay-fast.onion
+# .onion names do not resolve through normal DNS. Block Tor egress and
+# tor2web gateways instead if this matters in your estate.
+#
+# CONSIDER, not included here: the apex domains metrics-collector.io,
+# hostcloud-eu.net, serverstats-daemon.com and malloc.top are very likely
+# wholly attacker-owned, and blocking the apex would survive subdomain
+# rotation. They are omitted because that is not verified and this is a
+# public feed. Verify registration before blocking an apex.
+# Do NOT block the apex workers.dev — that is Cloudflare Workers, shared
+# infrastructure. Only the specific subdomain above is attacker-controlled.
+
+# ── MIRAI_OHSHIT — C2 IPs (HIGH — hardcoded in all 7 ELF payloads) ──
+45.61.161.207
+45.83.140.28
+5.101.221.87
+51.15.68.114
+94.130.53.201
+195.201.24.6
+
+# ── PERLBOT_SHELLBOT — second IRC C2 (HIGH — config block) ──
+# Used by /dodu and /gots. Distinct from /duba's 213.139.77.150.
+213.177.179.11
+
 # ── DO NOT BLOCK ──────────────────────────────────────────────
 # These appear in sample source but are legitimate shared
 # infrastructure. The gsocket sample abuses a real security tool;
 # attribute the abuse, not the tool.
 #   gsocket.io   thc.org   github.com   ifconfig.me
 #
-# No domains are blocked from this capture — every domain observed
-# in the samples falls into the list above.
+# Extracted from the MIRAI_OHSHIT ELF payloads and deliberately
+# EXCLUDED from the block lists — these are shared CDN and would
+# break large amounts of legitimate traffic:
+#   185.199.108.153   GitHub Pages
+#   104.21.234.17     Cloudflare
+#   workers.dev       Cloudflare Workers apex (the specific
+#                     sync.softwaremirror subdomain IS blocked)
+#   bugs.launchpad.net  glibc build boilerplate, not infrastructure
+#
+# Not real hosts — placeholders and network addresses picked up by
+# the extractor, excluded on inspection:
+#   1.2.3.4      documentation placeholder
+#   131.0.0.0    network address, not a host
+#   119.0.0.0  120.0.0.0  121.0.0.0   Mirai scanner range constants
+#
+# Mirai family fingerprint, NOT live infrastructure — present in all
+# five MIRAI_TELNETCURL payloads. It is the decoy domain from the
+# original leaked Mirai source. Useful for attribution; blocking it
+# achieves nothing:
+#   www.ikindalikemenbutonlyontuesday.com

@@ -44,3 +44,64 @@ alert ip $HOME_NET any -> 94.154.43.123 any ( \
   sid:9001004; rev:1; \
   metadata:affected_product Any, created_at 2026-08-07, tag MIRAI_OHSHIT; \
 )
+
+# ------------------------------------------------------------
+# C2 domains compiled into the ELF payloads.
+# DNS rules fire at resolution — before any session is established —
+# so these catch an infected host earlier than the IP rules below.
+# ------------------------------------------------------------
+
+alert dns $HOME_NET any -> any any ( \
+  msg:"ET MALWARE MIRAI_OHSHIT C2 domain lookup (metrics-collector.io)"; \
+  dns.query; content:"api-relay-3.metrics-collector.io"; nocase; isdataat:!1,relative; \
+  classtype:trojan-activity; \
+  sid:9001005; rev:1; \
+  metadata:affected_product Any, created_at 2026-08-07, tag MIRAI_OHSHIT; \
+)
+
+alert dns $HOME_NET any -> any any ( \
+  msg:"ET MALWARE MIRAI_OHSHIT C2 domain lookup (hostcloud-eu.net)"; \
+  dns.query; content:"cdn-edge-updates.hostcloud-eu.net"; nocase; isdataat:!1,relative; \
+  classtype:trojan-activity; \
+  sid:9001006; rev:1; \
+  metadata:affected_product Any, created_at 2026-08-07, tag MIRAI_OHSHIT; \
+)
+
+alert dns $HOME_NET any -> any any ( \
+  msg:"ET MALWARE MIRAI_OHSHIT C2 domain lookup (serverstats-daemon.com)"; \
+  dns.query; content:"mgmt-panel.serverstats-daemon.com"; nocase; isdataat:!1,relative; \
+  classtype:trojan-activity; \
+  sid:9001007; rev:1; \
+  metadata:affected_product Any, created_at 2026-08-07, tag MIRAI_OHSHIT; \
+)
+
+# Cloudflare Workers-hosted. Matched on the FULL hostname only —
+# a substring match on workers.dev would fire on legitimate traffic.
+alert dns $HOME_NET any -> any any ( \
+  msg:"ET MALWARE MIRAI_OHSHIT C2 domain lookup (softwaremirror.workers.dev)"; \
+  dns.query; content:"sync.softwaremirror.workers.dev"; nocase; isdataat:!1,relative; \
+  classtype:trojan-activity; \
+  sid:9001008; rev:1; \
+  metadata:affected_product Any, created_at 2026-08-07, tag MIRAI_OHSHIT; \
+)
+
+alert dns $HOME_NET any -> any any ( \
+  msg:"ET MALWARE MIRAI_OHSHIT C2 domain lookup (glibc.malloc.top)"; \
+  dns.query; content:"glibc.malloc.top"; nocase; isdataat:!1,relative; \
+  classtype:trojan-activity; \
+  sid:9001009; rev:1; \
+  metadata:affected_product Any, created_at 2026-08-07, tag MIRAI_OHSHIT; \
+)
+
+# ------------------------------------------------------------
+# C2 IPs compiled into the ELF payloads.
+# GitHub Pages (185.199.108.153) and Cloudflare (104.21.234.17) are also
+# present in these binaries and are deliberately absent here.
+# ------------------------------------------------------------
+
+alert ip $HOME_NET any -> [45.61.161.207,45.83.140.28,5.101.221.87,51.15.68.114,94.130.53.201,195.201.24.6] any ( \
+  msg:"ET MALWARE MIRAI_OHSHIT outbound to payload-embedded C2"; \
+  classtype:trojan-activity; \
+  sid:9001010; rev:1; \
+  metadata:affected_product Any, created_at 2026-08-07, tag MIRAI_OHSHIT; \
+)

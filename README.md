@@ -23,25 +23,35 @@ Author: **AfterPacket** · Site: <https://afterpacket.github.io/drosera-threat-i
 | 2026-08-04 | [BOTKILL_PROCWIPE](#botkill_procwipe) | `2733d565138186645...` | Shell | 🟠 HIGH | IOC · Firewalla |
 | 2026-08-05 | [WEBROOT_PROBE](#webroot_probe) | `af77b643964afd79...` | Shell | 🟠 HIGH | Suricata · IOC · Firewalla |
 
-**34 IPs added to the blocklist. Zero domains — mostly confirmed, one loose end.**
+**41 IPs and 5 domains blocked.** String extraction over the ELF payloads is
+complete; the domain feed is no longer partial.
 
-Every domain in the *script* samples is legitimate shared infrastructure (see
-[Do not block](#do-not-block)). The ELF payloads were searched separately, by
-constraint-narrowing against the raw bytes rather than string extraction, since
-the analysis host could not execute a strings tool.
+The MIRAI_OHSHIT payloads carry a compiled-in C2 set, identical across all seven
+architecture builds — so the same indicators cover the nine architectures the
+loader fetches but we never captured:
 
-- **`openssh.com`** in the MIRAI_OHSHIT payloads is an SSH *protocol* string
-  (`chacha20-poly1305@openssh.com`), not C2. It is not blocked, and it should
-  not be. It did surface a real capability — see [SSH propagation](#mirai_ohshit).
-- **`.xyz`, `.top`, `.onion`, `.ru`, `.su`, `.io`, `.cc`, `.org`** all return
-  zero when anchored on a word boundary.
-- **Unresolved:** one two-label `.net` string in the OHSHIT payloads, and one
-  unidentified string in each MIRAI_TELNETCURL payload. The TELNETCURL one is
-  *not* `openssh.com` — that was checked and is absent — so it has no benign
-  explanation yet and could be C2.
+```
+api-relay-3.metrics-collector.io     mgmt-panel.serverstats-daemon.com
+cdn-edge-updates.hostcloud-eu.net    sync.softwaremirror.workers.dev
+glibc.malloc.top                     control.tor2web-relay-fast.onion
+```
 
-**MIRAI_TELNETCURL must not be described as IP-only** until
-[`tools/binstrings.py`](tools/binstrings.py) has been run over its payloads.
+Every one impersonates ordinary infrastructure — a metrics collector, CDN edge
+updates, a server stats daemon, a software mirror, glibc's allocator. The
+`.onion` is recorded but not blocklisted: it does not resolve through normal DNS.
+
+**Deliberately excluded from the blocklist**, though present in the same
+binaries: `185.199.108.153` (GitHub Pages), `104.21.234.17` (Cloudflare), the
+`workers.dev` apex, `bugs.launchpad.net` (glibc boilerplate), and `1.2.3.4` /
+`131.0.0.0` / `119-121.0.0.0` (placeholders and scanner range constants, not
+hosts). Adding shared CDN to a blocklist is the most damaging mistake this feed
+could make.
+
+MIRAI_TELNETCURL is **genuinely IP-only** — established by extraction, not
+assumed. Its payloads carry one domain,
+`www.ikindalikemenbutonlyontuesday.com`, the decoy from the leaked Mirai source.
+That is a lineage marker useful for attribution, not infrastructure, and is not
+blocked.
 
 ---
 
@@ -187,9 +197,9 @@ take the next free block from this table and update it.
 
 | Family | SID block | Status |
 |--------|-----------|--------|
-| MIRAI_OHSHIT | `9001001–9001999` | in use (9001001–9001004) |
+| MIRAI_OHSHIT | `9001001–9001999` | in use (9001001–9001010) |
 | MIRAI_TELNETCURL | `9002001–9002999` | in use (9002001–9002005) |
-| PERLBOT_SHELLBOT | `9003001–9003999` | in use (9003001–9003003) |
+| PERLBOT_SHELLBOT | `9003001–9003999` | in use (9003001–9003004) |
 | GSOCKET_SSHIT | `9004001–9004999` | in use (9004001–9004003) |
 | MIRAI_LOADER | `9005001–9005999` | in use (9005001–9005003) |
 | BOTKILL_PROCWIPE | `9006001–9006999` | reserved — no network activity, no rules |

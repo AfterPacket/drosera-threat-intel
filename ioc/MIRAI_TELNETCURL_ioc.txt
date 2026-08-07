@@ -32,23 +32,32 @@ f6f9c5f16c7d2b9e4df3b132c05f356c9abc48a7ee1d5f079016338bc2030e40   # /mipsel, 68
 # mips, mipsel) match the five filenames dropped by 60.185.49.73 exactly.
 # Same kit, two hosts. Treat as one campaign.
 
-# [DOMAINS — INCOMPLETE, one unresolved string per payload]
-# The dropper scripts use bare IPs exclusively — no domains.
+# [DOMAINS — resolved; no blockable domain in this family]
+# The dropper scripts use bare IPs exclusively.
 #
-# The ELF payloads each contain one domain-shaped string:
-#   /arm5  — 1 occurrence
-#   /mips  — 1 occurrence
+# All five ELF payloads contain exactly one domain, identical across builds:
+#   www.ikindalikemenbutonlyontuesday.com
 #
-# NOT IDENTIFIED. Note that it is NOT openssh.com — that string was confirmed
-# present in the MIRAI_OHSHIT payloads and confirmed ABSENT from /arm5. So the
-# convenient explanation that resolved the other family does not apply here,
-# and this string remains genuinely unknown.
+# This is the decoy domain from the LEAKED MIRAI SOURCE. It is not C2 and
+# not attacker-registered — it is a lineage artefact carried by any Mirai
+# descendant that kept the original resolver code. NOT added to blocklist.txt:
+# blocking it achieves nothing operationally.
 #
-# It may be a C2 domain. Until someone runs `tools/binstrings.py` over these
-# payloads and reads the result, THIS FEED IS INCOMPLETE for domain
-# indicators, and this family must NOT be described as IP-only.
+# Its value is attribution. Its presence confirms these payloads are
+# Mirai-derived rather than an unrelated bot family wearing Mirai filenames.
+# It does NOT identify this campaign — treat a hit as "some Mirai descendant"
+# and require corroborating infrastructure before attributing to
+# MIRAI_TELNETCURL.
 #
-# Ruled out by anchored pattern match: .xyz .top .onion .ru .su .org
+# Unlike MIRAI_OHSHIT, these payloads carry NO compiled-in C2 domains and no
+# compiled-in C2 IPs. This family is genuinely IP-only, with C2 reached
+# through the 205.237.110.232 staging host recorded above. That is now
+# established by extraction rather than assumed.
+
+# [SCANNER RANGE CONSTANTS — not C2, do not block]
+#   119.0.0.0   120.0.0.0   121.0.0.0
+# Network addresses used as scan-range bounds. They are not hosts and will
+# appear in any extraction run over these payloads.
 
 # [PORTS]
 80    # HTTP — payload retrieval from 205.237.110.232

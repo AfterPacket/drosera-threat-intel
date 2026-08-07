@@ -17,15 +17,87 @@ the dominant cost.
     python3 binstrings.py SAMPLE --utf16          # also scan UTF-16LE
     python3 binstrings.py SAMPLE -t               # prefix each run with its offset
     python3 binstrings.py *.bin --header          # batch; filename-prefixed
+    python3 binstrings.py *.bin --ioc             # IPs, domains and URLs only
 """
 
 import argparse
+import ipaddress
 import re
 import struct
 import sys
 
 # Printable ASCII plus tab, matching GNU strings' default notion of printable.
 PRINTABLE_CLASS = rb"[\x20-\x7e\t]"
+
+# ---------------------------------------------------------------------------
+# IOC extraction
+#
+# These patterns are applied to already-extracted printable runs, never to raw
+# bytes. Running them against raw bytes is how you manufacture false positives:
+# an unanchored domain pattern happily matches inside arbitrary binary noise.
+# The leading (?<![...]) guards are load-bearing — drop them and a corpus of
+# IoT binaries will report .xyz and .onion "C2 domains" that do not exist.
+# ---------------------------------------------------------------------------
+
+IPV4_RE = re.compile(r"(?<![\d.])(?:\d{1,3}\.){3}\d{1,3}(?![\d.])")
+
+DOMAIN_RE = re.compile(
+    r"(?<![a-z0-9.@-])"
+    r"(?:[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?\.)+"
+    r"(?:com|net|org|ru|su|io|cc|xyz|top|info|biz|me|tv|pw|club|online|site|"
+    r"shop|link|dev|onion|tk|ml|ga|cf|gq|cn|br|in|ua|pl|nl|de|uk)"
+    r"(?![a-z0-9-])",
+    re.IGNORECASE,
+)
+
+URL_RE = re.compile(r"\b[a-z][a-z0-9+.-]*://[^\s\"'<>\\)]+", re.IGNORECASE)
+
+# Domains that routinely appear in statically linked binaries as protocol or
+# library strings rather than infrastructure. Reported, but flagged, so nobody
+# blocklists them. openssh.com is the one that matters: OpenSSH algorithm names
+# carry an @openssh.com suffix, so every binary with an embedded SSH client
+# contains it and it is never C2.
+KNOWN_BENIGN = {
+    "openssh.com", "libssh.org", "gnu.org", "openwall.com", "example.com",
+    "example.net", "example.org", "ietf.org", "zlib.net", "sourceware.org",
+    "tartarus.org", "openssl.org", "musl.libc.org", "uclibc.org",
+}
+
+
+def is_routable_ipv4(text):
+    """True for a syntactically valid, publicly routable IPv4 address.
+
+    Version strings ("1.2.3.4") are indistinguishable from addresses by shape
+    alone, so this cannot be perfect — but rejecting malformed octets and
+    private/loopback/multicast space removes most of the noise.
+    """
+    try:
+        addr = ipaddress.IPv4Address(text)
+    except ValueError:
+        return False
+    return not (addr.is_private or addr.is_loopback or addr.is_multicast
+                or addr.is_reserved or addr.is_unspecified or addr.is_link_local)
+
+
+def extract_iocs(runs):
+    """Collect IOCs from (offset, text) runs. Returns dict of kind -> sorted set."""
+    found = {"url": set(), "ipv4": set(), "domain": set(), "benign": set()}
+
+    for _, text in runs:
+        for match in URL_RE.finditer(text):
+            found["url"].add(match.group())
+
+        for match in IPV4_RE.finditer(text):
+            candidate = match.group()
+            if is_routable_ipv4(candidate):
+                found["ipv4"].add(candidate)
+
+        for match in DOMAIN_RE.finditer(text):
+            domain = match.group().lower()
+            bucket = "benign" if domain in KNOWN_BENIGN else "domain"
+            found[bucket].add(domain)
+
+    return {kind: sorted(values) for kind, values in found.items()}
 
 
 def ascii_runs(data, minlen):
@@ -81,7 +153,8 @@ OSABI = {
 
 def elf_header(data):
     """Parse the ELF header. Returns None if this is not an ELF file."""
-    if len(data) < 28 or data[:4] != b"\x7fELF":
+    # 32 bytes, not 28: ELF64's e_entry spans offsets 24-31.
+    if len(data) < 32 or data[:4] != b"\x7fELF":
         return None
 
     ei_class, ei_data = data[4], data[5]
@@ -94,10 +167,11 @@ def elf_header(data):
         kind = "processor-specific" if osabi >= 64 else "unknown"
         osabi_text = f"{kind} ({osabi})"
 
+    version = data[6]
     fields = {
         "Class": EI_CLASS.get(ei_class, f"unknown ({ei_class})"),
         "Data": EI_DATA.get(ei_data, f"unknown ({ei_data})"),
-        "Version": data[6],
+        "Version": f"{version} (current)" if version == 1 else str(version),
         "OS/ABI": osabi_text,
     }
 
@@ -128,21 +202,42 @@ def process(path, args, prefix):
 
     if args.header:
         if header is None:
+            # Not an error. Scanning a mixed corpus of scripts and ELF binaries
+            # is the normal case, and returning non-zero here made the batch
+            # usage in the docstring abort under `set -e`.
             print(f"{prefix}not an ELF file (no \\x7fELF magic)")
-            return 1
+            return 0
         for key, value in header.items():
             print(f"{prefix}{key + ':':<14} {value}")
         return 0
 
     # Lead with the header when present — it frames everything that follows.
-    if header is not None:
+    if header is not None and not args.ioc:
         print(f"{prefix}### ELF: {header['Class']}, {header['Machine']}, "
               f"{header['Data']}, {header['Type']}, entry {header['Entry point']}")
 
-    runs = list(ascii_runs(data, args.min_len))
     if args.utf16:
+        # Both sources must be in hand before sorting by offset.
+        runs = list(ascii_runs(data, args.min_len))
         runs.extend(utf16le_runs(data, args.min_len))
         runs.sort()
+    elif args.ioc:
+        runs = list(ascii_runs(data, args.min_len))
+    else:
+        # Stream — no need to hold every string from a multi-megabyte binary.
+        runs = ascii_runs(data, args.min_len)
+
+    if args.ioc:
+        iocs = extract_iocs(runs)
+        if not any(iocs.values()):
+            print(f"{prefix}no IOCs found")
+            return 0
+        for label, kind in (("URL", "url"), ("IPv4", "ipv4"),
+                            ("DOMAIN", "domain"),
+                            ("DOMAIN (known-benign, do not block)", "benign")):
+            for value in iocs[kind]:
+                print(f"{prefix}{label:<36} {value}")
+        return 0
 
     for offset, text in runs:
         if args.radix:
@@ -166,10 +261,15 @@ def main():
                         help="also scan for UTF-16LE strings")
     parser.add_argument("-t", "--radix", action="store_true",
                         help="prefix each run with its hex offset, like strings -t x")
+    parser.add_argument("--ioc", action="store_true",
+                        help="report only URLs, routable IPv4 addresses and domains")
     args = parser.parse_args()
 
     if args.min_len < 1:
         parser.error("--min-len must be at least 1")
+
+    if args.ioc and args.header:
+        parser.error("--ioc and --header are mutually exclusive")
 
     # Only prefix with the filename when it would otherwise be ambiguous.
     multi = len(args.file) > 1

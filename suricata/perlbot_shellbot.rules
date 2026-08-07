@@ -12,9 +12,18 @@
 # here. Tune 9003003 to your environment before enabling.
 
 alert ip $HOME_NET any -> 213.139.77.150 any ( \
-  msg:"ET MALWARE PERLBOT_SHELLBOT outbound to IRC C2 213.139.77.150"; \
+  msg:"ET MALWARE PERLBOT_SHELLBOT outbound to IRC C2 213.139.77.150 (duba)"; \
   classtype:trojan-activity; \
   sid:9003001; rev:1; \
+  metadata:affected_product Any, created_at 2026-08-07, tag PERLBOT_SHELLBOT; \
+)
+
+# Second C2, used by /dodu and /gots. Different host, different /16 —
+# blocking only the first server leaves this one operating.
+alert ip $HOME_NET any -> 213.177.179.11 any ( \
+  msg:"ET MALWARE PERLBOT_SHELLBOT outbound to IRC C2 213.177.179.11 (dodu/gots)"; \
+  classtype:trojan-activity; \
+  sid:9003004; rev:1; \
   metadata:affected_product Any, created_at 2026-08-07, tag PERLBOT_SHELLBOT; \
 )
 
