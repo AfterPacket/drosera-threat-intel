@@ -9,8 +9,11 @@
 # Incoming loot archives live outside the repo
 drosera-loot-*.zip
 
-# Personal permission allowlist — machine-specific, not for the public repo
-.claude/settings.local.json
+# Editor and agent configuration — local to the operator's machine, never
+# published. These stay on disk so tooling keeps working; they are simply
+# not tracked.
+.zed/
+.claude/
 
 # OS / editor noise
 Thumbs.db
