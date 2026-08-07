@@ -1,0 +1,43 @@
+# ============================================================
+# WEBROOT_PROBE — Suricata Rules
+# Author  : AfterPacket
+# Date    : 2026-08-07
+# TLP     : TLP:WHITE
+# SIDs    : 9007001-9007999
+# ============================================================
+#
+# Mass webroot RCE verification campaign. The write happens over ssh and
+# is therefore encrypted and not visible to Suricata — the detectable
+# moment is the operator's VERIFICATION REQUEST, when they fetch the
+# probe they just planted and look for "xxxxxx" in the response.
+#
+# 9007001 is the valuable rule here: it fires on YOUR server returning
+# the probe output, which means the operator has already confirmed RCE.
+# Treat a hit as a confirmed compromise, not an attempt.
+
+alert http $HOME_NET any -> $EXTERNAL_NET any ( \
+  msg:"ET MALWARE WEBROOT_PROBE server returned RCE confirmation output - HOST COMPROMISED"; \
+  flow:established,from_server; \
+  http.response_body; content:"xxxxxx"; \
+  classtype:successful-admin; \
+  sid:9007001; rev:1; \
+  metadata:affected_product Web_Server_Applications, created_at 2026-08-07, tag WEBROOT_PROBE; \
+)
+
+alert http $EXTERNAL_NET any -> $HOME_NET any ( \
+  msg:"ET MALWARE WEBROOT_PROBE verification request for planted probe"; \
+  flow:established,to_server; \
+  http.uri; content:"/filter"; endswith; \
+  classtype:web-application-attack; \
+  sid:9007002; rev:1; \
+  metadata:affected_product Web_Server_Applications, created_at 2026-08-07, tag WEBROOT_PROBE; \
+)
+
+# Source netblocks. The campaign rotates ~2 addresses per day inside
+# these five /24s, so range-based rules outlive per-host blocking.
+alert ip [2.57.122.0/24,92.118.39.0/24,80.94.92.0/24,195.178.110.0/24,193.32.162.0/24] any -> $HOME_NET 22 ( \
+  msg:"ET MALWARE WEBROOT_PROBE ssh access from campaign netblock"; \
+  classtype:attempted-admin; \
+  sid:9007003; rev:1; \
+  metadata:affected_product Any, created_at 2026-08-07, tag WEBROOT_PROBE; \
+)

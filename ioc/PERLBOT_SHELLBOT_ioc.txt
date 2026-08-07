@@ -1,0 +1,75 @@
+# ==============================================================
+# PERLBOT_SHELLBOT — IOC Feed
+# Author   : AfterPacket
+# Captured : 2026-08-02T11:27:34Z .. 2026-08-07T11:03:55Z
+# TLP      : TLP:WHITE
+# Source   : Drosera honeypot / static analysis
+# ==============================================================
+#
+# NOTE: MD5 and SHA-1 are not listed — the analysis host could not
+# execute hashing tools. Only sidecar SHA-256 is available.
+
+# [HASHES — SHA-256]
+03a4f492af99d2048f713081560b8fa45312e594e8439eefa714f0c67a1e0550   # /duba, 29427 B  (VT 29/60)
+fe6b7b4c09ec79caa51ee7a7c46bbfdb11b0c7e0a380292675fb5ac6ce2b26c2   # /dodu, 29427 B  (NO VT RECORD)
+fd93b4f7bd5e8360ecd6e782dd445356728e698b9f25e335131b28bcdd3e56e3   # /gots, 40272 B  (NO VT RECORD)
+
+# [PRIORITY NOTE — UNDETECTED TWIN]
+# /duba and /dodu are byte-for-byte the same SIZE (29,427) and were
+# delivered from different IPs five days apart. /duba is flagged by 29 of
+# 60 VT engines as trojan.perl/shellbot. /dodu has NO VirusTotal record
+# at all. Same bot, same size, one is tracked and one is invisible.
+# Hunt on /dodu's hash specifically — it is the higher-value indicator.
+
+# [IP ADDRESSES]
+# Confidence: HIGH — IRC C2 read directly from the Perl config block
+213.139.77.150   # IRC C2, port 6667
+# Confidence: HIGH — direct honeypot capture (ssh)
+160.30.204.101   # delivered /duba
+77.90.185.42     # delivered /dodu
+54.37.11.139     # delivered /gots
+
+# [DOMAINS]
+# None. Bare IP C2.
+
+# [PORTS]
+6667   # IRC — C2 channel. Cleartext IRC on 6667 to a non-service host is
+       #       itself a strong signal on most modern networks.
+
+# [IRC INDICATORS]
+# Server : 213.139.77.150
+# Port   : 6667
+# NICK   : randomised per-run from an @rircname array
+# Process: randomised per-run from an @rps array (process-name masquerade)
+# The bot accepts a C2 override as its first argument:
+#   $server="$ARGV[0]" if $ARGV[0];
+# so a captured sample may be pointed at any host — the hardcoded value is
+# the default, not a guarantee.
+
+# [CAMPAIGN METADATA]
+# Family     : PERLBOT_SHELLBOT (Perl IRC shellbot, ShellBot/legend lineage)
+# Language   : Perl
+# Delivery   : ssh, loader-fetch, dropped as /duba, /dodu, /gots
+# Capability : IRC command-and-control, HTTP flood (URL-parsing regex present),
+#              process-name masquerade, randomised nick
+# VirusTotal : /duba 29/60 trojan.perl/shellbot (first submitted 2026-08-01).
+#              /dodu and /gots have no VT record at capture time — absence of
+#              data, NOT a clean verdict.
+
+# [CONFIG BLOCK — verbatim]
+# my $process = $rps[rand scalar @rps];
+# my $nick    = $rircname[rand scalar @rircname];
+# my $server  = '213.139.77.150';
+# my $port    = '6667';
+
+# [HOST-BASED GREP STRINGS]
+# "213.139.77.150"
+# "rircname"
+# "@rps"
+# "$rps[rand scalar"
+
+# [HOST HUNT]
+# grep -rl "213.139.77.150" / 2>/dev/null
+# ss -tanp | grep ':6667'
+# ps aux | grep -i perl
+# find / -name "duba" -o -name "dodu" -o -name "gots" 2>/dev/null

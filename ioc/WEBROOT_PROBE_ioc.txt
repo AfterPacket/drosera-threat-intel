@@ -1,0 +1,96 @@
+# ==============================================================
+# WEBROOT_PROBE — IOC Feed
+# Author   : AfterPacket
+# Captured : 2026-07-28T21:18:42Z .. 2026-08-05T00:03:13Z
+# TLP      : TLP:WHITE
+# Source   : Drosera honeypot / static analysis
+# ==============================================================
+#
+# NOTE: MD5 and SHA-1 are not listed — the analysis host could not
+# execute hashing tools. Only sidecar SHA-256 is available.
+
+# [HASHES — SHA-256]
+af77b643964afd794460d28ab8a11b0ec8790cd5463abfde126613a4f3bccd32   # 26 B, 168 sightings
+f3abe9aa18137a8002706fd584b24b4c0d95cbc4f6ad25915bdd7a5ec184e002   # 24 B, 56 sightings
+
+# [WHAT THIS IS — READ BEFORE DEPLOYING]
+# These are the two most frequently seen samples in the capture (224
+# sightings combined) and the two least interesting as files. In full:
+#
+#   af77b643:  #!/bin/bash        f3abe9aa:  #!/bin/sh
+#              echo "xxxxxx"                 echo "xxxxxx"
+#
+# They are WRITE-AND-EXECUTE CAPABILITY PROBES. The operator writes a
+# trivial script into the webroot over ssh, requests it, and looks for
+# "xxxxxx" in the HTTP response. A hit confirms both webroot write access
+# and script execution — after which they return with a real payload.
+#
+# Finding one of these on a host means: someone has confirmed RCE on your
+# web server and intends to come back. The absence of a payload is timing,
+# not luck.
+
+# [NO YARA RULE IS SHIPPED FOR THIS FAMILY — DELIBERATE]
+# A signature on a two-line shell script containing echo "xxxxxx" would
+# false-positive on test fixtures, scaffolding and placeholder scripts
+# across any real estate. The file content carries no durable signal.
+# The value of this family is entirely the source IP set and the target
+# path. Detect on those.
+
+# [TARGET PATH — the durable indicator]
+/var/www/html/filter
+
+# [IP ADDRESSES]
+# Confidence: HIGH — direct honeypot capture (ssh, shell-write), 224 sightings
+2.57.122.209
+2.57.122.168
+92.118.39.77
+92.118.39.50
+92.118.39.71
+92.118.39.49
+92.118.39.14
+80.94.92.234
+80.94.92.55
+80.94.92.179
+195.178.110.217
+195.178.110.232
+195.178.110.228
+195.178.110.227
+193.32.162.84
+193.32.162.34
+193.32.162.15
+193.32.162.27
+
+# [NETBLOCKS]
+# The 18 addresses above occupy just five /24s, rotating roughly two
+# addresses per day across a nine-day window. Individual-IP blocking will
+# lag the rotation. If your policy permits CIDR, block the ranges:
+#   2.57.122.0/24
+#   92.118.39.0/24
+#   80.94.92.0/24
+#   195.178.110.0/24
+#   193.32.162.0/24
+# blocklist.txt carries individual addresses only, per repository policy.
+
+# [DOMAINS]
+# None. Direct-to-IP ssh access throughout.
+
+# [PORTS]
+22    # ssh — the write vector
+80    # http — the verification request (inferred from the probe's design;
+      #        not directly observed by the honeypot)
+
+# [CAMPAIGN METADATA]
+# Family     : WEBROOT_PROBE (mass webroot RCE verification)
+# Delivery   : ssh, shell-write, always to /var/www/html/filter
+# Window     : 2026-07-28 → 2026-08-05, sustained daily activity
+# Cadence    : same file rewritten 3x per visit, twice per visit-pair
+# VirusTotal : no record. Expected — a two-line echo script is not malware
+#              by any file-based measure, which is precisely why the
+#              technique works.
+
+# [HOST HUNT]
+# ls -la /var/www/html/filter 2>/dev/null
+# grep -rl 'echo "xxxxxx"' /var/www 2>/dev/null
+# Check web access logs for requests to /filter returning 200 with a
+# 7-byte body. A hit means the operator has confirmed RCE — audit for a
+# follow-up payload and treat the host as compromised.

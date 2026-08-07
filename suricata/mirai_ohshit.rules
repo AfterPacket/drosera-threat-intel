@@ -1,0 +1,46 @@
+# ============================================================
+# MIRAI_OHSHIT — Suricata Rules
+# Author  : AfterPacket
+# Date    : 2026-08-07
+# TLP     : TLP:WHITE
+# SIDs    : 9001001-9001999
+# ============================================================
+#
+# Loader chain staged from 94.154.43.123 over plain HTTP.
+# The doubled slash in "//bot." is characteristic of this loader's
+# URL construction and is the highest-value content match here.
+
+alert http $HOME_NET any -> $EXTERNAL_NET any ( \
+  msg:"ET MALWARE MIRAI_OHSHIT stage-1 fetch of ohshit.sh loader"; \
+  flow:established,to_server; \
+  http.method; content:"GET"; \
+  http.uri; content:"/ohshit.sh"; endswith; \
+  classtype:trojan-activity; \
+  sid:9001001; rev:1; \
+  metadata:affected_product Any, created_at 2026-08-07, tag MIRAI_OHSHIT; \
+)
+
+alert http $HOME_NET any -> $EXTERNAL_NET any ( \
+  msg:"ET MALWARE MIRAI_OHSHIT multi-arch payload fetch (doubled-slash //bot.)"; \
+  flow:established,to_server; \
+  http.uri; content:"//bot."; depth:6; \
+  classtype:trojan-activity; \
+  sid:9001002; rev:1; \
+  metadata:affected_product Any, created_at 2026-08-07, tag MIRAI_OHSHIT; \
+)
+
+alert http $HOME_NET any -> $EXTERNAL_NET any ( \
+  msg:"ET MALWARE MIRAI_OHSHIT payload retrieval from known staging host"; \
+  flow:established,to_server; \
+  http.host; content:"94.154.43.123"; \
+  classtype:trojan-activity; \
+  sid:9001003; rev:1; \
+  metadata:affected_product Any, created_at 2026-08-07, tag MIRAI_OHSHIT; \
+)
+
+alert ip $HOME_NET any -> 94.154.43.123 any ( \
+  msg:"ET MALWARE MIRAI_OHSHIT outbound to staging host 94.154.43.123"; \
+  classtype:trojan-activity; \
+  sid:9001004; rev:1; \
+  metadata:affected_product Any, created_at 2026-08-07, tag MIRAI_OHSHIT; \
+)

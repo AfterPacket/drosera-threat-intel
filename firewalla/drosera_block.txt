@@ -18,3 +18,78 @@
 # are ever added here — they break legitimate traffic.
 #
 # ── Entries begin below; one section per family ───────────────
+
+
+# ══════════════════════════════════════════════════════════════
+# CAPTURE 2026-08-07 — drosera-loot.zip, 25 samples
+# ══════════════════════════════════════════════════════════════
+
+# ── MIRAI_OHSHIT — telnet dropper + payload host (HIGH — direct capture) ──
+# Serves /ohshit.sh and //bot.<arch> across 16 architectures.
+94.154.43.123
+
+# ── MIRAI_TELNETCURL — payload server (HIGH — hardcoded in curl.sh/wget.sh) ──
+# Serves /arm /arm5 /arm7 /mips /mipsel
+205.237.110.232
+
+# ── MIRAI_TELNETCURL — telnet dropper delivery (HIGH — direct capture) ──
+60.185.49.73
+138.117.43.19
+
+# ── MIRAI_LOADER — loader host (HIGH — SERVER= in config block) ──
+77.90.185.66
+
+# ── PERLBOT_SHELLBOT — IRC C2 (HIGH — config block, port 6667) ──
+213.139.77.150
+
+# ── PERLBOT_SHELLBOT — ssh dropper delivery (HIGH — direct capture) ──
+160.30.204.101
+77.90.185.42
+54.37.11.139
+
+# ── GSOCKET_SSHIT — exfil endpoint (HIGH — POST /gsocket/up.php in config) ──
+192.253.248.9
+
+# ── GSOCKET_SSHIT — ssh dropper delivery (HIGH — direct capture) ──
+192.253.248.92
+
+# ── Mirai loader droppers, misc telnet (HIGH — direct capture) ──
+195.123.171.185
+123.145.11.38
+27.137.233.190
+211.219.254.187
+175.198.110.15
+
+# ── WEBROOT_PROBE — /var/www/html/filter campaign (HIGH — 224 sightings) ──
+# Write-and-execute capability probes over ssh, 2026-07-28 → 2026-08-05.
+# Rotates ~2 IPs/day inside five bulletproof /24s. If your policy permits
+# CIDR blocks, the /24s below are a better fit than individual hosts:
+#   2.57.122.0/24  92.118.39.0/24  80.94.92.0/24
+#   195.178.110.0/24  193.32.162.0/24
+2.57.122.209
+2.57.122.168
+92.118.39.77
+92.118.39.50
+92.118.39.71
+92.118.39.49
+92.118.39.14
+80.94.92.234
+80.94.92.55
+80.94.92.179
+195.178.110.217
+195.178.110.232
+195.178.110.228
+195.178.110.227
+193.32.162.84
+193.32.162.34
+193.32.162.15
+193.32.162.27
+
+# ── DO NOT BLOCK ──────────────────────────────────────────────
+# These appear in sample source but are legitimate shared
+# infrastructure. The gsocket sample abuses a real security tool;
+# attribute the abuse, not the tool.
+#   gsocket.io   thc.org   github.com   ifconfig.me
+#
+# No domains are blocked from this capture — every domain observed
+# in the samples falls into the list above.

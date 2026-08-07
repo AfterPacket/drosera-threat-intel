@@ -1,0 +1,38 @@
+# ============================================================
+# GSOCKET_SSHIT — Suricata Rules
+# Author  : AfterPacket
+# Date    : 2026-08-07
+# TLP     : TLP:WHITE
+# SIDs    : 9004001-9004999
+# ============================================================
+#
+# Deliberately narrow. The deployed tool (THC gsocket) is legitimate and
+# has lawful administrative uses, so these rules target ONLY the
+# attacker's exfil callback — never gsocket traffic itself.
+#
+# Do not add rules matching gsocket.io, thc.org or the gsocket relay
+# network. They will fire on legitimate use.
+
+alert http $HOME_NET any -> $EXTERNAL_NET any ( \
+  msg:"ET MALWARE GSOCKET_SSHIT victim beacon POST to operator endpoint"; \
+  flow:established,to_server; \
+  http.method; content:"POST"; \
+  http.uri; content:"/gsocket/up.php"; \
+  classtype:trojan-activity; \
+  sid:9004001; rev:1; \
+  metadata:affected_product Any, created_at 2026-08-07, tag GSOCKET_SSHIT; \
+)
+
+alert ip $HOME_NET any -> 192.253.248.9 any ( \
+  msg:"ET MALWARE GSOCKET_SSHIT outbound to exfil host 192.253.248.9"; \
+  classtype:trojan-activity; \
+  sid:9004002; rev:1; \
+  metadata:affected_product Any, created_at 2026-08-07, tag GSOCKET_SSHIT; \
+)
+
+alert ip $HOME_NET any -> 192.253.248.92 any ( \
+  msg:"ET MALWARE GSOCKET_SSHIT outbound to dropper host 192.253.248.92"; \
+  classtype:trojan-activity; \
+  sid:9004003; rev:1; \
+  metadata:affected_product Any, created_at 2026-08-07, tag GSOCKET_SSHIT; \
+)

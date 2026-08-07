@@ -1,0 +1,79 @@
+# ==============================================================
+# BOTKILL_PROCWIPE — IOC Feed
+# Author   : AfterPacket
+# Captured : 2026-08-02T20:06:15Z .. 2026-08-04T17:26:28Z
+# TLP      : TLP:WHITE
+# Source   : Drosera honeypot / static analysis
+# ==============================================================
+#
+# NOTE: MD5 and SHA-1 are not listed — the analysis host could not
+# execute hashing tools. Only sidecar SHA-256 is available.
+
+# [HASHES — SHA-256]
+41d9a2a07ccfc769854bf71c82258da1f0a622644f12fada54320e7ff310fcfa   # /home/.k, 200 B, 3 sightings
+2733d565138186645b2ff2485f88cfdaee2a1cf2cd3af1306273fc0f6191a58c   # /home/.k, 390 B, 1 sighting
+
+# [WHAT THIS IS]
+# Neither sample is a bot. Both are COMPETITOR-REMOVAL scripts written to
+# /home/.k over telnet — one operator clearing rival malware off a box it
+# intends to keep. This is botnet turf war, and it is useful intelligence
+# for two reasons:
+#   1. Presence of /home/.k means the host was already compromised by
+#      someone else first — treat as a second, earlier incident.
+#   2. Sample 2733d565 names its target explicitly, which links two
+#      otherwise unconnected families in this capture.
+
+# [IP ADDRESSES]
+# Confidence: HIGH — direct honeypot capture (telnet, shell-write)
+27.137.233.190    # 41d9a2a0
+211.219.254.187   # 41d9a2a0
+175.198.110.15    # 41d9a2a0
+123.145.11.38     # 2733d565
+
+# [DOMAINS]
+# None. These scripts contain no network activity whatsoever.
+
+# [PORTS]
+# None. Purely local process manipulation.
+
+# [CAPABILITY — 41d9a2a0, 200 B]
+# Iterates /proc/*, resolves /proc/$pid/exe, and kills -9 any process whose
+# exe symlink ends in "(deleted)". Deleting its own binary after execution
+# is standard IoT-botnet hygiene, so this reliably kills OTHER people's
+# bots while leaving normal daemons alone. Broad, indiscriminate, effective.
+
+# [CAPABILITY — 2733d565, 390 B]
+# Iterates /proc/*, skips non-numeric entries, reads /proc/$pid/cmdline,
+# translates NULs to spaces, and kills -9 any process whose cmdline
+# contains the literal string "dvrHelper".
+#
+#   *** dvrHelper is the exact output filename used by MIRAI_LOADER
+#   *** (246c3c37, SERVER="77.90.185.66") elsewhere in this same capture.
+#
+# This is a targeted strike against that specific family.
+
+# [CAMPAIGN METADATA]
+# Family     : BOTKILL_PROCWIPE (competitor removal, not a payload)
+# Delivery   : telnet, shell-write, always to /home/.k
+# Persistence: none
+# C2         : none
+# VirusTotal : no record for either sample. Expected — they are short,
+#              network-silent shell scripts with no malicious API surface.
+
+# [DETECTION NOTE — NO YARA RULE SHIPPED]
+# These are generic /proc-walking shell loops. A YARA rule matching
+# "kill -9" plus "/proc/" would fire on legitimate process-management
+# scripts across any fleet. The durable indicators are the file path
+# /home/.k and the literal target string "dvrHelper", both better served
+# by the Sigma rule and host hunt below than by file signatures.
+
+# [HOST-BASED GREP STRINGS]
+# "/home/.k"
+# "${result%(deleted)}"
+# "dvrHelper"
+
+# [HOST HUNT]
+# ls -la /home/.k 2>/dev/null
+# grep -rl "deleted)}\|dvrHelper" /home /tmp /var/tmp 2>/dev/null
+# Any host with /home/.k present should be treated as compromised by at
+# least two separate actors and reimaged, not cleaned.

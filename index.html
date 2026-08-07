@@ -114,8 +114,8 @@ footer p{margin:0 0 6px}
     <p class="tlp"><b>TLP:WHITE</b> — free to share. Maintained by AfterPacket.</p>
 
     <div class="stats-row">
-      <div class="stat"><span class="stat-value" id="stat-families">0</span><span class="stat-label">Families</span></div>
-      <div class="stat"><span class="stat-value" id="stat-ips">0</span><span class="stat-label">IPs blocked</span></div>
+      <div class="stat"><span class="stat-value" id="stat-families">7</span><span class="stat-label">Families</span></div>
+      <div class="stat"><span class="stat-value" id="stat-ips">34</span><span class="stat-label">IPs blocked</span></div>
       <div class="stat"><span class="stat-value" id="stat-domains">0</span><span class="stat-label">Domains blocked</span></div>
       <div class="stat"><span class="stat-value" id="stat-ports">0</span><span class="stat-label">Backdoor ports</span></div>
     </div>
@@ -184,7 +184,288 @@ footer p{margin:0 0 6px}
 
            ══════════════════════════════════════════════════════════════════ -->
 
-      <p class="empty-state">No captures published yet.</p>
+      <article class="card crit">
+        <header class="card-head">
+          <span class="sev sev-crit">
+            <svg viewBox="0 0 16 16" width="12" height="12" aria-hidden="true"><path fill="currentColor" d="M8 1.4 15.6 14.6H.4L8 1.4Zm-.9 4.3v4.1h1.8V5.7H7.1Zm0 5.2v1.7h1.8v-1.7H7.1Z"/></svg>
+            CRITICAL
+          </span>
+          <h3>MIRAI_OHSHIT</h3>
+          <time datetime="2026-08-07T19:04:06Z">2026-08-07</time>
+        </header>
+
+        <div class="hash-row">
+          <span class="hash-label">SHA-256</span>
+          <span class="hash-val" id="h-mirai-ohshit">8b1a2fb6b358484b7769aeeb63209f2b277d91b5015cf28ce471a67e0ef83d28</span>
+          <button class="copy" data-copy="h-mirai-ohshit" type="button">Copy</button>
+        </div>
+
+        <p class="desc">Multi-architecture IoT botnet staged entirely from 94.154.43.123, with the full
+          chain recovered. A 104-byte fetcher written to <code>/tmp/.p</code> over telnet pulls
+          <code>ohshit.sh</code>, which loops 16 architectures, cats each payload into a file named
+          <code>WTF</code>, and executes it. Seven of the sixteen builds were captured; the doubled slash
+          in <code>//bot.&lt;arch&gt;</code> makes a reliable detection string.</p>
+
+        <ul class="tags">
+          <li>Mirai-derived</li><li>16 architectures</li><li>telnet propagation</li><li>busybox staging</li>
+        </ul>
+
+        <dl class="iocs">
+          <div class="ioc-stat"><span class="ioc-num">9</span><span class="ioc-cap">Samples</span></div>
+          <div class="ioc-stat"><span class="ioc-num">1</span><span class="ioc-cap">IP blocked</span></div>
+          <div class="ioc-stat"><span class="ioc-num">7/16</span><span class="ioc-cap">Arches captured</span></div>
+          <div class="ioc-stat"><span class="ioc-num">none</span><span class="ioc-cap">VT at capture</span></div>
+        </dl>
+
+        <div class="dl">
+          <a href="yara/MIRAI_OHSHIT_botloader.yar">YARA</a> <span class="sep">·</span>
+          <a href="suricata/mirai_ohshit.rules">Suricata</a> <span class="sep">·</span>
+          <a href="ioc/MIRAI_OHSHIT_ioc.txt">IOC</a> <span class="sep">·</span>
+          <a href="firewalla/drosera_block.txt">Firewalla block</a>
+        </div>
+      </article>
+
+      <article class="card crit">
+        <header class="card-head">
+          <span class="sev sev-crit">
+            <svg viewBox="0 0 16 16" width="12" height="12" aria-hidden="true"><path fill="currentColor" d="M8 1.4 15.6 14.6H.4L8 1.4Zm-.9 4.3v4.1h1.8V5.7H7.1Zm0 5.2v1.7h1.8v-1.7H7.1Z"/></svg>
+            CRITICAL
+          </span>
+          <h3>MIRAI_TELNETCURL</h3>
+          <time datetime="2026-08-07T10:03:55Z">2026-08-07</time>
+        </header>
+
+        <div class="hash-row">
+          <span class="hash-label">SHA-256</span>
+          <span class="hash-val" id="h-mirai-telnetcurl">3801a288c16a19c57c7a8a7b0f139cf630d2cd0c4bbcb26876e3593c492ffc5d</span>
+          <button class="copy" data-copy="h-mirai-telnetcurl" type="button">Copy</button>
+        </div>
+
+        <p class="desc">Telnet-propagated Mirai variant fetching from 205.237.110.232, shipped as both a
+          <code>curl</code> and a <code>busybox wget</code> dropper. Uses fixed non-dictionary output
+          filenames per architecture and the exec argument <code>telnet.curl</code>. The five filenames
+          served by 205.237.110.232 match those dropped by 60.185.49.73 exactly — one kit, two hosts.</p>
+
+        <ul class="tags">
+          <li>Mirai-derived</li><li>5 architectures</li><li>fixed payload names</li><li>two-host infra</li>
+        </ul>
+
+        <dl class="iocs">
+          <div class="ioc-stat"><span class="ioc-num">7</span><span class="ioc-cap">Samples</span></div>
+          <div class="ioc-stat"><span class="ioc-num">3</span><span class="ioc-cap">IPs blocked</span></div>
+          <div class="ioc-stat"><span class="ioc-num">5</span><span class="ioc-cap">Arches captured</span></div>
+          <div class="ioc-stat"><span class="ioc-num">15/60</span><span class="ioc-cap">VT (wget.sh)</span></div>
+        </dl>
+
+        <div class="dl">
+          <a href="yara/MIRAI_TELNETCURL_arch5.yar">YARA</a> <span class="sep">·</span>
+          <a href="suricata/mirai_telnetcurl.rules">Suricata</a> <span class="sep">·</span>
+          <a href="ioc/MIRAI_TELNETCURL_ioc.txt">IOC</a> <span class="sep">·</span>
+          <a href="firewalla/drosera_block.txt">Firewalla block</a>
+        </div>
+      </article>
+
+      <article class="card crit">
+        <header class="card-head">
+          <span class="sev sev-crit">
+            <svg viewBox="0 0 16 16" width="12" height="12" aria-hidden="true"><path fill="currentColor" d="M8 1.4 15.6 14.6H.4L8 1.4Zm-.9 4.3v4.1h1.8V5.7H7.1Zm0 5.2v1.7h1.8v-1.7H7.1Z"/></svg>
+            CRITICAL
+          </span>
+          <h3>PERLBOT_SHELLBOT</h3>
+          <time datetime="2026-08-07T11:03:55Z">2026-08-07</time>
+        </header>
+
+        <div class="hash-row">
+          <span class="hash-label">SHA-256</span>
+          <span class="hash-val" id="h-perlbot">03a4f492af99d2048f713081560b8fa45312e594e8439eefa714f0c67a1e0550</span>
+          <button class="copy" data-copy="h-perlbot" type="button">Copy</button>
+        </div>
+
+        <p class="desc">Perl IRC shellbot with C2 at 213.139.77.150:6667, randomised nick and process-name
+          masquerade. <strong>Contains an undetected twin:</strong> <code>/duba</code> and <code>/dodu</code>
+          are both exactly 29,427 bytes from different IPs five days apart — one is flagged by 29 of 60
+          engines, the other has no VirusTotal record at all. The bot accepts a C2 override via
+          <code>$ARGV[0]</code>, so the YARA rule ships C2-independent structural matches.</p>
+
+        <ul class="tags">
+          <li>IRC C2</li><li>Perl</li><li>undetected twin</li><li>process masquerade</li><li>C2 override</li>
+        </ul>
+
+        <dl class="iocs">
+          <div class="ioc-stat"><span class="ioc-num">3</span><span class="ioc-cap">Samples</span></div>
+          <div class="ioc-stat"><span class="ioc-num">4</span><span class="ioc-cap">IPs blocked</span></div>
+          <div class="ioc-stat"><span class="ioc-num">6667</span><span class="ioc-cap">C2 port</span></div>
+          <div class="ioc-stat"><span class="ioc-num">29/60</span><span class="ioc-cap">VT (duba only)</span></div>
+        </dl>
+
+        <div class="dl">
+          <a href="yara/PERLBOT_SHELLBOT_irc.yar">YARA</a> <span class="sep">·</span>
+          <a href="suricata/perlbot_shellbot.rules">Suricata</a> <span class="sep">·</span>
+          <a href="ioc/PERLBOT_SHELLBOT_ioc.txt">IOC</a> <span class="sep">·</span>
+          <a href="firewalla/drosera_block.txt">Firewalla block</a>
+        </div>
+      </article>
+
+      <article class="card crit">
+        <header class="card-head">
+          <span class="sev sev-crit">
+            <svg viewBox="0 0 16 16" width="12" height="12" aria-hidden="true"><path fill="currentColor" d="M8 1.4 15.6 14.6H.4L8 1.4Zm-.9 4.3v4.1h1.8V5.7H7.1Zm0 5.2v1.7h1.8v-1.7H7.1Z"/></svg>
+            CRITICAL
+          </span>
+          <h3>GSOCKET_SSHIT</h3>
+          <time datetime="2026-08-02T11:52:45Z">2026-08-02</time>
+        </header>
+
+        <div class="hash-row">
+          <span class="hash-label">SHA-256</span>
+          <span class="hash-val" id="h-gsocket">22585585074dfaf862ab5bf0de958b99f146f0942b651af4f2f3ff3077b2513b</span>
+          <button class="copy" data-copy="h-gsocket" type="button">Copy</button>
+        </div>
+
+        <p class="desc">Abuse of THC Global Socket / ssh-it — a legitimate published security tool — for
+          persistent remote access. Installs a systemd unit plus watchdog script and beacons the victim's
+          public IP to <code>POST /gsocket/up.php</code> on the operator's own host. Detection targets the
+          attacker's wrapper and exfil callback only, never gsocket itself.</p>
+
+        <ul class="tags">
+          <li>tool abuse</li><li>systemd persistence</li><li>watchdog</li><li>IP exfil</li><li>VT 2/60</li>
+        </ul>
+
+        <dl class="iocs">
+          <div class="ioc-stat"><span class="ioc-num">1</span><span class="ioc-cap">Sample</span></div>
+          <div class="ioc-stat"><span class="ioc-num">2</span><span class="ioc-cap">IPs blocked</span></div>
+          <div class="ioc-stat"><span class="ioc-num">4</span><span class="ioc-cap">Domains spared</span></div>
+          <div class="ioc-stat"><span class="ioc-num">2/60</span><span class="ioc-cap">VT at capture</span></div>
+        </dl>
+
+        <div class="dl">
+          <a href="yara/GSOCKET_SSHIT_persist.yar">YARA</a> <span class="sep">·</span>
+          <a href="suricata/gsocket_sshit.rules">Suricata</a> <span class="sep">·</span>
+          <a href="ioc/GSOCKET_SSHIT_ioc.txt">IOC</a> <span class="sep">·</span>
+          <a href="firewalla/drosera_block.txt">Firewalla block</a>
+        </div>
+      </article>
+
+      <article class="card high">
+        <header class="card-head">
+          <span class="sev sev-high">
+            <svg viewBox="0 0 16 16" width="12" height="12" aria-hidden="true"><path fill="currentColor" d="M8 .8a7.2 7.2 0 1 0 0 14.4A7.2 7.2 0 0 0 8 .8Zm-.9 3.4h1.8v4.9H7.1V4.2Zm0 6.1h1.8V12H7.1v-1.7Z"/></svg>
+            HIGH
+          </span>
+          <h3>MIRAI_LOADER</h3>
+          <time datetime="2026-08-03T18:19:44Z">2026-08-03</time>
+        </header>
+
+        <div class="hash-row">
+          <span class="hash-label">SHA-256</span>
+          <span class="hash-val" id="h-mirai-loader">246c3c37a0de2987d9352411f22ea4805f7e75287f2782d5ee56770219a096a4</span>
+          <button class="copy" data-copy="h-mirai-loader" type="button">Copy</button>
+        </div>
+
+        <p class="desc">Unobfuscated Mirai loader with <code>SERVER="77.90.185.66"</code>, fetching
+          <code>mirai.&lt;arch&gt;</code> and writing the classic <code>dvrHelper</code> binary name.
+          Self-identifying and trivially detected. Notable chiefly for being actively hunted by the
+          BOTKILL_PROCWIPE scripts in this same capture.</p>
+
+        <ul class="tags">
+          <li>Mirai</li><li>dvrHelper</li><li>self-identifying</li><li>targeted by rivals</li>
+        </ul>
+
+        <dl class="iocs">
+          <div class="ioc-stat"><span class="ioc-num">1</span><span class="ioc-cap">Sample</span></div>
+          <div class="ioc-stat"><span class="ioc-num">2</span><span class="ioc-cap">IPs blocked</span></div>
+          <div class="ioc-stat"><span class="ioc-num">409</span><span class="ioc-cap">Bytes</span></div>
+          <div class="ioc-stat"><span class="ioc-num">none</span><span class="ioc-cap">VT at capture</span></div>
+        </dl>
+
+        <div class="dl">
+          <a href="yara/MIRAI_LOADER_dvrhelper.yar">YARA</a> <span class="sep">·</span>
+          <a href="suricata/mirai_loader.rules">Suricata</a> <span class="sep">·</span>
+          <a href="ioc/MIRAI_LOADER_ioc.txt">IOC</a> <span class="sep">·</span>
+          <a href="firewalla/drosera_block.txt">Firewalla block</a>
+        </div>
+      </article>
+
+      <article class="card high">
+        <header class="card-head">
+          <span class="sev sev-high">
+            <svg viewBox="0 0 16 16" width="12" height="12" aria-hidden="true"><path fill="currentColor" d="M8 .8a7.2 7.2 0 1 0 0 14.4A7.2 7.2 0 0 0 8 .8Zm-.9 3.4h1.8v4.9H7.1V4.2Zm0 6.1h1.8V12H7.1v-1.7Z"/></svg>
+            HIGH
+          </span>
+          <h3>BOTKILL_PROCWIPE</h3>
+          <time datetime="2026-08-04T17:26:28Z">2026-08-04</time>
+        </header>
+
+        <div class="hash-row">
+          <span class="hash-label">SHA-256</span>
+          <span class="hash-val" id="h-botkill">2733d565138186645b2ff2485f88cfdaee2a1cf2cd3af1306273fc0f6191a58c</span>
+          <button class="copy" data-copy="h-botkill" type="button">Copy</button>
+        </div>
+
+        <p class="desc">Not malware — competitor-removal scripts written to <code>/home/.k</code> by an
+          operator clearing rivals off a box it wants to keep. One kills any process whose
+          <code>/proc/$pid/exe</code> ends in <code>(deleted)</code>, the standard tell of a self-deleting
+          bot; the other greps cmdlines specifically for <code>dvrHelper</code> — the exact payload name
+          used by MIRAI_LOADER above. A host with <code>/home/.k</code> has two intruders, not one.</p>
+
+        <ul class="tags">
+          <li>competitor removal</li><li>botnet turf war</li><li>no C2</li><li>no network activity</li>
+        </ul>
+
+        <dl class="iocs">
+          <div class="ioc-stat"><span class="ioc-num">2</span><span class="ioc-cap">Samples</span></div>
+          <div class="ioc-stat"><span class="ioc-num">4</span><span class="ioc-cap">IPs blocked</span></div>
+          <div class="ioc-stat"><span class="ioc-num">0</span><span class="ioc-cap">C2 endpoints</span></div>
+          <div class="ioc-stat"><span class="ioc-num">none</span><span class="ioc-cap">VT at capture</span></div>
+        </dl>
+
+        <div class="dl">
+          <a href="ioc/BOTKILL_PROCWIPE_ioc.txt">IOC</a> <span class="sep">·</span>
+          <a href="firewalla/drosera_block.txt">Firewalla block</a>
+          <span class="pw">no YARA — generic /proc kill loops would false-positive</span>
+        </div>
+      </article>
+
+      <article class="card high">
+        <header class="card-head">
+          <span class="sev sev-high">
+            <svg viewBox="0 0 16 16" width="12" height="12" aria-hidden="true"><path fill="currentColor" d="M8 .8a7.2 7.2 0 1 0 0 14.4A7.2 7.2 0 0 0 8 .8Zm-.9 3.4h1.8v4.9H7.1V4.2Zm0 6.1h1.8V12H7.1v-1.7Z"/></svg>
+            HIGH
+          </span>
+          <h3>WEBROOT_PROBE</h3>
+          <time datetime="2026-08-05T00:03:13Z">2026-08-05</time>
+        </header>
+
+        <div class="hash-row">
+          <span class="hash-label">SHA-256</span>
+          <span class="hash-val" id="h-webroot">af77b643964afd794460d28ab8a11b0ec8790cd5463abfde126613a4f3bccd32</span>
+          <button class="copy" data-copy="h-webroot" type="button">Copy</button>
+        </div>
+
+        <p class="desc">The two most-seen samples in this capture — 224 sightings combined — and the least
+          interesting as files: both are a shebang and <code>echo "xxxxxx"</code>, written to
+          <code>/var/www/html/filter</code> over ssh. They are write-and-execute capability probes; the
+          operator plants one, requests it, and confirms RCE from the response before returning with a real
+          payload. Finding one means someone has already confirmed RCE on that host.</p>
+
+        <ul class="tags">
+          <li>RCE verification</li><li>224 sightings</li><li>18 source IPs</li><li>5 bulletproof /24s</li>
+        </ul>
+
+        <dl class="iocs">
+          <div class="ioc-stat"><span class="ioc-num">2</span><span class="ioc-cap">Samples</span></div>
+          <div class="ioc-stat"><span class="ioc-num">18</span><span class="ioc-cap">IPs blocked</span></div>
+          <div class="ioc-stat"><span class="ioc-num">224</span><span class="ioc-cap">Sightings</span></div>
+          <div class="ioc-stat"><span class="ioc-num">none</span><span class="ioc-cap">VT at capture</span></div>
+        </dl>
+
+        <div class="dl">
+          <a href="suricata/webroot_probe.rules">Suricata</a> <span class="sep">·</span>
+          <a href="ioc/WEBROOT_PROBE_ioc.txt">IOC</a> <span class="sep">·</span>
+          <a href="firewalla/drosera_block.txt">Firewalla block</a>
+          <span class="pw">no YARA — <code>echo "xxxxxx"</code> would false-positive</span>
+        </div>
+      </article>
 
     </div><!-- /samples -->
   </div>

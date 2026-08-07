@@ -1,0 +1,55 @@
+# ============================================================
+# MIRAI_TELNETCURL — Suricata Rules
+# Author  : AfterPacket
+# Date    : 2026-08-07
+# TLP     : TLP:WHITE
+# SIDs    : 9002001-9002999
+# ============================================================
+#
+# Telnet-propagated Mirai variant. Payloads are fetched over plain
+# HTTP from 205.237.110.232 (and mirrored on 60.185.49.73) using
+# fixed six-character output filenames.
+
+alert ip $HOME_NET any -> 205.237.110.232 any ( \
+  msg:"ET MALWARE MIRAI_TELNETCURL outbound to payload server 205.237.110.232"; \
+  classtype:trojan-activity; \
+  sid:9002001; rev:1; \
+  metadata:affected_product Any, created_at 2026-08-07, tag MIRAI_TELNETCURL; \
+)
+
+alert ip $HOME_NET any -> 60.185.49.73 any ( \
+  msg:"ET MALWARE MIRAI_TELNETCURL outbound to payload mirror 60.185.49.73"; \
+  classtype:trojan-activity; \
+  sid:9002002; rev:1; \
+  metadata:affected_product Any, created_at 2026-08-07, tag MIRAI_TELNETCURL; \
+)
+
+alert http $HOME_NET any -> $EXTERNAL_NET any ( \
+  msg:"ET MALWARE MIRAI_TELNETCURL architecture payload fetch"; \
+  flow:established,to_server; \
+  http.host; content:"205.237.110.232"; \
+  http.uri; pcre:"/^\/(arm|arm5|arm7|mips|mipsel)$/"; \
+  classtype:trojan-activity; \
+  sid:9002003; rev:1; \
+  metadata:affected_product Any, created_at 2026-08-07, tag MIRAI_TELNETCURL; \
+)
+
+# Telnet propagation — the dropper is typed directly into the session,
+# so the fixed output filenames appear in cleartext on the wire.
+alert tcp $EXTERNAL_NET any -> $HOME_NET 23 ( \
+  msg:"ET MALWARE MIRAI_TELNETCURL dropper typed into telnet session"; \
+  flow:established,to_server; \
+  content:"205.237.110.232"; \
+  classtype:attempted-admin; \
+  sid:9002004; rev:1; \
+  metadata:affected_product Any, created_at 2026-08-07, tag MIRAI_TELNETCURL; \
+)
+
+alert tcp $EXTERNAL_NET any -> $HOME_NET 23 ( \
+  msg:"ET MALWARE MIRAI_TELNETCURL fixed payload filename over telnet"; \
+  flow:established,to_server; \
+  content:"telnet.curl"; \
+  classtype:attempted-admin; \
+  sid:9002005; rev:1; \
+  metadata:affected_product Any, created_at 2026-08-07, tag MIRAI_TELNETCURL; \
+)

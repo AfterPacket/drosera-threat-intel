@@ -1,0 +1,33 @@
+# ============================================================
+# MIRAI_LOADER — Suricata Rules
+# Author  : AfterPacket
+# Date    : 2026-08-07
+# TLP     : TLP:WHITE
+# SIDs    : 9005001-9005999
+# ============================================================
+#
+# Unobfuscated Mirai loader. The URI path is literally "/mirai.<arch>",
+# which is self-identifying and effectively absent from benign traffic.
+
+alert http $HOME_NET any -> $EXTERNAL_NET any ( \
+  msg:"ET MALWARE MIRAI_LOADER self-identifying mirai.<arch> payload fetch"; \
+  flow:established,to_server; \
+  http.uri; content:"/mirai."; depth:7; \
+  classtype:trojan-activity; \
+  sid:9005001; rev:1; \
+  metadata:affected_product Any, created_at 2026-08-07, tag MIRAI_LOADER; \
+)
+
+alert ip $HOME_NET any -> 77.90.185.66 any ( \
+  msg:"ET MALWARE MIRAI_LOADER outbound to payload host 77.90.185.66"; \
+  classtype:trojan-activity; \
+  sid:9005002; rev:1; \
+  metadata:affected_product Any, created_at 2026-08-07, tag MIRAI_LOADER; \
+)
+
+alert ip $HOME_NET any -> 195.123.171.185 any ( \
+  msg:"ET MALWARE MIRAI_LOADER outbound to dropper host 195.123.171.185"; \
+  classtype:trojan-activity; \
+  sid:9005003; rev:1; \
+  metadata:affected_product Any, created_at 2026-08-07, tag MIRAI_LOADER; \
+)

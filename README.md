@@ -11,9 +11,98 @@ Author: **AfterPacket** · Site: <https://afterpacket.github.io/drosera-threat-i
 
 ## Samples
 
-| Date | Family | SHA-256 | Arch | Severity | Artifacts |
-|------|--------|---------|------|----------|-----------|
-| — | _No captures published yet_ | — | — | — | — |
+### Capture 2026-08-07 — 25 samples, 6 families
+
+| Date | Family | Lead SHA-256 | Type | Severity | Artifacts |
+|------|--------|--------------|------|----------|-----------|
+| 2026-08-07 | [MIRAI_OHSHIT](#mirai_ohshit) | `8b1a2fb6b3584847...` | sh + ELF ×7 | 🔴 CRITICAL | YARA · Suricata · IOC · Firewalla |
+| 2026-08-07 | [MIRAI_TELNETCURL](#mirai_telnetcurl) | `3801a288c16a19c5...` | sh + ELF ×5 | 🔴 CRITICAL | YARA · Suricata · IOC · Firewalla |
+| 2026-08-07 | [PERLBOT_SHELLBOT](#perlbot_shellbot) | `03a4f492af99d204...` | Perl | 🔴 CRITICAL | YARA · Suricata · IOC · Firewalla |
+| 2026-08-02 | [GSOCKET_SSHIT](#gsocket_sshit) | `22585585074dfaf8...` | Shell | 🔴 CRITICAL | YARA · Suricata · IOC · Firewalla |
+| 2026-08-03 | [MIRAI_LOADER](#mirai_loader) | `246c3c37a0de2987...` | Shell | 🟠 HIGH | YARA · Suricata · IOC · Firewalla |
+| 2026-08-04 | [BOTKILL_PROCWIPE](#botkill_procwipe) | `2733d565138186645...` | Shell | 🟠 HIGH | IOC · Firewalla |
+| 2026-08-05 | [WEBROOT_PROBE](#webroot_probe) | `af77b643964afd79...` | Shell | 🟠 HIGH | Suricata · IOC · Firewalla |
+
+**34 IPs added to the blocklist. No domains** — every domain observed in these
+samples is legitimate shared infrastructure (see [Do not block](#do-not-block)).
+
+---
+
+### MIRAI_OHSHIT
+
+Multi-architecture IoT botnet, staged entirely from `94.154.43.123`. Full chain
+recovered: a 104-byte fetcher written to `/tmp/.p` over telnet pulls `ohshit.sh`,
+which loops 16 architectures, `cat`s each payload into a file named `WTF`, runs
+`chmod +x *`, and executes. Seven of the sixteen architecture builds were captured.
+The doubled slash in `http://94.154.43.123//bot.<arch>` is a reliable detection string.
+
+### MIRAI_TELNETCURL
+
+Telnet-propagated Mirai variant fetching from `205.237.110.232`. Ships as two
+dropper variants — a `curl` version and a `busybox wget` version — with fixed
+non-dictionary output filenames per architecture (`VFASXC`, `WQZRTY`, `YUIOXC`,
+`GHJKLB`, `MNCXOP`) and the exec argument `telnet.curl`. Those five filenames served
+by `205.237.110.232` match the five dropped directly by `60.185.49.73` exactly:
+one kit, two hosts.
+
+### PERLBOT_SHELLBOT
+
+Perl IRC shellbot, C2 `213.139.77.150:6667`, with randomised nick and process-name
+masquerade. **Contains an undetected twin:** `/duba` and `/dodu` are both exactly
+29,427 bytes and arrived from different IPs five days apart. `/duba` is flagged by
+29 of 60 VirusTotal engines; `/dodu` has no VirusTotal record at all. The bot accepts
+a C2 override via `$ARGV[0]`, so the hardcoded server is a default, not a guarantee —
+the shipped YARA rule includes C2-independent structural matches.
+
+### GSOCKET_SSHIT
+
+Abuse of **THC Global Socket / ssh-it**, a legitimate published security tool, for
+persistent remote access. Installs a systemd unit plus watchdog script and beacons
+the victim's public IP to `POST http://192.253.248.9/gsocket/up.php`. Detection here
+targets the attacker's wrapper and exfil callback only — never gsocket itself.
+VirusTotal 2/60, very low for a working persistent backdoor installer.
+
+### MIRAI_LOADER
+
+Unobfuscated Mirai loader, `SERVER="77.90.185.66"`, fetching `mirai.<arch>` and
+writing `dvrHelper`. Self-identifying and trivially detected. Notable for being
+actively targeted by BOTKILL_PROCWIPE below.
+
+### BOTKILL_PROCWIPE
+
+Not malware — **competitor-removal scripts**, written to `/home/.k` over telnet by an
+operator clearing rivals off a box it wants to keep. One kills any process whose
+`/proc/$pid/exe` symlink ends in `(deleted)`, the standard tell of a self-deleting
+bot. The other greps process cmdlines specifically for `dvrHelper` and kills matches —
+**the exact payload name used by MIRAI_LOADER in this same capture.** A host with
+`/home/.k` present has been compromised by at least two separate actors; reimage
+rather than clean. No YARA rule ships: generic `/proc`-walking kill loops would
+false-positive on legitimate process management.
+
+### WEBROOT_PROBE
+
+The two most-seen samples in the capture (224 sightings combined) and the least
+interesting as files — both are two lines: a shebang and `echo "xxxxxx"`, written to
+`/var/www/html/filter` over ssh. They are **write-and-execute capability probes**:
+the operator plants one, requests it, and looks for `xxxxxx` in the response to
+confirm webroot write plus RCE, then returns with a real payload. Finding one means
+someone has already confirmed RCE on that host.
+
+No YARA rule ships, deliberately — a signature on `echo "xxxxxx"` would false-positive
+across any estate. The value is the 18 source IPs, rotating ~2/day inside five /24s:
+`2.57.122.0/24`, `92.118.39.0/24`, `80.94.92.0/24`, `195.178.110.0/24`, `193.32.162.0/24`.
+
+### Do not block
+
+These appear in sample source but are legitimate infrastructure. Blocking them breaks
+real traffic:
+
+```
+gsocket.io    thc.org    github.com    ifconfig.me
+```
+
+`gsocket.io` and `thc.org` are the genuine THC project. The sample abuses a real tool —
+attribute the abuse, not the tool.
 
 ---
 
@@ -74,7 +163,14 @@ take the next free block from this table and update it.
 
 | Family | SID block | Status |
 |--------|-----------|--------|
-| — | `9001001–9001999` | **next available** |
+| MIRAI_OHSHIT | `9001001–9001999` | in use (9001001–9001004) |
+| MIRAI_TELNETCURL | `9002001–9002999` | in use (9002001–9002005) |
+| PERLBOT_SHELLBOT | `9003001–9003999` | in use (9003001–9003003) |
+| GSOCKET_SSHIT | `9004001–9004999` | in use (9004001–9004003) |
+| MIRAI_LOADER | `9005001–9005999` | in use (9005001–9005003) |
+| BOTKILL_PROCWIPE | `9006001–9006999` | reserved — no network activity, no rules |
+| WEBROOT_PROBE | `9007001–9007999` | in use (9007001–9007003) |
+| — | `9008001–9008999` | **next available** |
 
 ---
 

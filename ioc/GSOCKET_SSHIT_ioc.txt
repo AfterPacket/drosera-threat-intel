@@ -1,0 +1,72 @@
+# ==============================================================
+# GSOCKET_SSHIT — IOC Feed
+# Author   : AfterPacket
+# Captured : 2026-08-02T11:52:45Z
+# TLP      : TLP:WHITE
+# Source   : Drosera honeypot / static analysis
+# ==============================================================
+#
+# NOTE: MD5 and SHA-1 are not listed — the analysis host could not
+# execute hashing tools. Only sidecar SHA-256 is available.
+
+# [HASHES — SHA-256]
+22585585074dfaf862ab5bf0de958b99f146f0942b651af4f2f3ff3077b2513b   # /da, 20821 B (VT 2/60)
+
+# [IP ADDRESSES]
+# Confidence: HIGH — exfil endpoint hardcoded in the config block
+192.253.248.9    # POST /gsocket/up.php — receives victim beacon
+# Confidence: HIGH — direct honeypot capture (ssh)
+192.253.248.92   # delivered /da
+# NOTE: exfil host and delivery host sit in the same /24. Same operator.
+
+# [DOMAINS — DO NOT BLOCK]
+# The following appear in the sample but are LEGITIMATE infrastructure.
+# This sample abuses a real, published security tool. Attribute the abuse,
+# not the tool. Blocking these breaks genuine traffic and violates the
+# repository's shared-infrastructure rule.
+#   gsocket.io     — THC Global Socket project
+#   thc.org        — The Hacker's Choice
+#   github.com     — hosts hackerschoice/binary
+#   ifconfig.me    — public IP echo service
+# No domains from this family are added to blocklist.txt.
+
+# [PORTS]
+80    # HTTP — exfil POST to 192.253.248.9
+
+# [HTTP INDICATORS]
+# Endpoint : POST http://192.253.248.9/gsocket/up.php
+# Retrieval: https://gsocket.io/y            (legitimate host, malicious use)
+#            https://thc.org/ssh-it/x        (legitimate host, malicious use)
+#            https://github.com/hackerschoice/binary/raw/main/ssh-it/
+# Beacon includes the victim's public IP, obtained via:
+#   curl -fsSL -4 ifconfig.me || wget -qO- -4 ifconfig.me
+
+# [CAMPAIGN METADATA]
+# Family      : GSOCKET_SSHIT (abuse of THC gsocket / ssh-it)
+# Delivery    : ssh, loader-fetch, dropped as /da
+# Tooling     : THC Global Socket — legitimate pentest tool providing
+#               NAT-traversing encrypted shells via a public relay network.
+#               Abused here for persistent remote access.
+# Persistence : systemd unit file (chmod 644) + watchdog script (chmod 755)
+# Staging     : $THC_TMPDIR, chmod 700
+# Exfil       : victim public IP POSTed to the operator's own host
+# VirusTotal  : 2/60 (downloader.prng/shell) — very low detection for a
+#               fully functional persistent backdoor installer.
+
+# [DETECTION NOTE]
+# Because the payload is a legitimate signed tool, file-based detection is
+# weak. Detect on BEHAVIOUR: the exfil POST to 192.253.248.9, the systemd
+# unit + watchdog pair, and outbound connections to the gsocket relay
+# network from a host with no business using it.
+
+# [HOST-BASED GREP STRINGS]
+# "192.253.248.9"
+# "gsocket/up.php"
+# "GS_UPLOAD_URL"
+# "THC_TMPDIR"
+# "URL_DEPLOY"
+
+# [HOST HUNT]
+# grep -rl "gsocket\|192.253.248.9" /etc/systemd /usr/lib/systemd /root /home 2>/dev/null
+# systemctl list-units --all | grep -iE "gs_|gsocket"
+# ls -la /etc/systemd/system/*.service | grep -v dpkg

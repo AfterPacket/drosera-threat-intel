@@ -1,0 +1,40 @@
+# ============================================================
+# PERLBOT_SHELLBOT — Suricata Rules
+# Author  : AfterPacket
+# Date    : 2026-08-07
+# TLP     : TLP:WHITE
+# SIDs    : 9003001-9003999
+# ============================================================
+#
+# Perl IRC shellbot. C2 is cleartext IRC on 6667 — on a modern network
+# any cleartext IRC egress from a server subnet is worth alerting on
+# regardless of destination, so both a targeted and a generic rule ship
+# here. Tune 9003003 to your environment before enabling.
+
+alert ip $HOME_NET any -> 213.139.77.150 any ( \
+  msg:"ET MALWARE PERLBOT_SHELLBOT outbound to IRC C2 213.139.77.150"; \
+  classtype:trojan-activity; \
+  sid:9003001; rev:1; \
+  metadata:affected_product Any, created_at 2026-08-07, tag PERLBOT_SHELLBOT; \
+)
+
+alert tcp $HOME_NET any -> 213.139.77.150 6667 ( \
+  msg:"ET MALWARE PERLBOT_SHELLBOT IRC registration to known C2"; \
+  flow:established,to_server; \
+  content:"NICK"; depth:8; \
+  classtype:trojan-activity; \
+  sid:9003002; rev:1; \
+  metadata:affected_product Any, created_at 2026-08-07, tag PERLBOT_SHELLBOT; \
+)
+
+# Generic — catches this bot after an $ARGV[0] C2 override, which the
+# targeted rules above would miss entirely. Higher noise; tune first.
+alert tcp $HOME_NET any -> $EXTERNAL_NET 6667 ( \
+  msg:"ET POLICY Cleartext IRC egress from server subnet (possible shellbot C2)"; \
+  flow:established,to_server; \
+  content:"NICK"; depth:8; \
+  content:"USER"; distance:0; \
+  classtype:policy-violation; \
+  sid:9003003; rev:1; \
+  metadata:affected_product Any, created_at 2026-08-07, tag PERLBOT_SHELLBOT; \
+)
