@@ -1,0 +1,18 @@
+# This repo is authored on Windows but every artifact is consumed by Linux
+# tooling — blocklist.txt by curl on a cron, plus Suricata, YARA and Sigma.
+# Force LF so a Windows checkout never publishes CRLF into the feeds.
+* text=auto eol=lf
+
+blocklist.txt text eol=lf
+*.txt         text eol=lf
+*.rules       text eol=lf
+*.yar         text eol=lf
+*.yml         text eol=lf
+*.md          text eol=lf
+*.html        text eol=lf
+*.json        text eol=lf
+
+# Encrypted samples and the detection bundle must never be line-ending mangled.
+*.zip  binary
+*.bin  binary
+*.elf  binary
