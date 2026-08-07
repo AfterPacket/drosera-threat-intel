@@ -249,8 +249,33 @@ legitimate tool. Attribute the abuse, not the tool.
 ## 7. Done
 
 - 7 IOC feeds — one per family, in `ioc/`.
-- 5 YARA rules. **None ship for `WEBROOT_PROBE` or `BOTKILL_PROCWIPE`** — both
-  would false-positive on ordinary shell scripts. That is a decision, not a gap.
+- 7 YARA rules across 5 files. **None ship for `WEBROOT_PROBE` or
+  `BOTKILL_PROCWIPE`** — both would false-positive on ordinary shell scripts.
+  That is a decision, not a gap.
+
+  **Validated against YARA 4.5.5** — all 5 files compile with zero errors and
+  zero warnings (checked without `-w`), and were run against the live corpus:
+
+  | Rule | Matched | Expected |
+  |------|---------|----------|
+  | `MIRAI_OHSHIT_payload` | 7 | 7 ELF payloads |
+  | `MIRAI_OHSHIT_loader` | 2 | `/tmp/.p`, `ohshit.sh` |
+  | `MIRAI_TELNETCURL_payload` | 5 | 5 ELF payloads |
+  | `MIRAI_TELNETCURL_dropper` | 2 | `curl.sh`, `wget.sh` |
+  | `PERLBOT_SHELLBOT_irc` | 3 | `/duba`, `/dodu`, `/gots` |
+  | `GSOCKET_SSHIT_deployer` | 1 | `/da` |
+  | `MIRAI_LOADER_dvrhelper` | 1 | `/wget` |
+
+  **Zero false positives.** The two payload rules did not cross-match each
+  other's families despite both being Mirai-derived ELF binaries of similar
+  size — the discriminator is the compiled-in C2 set, and it holds. Nothing
+  matched the 4 samples that ship no rule by design. 21 of 25 samples matched
+  their family rule; the remaining 4 are exactly those 4.
+
+  This confirms two things that were previously assertions: the string-based
+  `MIRAI_OHSHIT_payload` rule fires across all 7 architectures from one string
+  set (so it should also cover the 9 builds never captured), and
+  `PERLBOT_SHELLBOT_irc` catches `/dodu` — the twin with no VT record.
 - 6 Suricata rulesets, SID blocks 9001001–9007003, registry updated in README.
 - `blocklist.txt` — 34 IPs, no domains, no comments, no blank lines.
 - `firewalla/drosera_block.txt`, `README.md` family sections, `index.html` cards

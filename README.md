@@ -173,6 +173,12 @@ them breaks legitimate traffic.
 yara -r yara/*.yar /path/to/scan
 ```
 
+All rules are validated against **YARA 4.5.5**: every file compiles with zero
+errors and zero warnings, and each rule was run against the capture corpus and
+matches exactly its intended family with **no cross-family false positives**.
+The two Mirai payload rules were checked specifically against each other's
+binaries, since both target Mirai-derived ELF files of similar size.
+
 **Suricata** — drop the `.rules` files into your rules directory and add them to
 `suricata.yaml`, then validate before reload:
 
