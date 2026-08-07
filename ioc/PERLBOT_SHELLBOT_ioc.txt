@@ -23,8 +23,8 @@ fd93b4f7bd5e8360ecd6e782dd445356728e698b9f25e335131b28bcdd3e56e3   # /gots, 4027
 
 # [IP ADDRESSES]
 # Confidence: HIGH — IRC C2 read directly from the Perl config block
-213.139.77.150   # IRC C2 for /duba
-213.177.179.11   # IRC C2 for /dodu AND /gots
+213.139.77.150   # IRC C2, port 6667 — /duba
+213.177.179.11   # IRC C2, port 6667 — /dodu and /gots
 # Confidence: HIGH — direct honeypot capture (ssh)
 160.30.204.101   # delivered /duba
 77.90.185.42     # delivered /dodu
@@ -73,11 +73,25 @@ fd93b4f7bd5e8360ecd6e782dd445356728e698b9f25e335131b28bcdd3e56e3   # /gots, 4027
 #              /dodu and /gots have no VT record at capture time — absence of
 #              data, NOT a clean verdict.
 
-# [CONFIG BLOCK — verbatim]
-# my $process = $rps[rand scalar @rps];
-# my $nick    = $rircname[rand scalar @rircname];
-# my $server  = '213.139.77.150';
-# my $port    = '6667';
+# [CONFIG BLOCK — verbatim, per sample]
+#
+# /duba (03a4f492):
+#   my $process = $rps[rand scalar @rps];
+#   my $nick    = $rircname[rand scalar @rircname];
+#   my $server  = '213.139.77.150';
+#   my $port    = '6667';
+#
+# /dodu (fe6b7b4c):
+#   my $server = '213.177.179.11';
+#   my $port   = '6667';
+#
+# /gots (fd93b4f7):
+#   $server = '213.177.179.11' unless $server;
+#   my $port = '6667';
+#
+# All three use port 6667 — verified per sample, not inferred from /duba.
+# Note /gots guards the assignment with `unless $server` where the other two
+# assign unconditionally: a small build variant, same operator.
 
 # [HOST-BASED GREP STRINGS]
 # "213.139.77.150"
