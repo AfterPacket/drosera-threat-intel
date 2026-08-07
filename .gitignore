@@ -9,6 +9,9 @@
 # Incoming loot archives live outside the repo
 drosera-loot-*.zip
 
+# Personal permission allowlist — machine-specific, not for the public repo
+.claude/settings.local.json
+
 # OS / editor noise
 Thumbs.db
 desktop.ini
