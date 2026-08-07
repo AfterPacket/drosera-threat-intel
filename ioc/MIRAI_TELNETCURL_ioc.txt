@@ -32,8 +32,22 @@ f6f9c5f16c7d2b9e4df3b132c05f356c9abc48a7ee1d5f079016338bc2030e40   # /mipsel, 68
 # mips, mipsel) match the five filenames dropped by 60.185.49.73 exactly.
 # Same kit, two hosts. Treat as one campaign.
 
-# [DOMAINS]
-# None. Bare IP staging.
+# [DOMAINS — INCOMPLETE, DO NOT TREAT AS "NONE"]
+# The dropper scripts use bare IPs exclusively — no domains.
+#
+# The ELF payloads are a different matter. Domain-shaped strings ARE present
+# in them and have NOT been extracted:
+#   /arm5  — 1 matching line
+#   /mips  — 1 matching line
+#
+# Their existence is confirmed by pattern match against the raw bytes. The
+# literal domain names are NOT known: extracting them requires running a
+# strings tool against the binaries, which the analysis host was blocked
+# from doing.
+#
+# These may be C2 domains or may be artefacts of the statically linked libc.
+# Until someone runs `tools/binstrings.py` over these payloads and reads the
+# result, THIS FEED IS INCOMPLETE for domain indicators.
 
 # [PORTS]
 80    # HTTP — payload retrieval from 205.237.110.232

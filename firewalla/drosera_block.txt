@@ -17,6 +17,13 @@
 # No shared CDN ranges (Cloudflare, AWS, Fastly, GitHub, Akamai)
 # are ever added here — they break legitimate traffic.
 #
+# ⚠ PORT RULES ARE NOT IN THIS FILE.
+# A Target List cannot express a port. The IRC C2 channel used by
+# PERLBOT_SHELLBOT (tcp/6667) is NOT blocked by anything below, and
+# that bot accepts a C2 override at runtime — so the IP entries here
+# do not contain it. See drosera_port_policy.txt in this directory
+# for the rules to create manually. Rule 1 is the important one.
+#
 # ── Entries begin below; one section per family ───────────────
 
 

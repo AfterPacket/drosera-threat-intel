@@ -1,0 +1,128 @@
+# ==============================================================
+# Drosera Honeypot — Port / Egress Policy
+# Author : AfterPacket
+# TLP    : TLP:WHITE
+# Source : Drosera honeypot / static analysis
+# ==============================================================
+#
+# WHY THIS FILE EXISTS
+# A Firewalla MSP Target List accepts IP addresses and domains only —
+# it cannot express a port rule. The indicators in drosera_block.txt
+# therefore cover *where* traffic goes but never *what port*, which
+# leaves the single highest-value control in this capture unimplemented:
+# blocking the IRC C2 channel.
+#
+# These are rules to CREATE MANUALLY (Firewalla MSP -> Rules -> Block,
+# or the equivalent on any stateful firewall). They are not pasteable.
+#
+# Ordered by value-to-noise. Rule 1 is the one that matters.
+
+
+# ══════════════════════════════════════════════════════════════
+# RULE 1 — BLOCK OUTBOUND IRC   [HIGHEST VALUE]
+# ══════════════════════════════════════════════════════════════
+# Direction : outbound (LAN -> WAN)
+# Protocol  : TCP
+# Ports     : 6667, 6660-6669, 6697, 7000
+# Scope     : server, IoT and DMZ subnets. Exclude user workstations
+#             only if you have staff who legitimately use IRC.
+# Action    : block + alarm
+#
+# Family    : PERLBOT_SHELLBOT — C2 is cleartext IRC to 213.139.77.150:6667
+#
+# 6667 is the primary. 6660-6669 is the standard IRC range and costs
+# nothing extra to include. 6697 is IRC-over-TLS — the sample does not
+# use it, but a config change to TLS is a one-line edit for the operator
+# and would silently defeat a 6667-only rule. 7000 is a common alternate.
+#
+# This rule survives the sample's own evasion: PERLBOT accepts a C2
+# override via $ARGV[0], so an IP-based block on 213.139.77.150 is
+# defeated by pointing the bot at any other host. A PORT block is not.
+# This is precisely why the IP list alone is insufficient.
+#
+# Legitimate IRC egress from a server subnet is close to nonexistent in
+# a modern estate. Expect near-zero false positives.
+
+
+# ══════════════════════════════════════════════════════════════
+# RULE 2 — BLOCK INBOUND TELNET
+# ══════════════════════════════════════════════════════════════
+# Direction : inbound (WAN -> LAN)
+# Protocol  : TCP
+# Port      : 23
+# Scope     : all
+# Action    : block + alarm
+#
+# Families  : MIRAI_OHSHIT, MIRAI_TELNETCURL, MIRAI_LOADER,
+#             BOTKILL_PROCWIPE — every one arrived over telnet
+#
+# 19 of the 25 samples in this capture were delivered via telnet.
+# Nothing should accept inbound telnet from the internet in 2026. If a
+# device genuinely requires it, that device should not be internet-facing.
+
+
+# ══════════════════════════════════════════════════════════════
+# RULE 3 — BLOCK OUTBOUND TELNET FROM SERVER / IoT SUBNETS
+# ══════════════════════════════════════════════════════════════
+# Direction : outbound (LAN -> WAN)
+# Protocol  : TCP
+# Port      : 23
+# Scope     : server, IoT, DMZ
+# Action    : block + alarm
+#
+# Families  : all Mirai variants
+#
+# Mirai-family bots scan and propagate over telnet. Outbound 23 from
+# your own subnet means a host of yours is already infected and is now
+# attacking someone else. Treat any hit as a confirmed compromise, not
+# an attempt — this rule is worth more as a detection than a control.
+
+
+# ══════════════════════════════════════════════════════════════
+# RULE 4 — RESTRICT INBOUND SSH
+# ══════════════════════════════════════════════════════════════
+# Direction : inbound (WAN -> LAN)
+# Protocol  : TCP
+# Port      : 22
+# Scope     : all
+# Action    : allow-list source addresses; block by default
+#
+# Families  : WEBROOT_PROBE (224 sightings), GSOCKET_SSHIT,
+#             PERLBOT_SHELLBOT
+#
+# If a blanket restriction is not workable, block port 22 at minimum from
+# the five campaign netblocks, which rotate roughly two addresses per day
+# and will outrun any per-host list:
+#   2.57.122.0/24
+#   92.118.39.0/24
+#   80.94.92.0/24
+#   195.178.110.0/24
+#   193.32.162.0/24
+
+
+# ══════════════════════════════════════════════════════════════
+# NOT RECOMMENDED — port 80 / 443
+# ══════════════════════════════════════════════════════════════
+# Every payload in this capture was retrieved over plain HTTP on port 80,
+# and the gsocket beacon exfiltrates over 80 as well. Do NOT blanket-block
+# outbound 80 — it breaks package managers, certificate revocation checks,
+# captive portals and much else.
+#
+# Handle HTTP by DESTINATION instead: the IPs in drosera_block.txt, plus
+# the Suricata content rules in ../suricata/, which match the specific URI
+# patterns (/ohshit.sh, //bot., /mirai., /gsocket/up.php) rather than the
+# port.
+
+
+# ══════════════════════════════════════════════════════════════
+# PORT REFERENCE — observed in this capture
+# ══════════════════════════════════════════════════════════════
+# 6667/tcp   IRC C2               PERLBOT_SHELLBOT      -> Rule 1, BLOCK
+# 23/tcp     telnet delivery      all Mirai families    -> Rules 2 and 3, BLOCK
+# 22/tcp     ssh delivery         WEBROOT_PROBE, others -> Rule 4, RESTRICT
+# 80/tcp     payload + exfil      all HTTP families     -> by destination only
+#
+# No bind shells, inetd entries or listening backdoor ports were found in
+# any sample in this capture. Every port above is a delivery or C2 channel,
+# not an implanted listener. The "Backdoor ports" counter on the site is 0
+# for that reason, and it is accurate.

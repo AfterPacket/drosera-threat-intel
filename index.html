@@ -126,8 +126,9 @@ footer p{margin:0 0 6px}
   <div class="wrap">
     <div class="section-head">
       <h2>Captures</h2>
-      <span class="count"><a href="drosera-detection-bundle.zip">Download full detection bundle</a>
-        <span class="sep">·</span> <a href="blocklist.txt">Raw blocklist</a></span>
+      <span class="count"><a href="blocklist.txt">Raw blocklist</a>
+        <span class="sep">·</span> <a href="firewalla/drosera_block.txt">Firewalla list</a>
+        <span class="sep">·</span> <a href="firewalla/drosera_port_policy.txt">Port policy</a></span>
     </div>
 
     <div class="samples">
@@ -204,7 +205,9 @@ footer p{margin:0 0 6px}
           chain recovered. A 104-byte fetcher written to <code>/tmp/.p</code> over telnet pulls
           <code>ohshit.sh</code>, which loops 16 architectures, cats each payload into a file named
           <code>WTF</code>, and executes it. Seven of the sixteen builds were captured; the doubled slash
-          in <code>//bot.&lt;arch&gt;</code> makes a reliable detection string.</p>
+          in <code>//bot.&lt;arch&gt;</code> makes a reliable detection string.
+          <strong>Domain indicators are incomplete:</strong> the ELF payloads contain domain strings that
+          could not be extracted, so this family is not IP-only despite the loader chain being so.</p>
 
         <ul class="tags">
           <li>Mirai-derived</li><li>16 architectures</li><li>telnet propagation</li><li>busybox staging</li>
@@ -244,7 +247,9 @@ footer p{margin:0 0 6px}
         <p class="desc">Telnet-propagated Mirai variant fetching from 205.237.110.232, shipped as both a
           <code>curl</code> and a <code>busybox wget</code> dropper. Uses fixed non-dictionary output
           filenames per architecture and the exec argument <code>telnet.curl</code>. The five filenames
-          served by 205.237.110.232 match those dropped by 60.185.49.73 exactly — one kit, two hosts.</p>
+          served by 205.237.110.232 match those dropped by 60.185.49.73 exactly — one kit, two hosts.
+          <strong>Domain indicators are incomplete:</strong> the ELF payloads contain unextracted domain
+          strings.</p>
 
         <ul class="tags">
           <li>Mirai-derived</li><li>5 architectures</li><li>fixed payload names</li><li>two-host infra</li>
@@ -302,7 +307,9 @@ footer p{margin:0 0 6px}
           <a href="yara/PERLBOT_SHELLBOT_irc.yar">YARA</a> <span class="sep">·</span>
           <a href="suricata/perlbot_shellbot.rules">Suricata</a> <span class="sep">·</span>
           <a href="ioc/PERLBOT_SHELLBOT_ioc.txt">IOC</a> <span class="sep">·</span>
-          <a href="firewalla/drosera_block.txt">Firewalla block</a>
+          <a href="firewalla/drosera_block.txt">Firewalla block</a> <span class="sep">·</span>
+          <a href="firewalla/drosera_port_policy.txt">Port policy →</a>
+          <span class="pw">block tcp/6667 — the IP block alone is defeated by the C2 override</span>
         </div>
       </article>
 

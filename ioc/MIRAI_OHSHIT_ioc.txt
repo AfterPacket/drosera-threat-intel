@@ -29,8 +29,24 @@ de9cfdf7d1330534731e8354ec5927db99e06365850a8fe1d07c6bf8dec97ad0   # /tmp/.p, 10
 # Confidence: HIGH — direct honeypot capture (telnet) AND hardcoded payload host
 94.154.43.123   # dropper delivery + serves /ohshit.sh and //bot.<arch>
 
-# [DOMAINS]
-# None. This family uses a bare IP for all staging.
+# [DOMAINS — INCOMPLETE, DO NOT TREAT AS "NONE"]
+# The loader chain (stages 1 and 2) uses bare IPs exclusively — no domains.
+#
+# The ELF payloads are a different matter. Domain-shaped strings ARE present
+# in them and have NOT been extracted:
+#   //bot.arm7   — 2 x .com, 2 x .net, plus one further TLD
+#   //bot.x86_64 — 3 matching lines
+#   //bot.ppc    — 3 matching lines
+#
+# Their existence and TLDs are confirmed by pattern match against the raw
+# bytes. The literal domain names are NOT known: extracting them requires
+# running a strings tool against the binaries, which the analysis host was
+# blocked from doing.
+#
+# These may be C2 domains or may be artefacts of the statically linked libc.
+# Until someone runs `tools/binstrings.py` over these payloads and reads the
+# result, THIS FEED IS INCOMPLETE for domain indicators. Do not cite it as
+# evidence that this family is IP-only.
 
 # [PORTS]
 80    # HTTP — payload retrieval from 94.154.43.123

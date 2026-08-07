@@ -23,8 +23,18 @@ Author: **AfterPacket** · Site: <https://afterpacket.github.io/drosera-threat-i
 | 2026-08-04 | [BOTKILL_PROCWIPE](#botkill_procwipe) | `2733d565138186645...` | Shell | 🟠 HIGH | IOC · Firewalla |
 | 2026-08-05 | [WEBROOT_PROBE](#webroot_probe) | `af77b643964afd79...` | Shell | 🟠 HIGH | Suricata · IOC · Firewalla |
 
-**34 IPs added to the blocklist. No domains** — every domain observed in these
-samples is legitimate shared infrastructure (see [Do not block](#do-not-block)).
+**34 IPs added to the blocklist. Zero domains — but that is a gap, not a finding.**
+
+Every domain found in the *script* samples is legitimate shared infrastructure
+(see [Do not block](#do-not-block)). The **ELF payloads were not searched**, and
+they do contain domain-shaped strings: `bot.arm7` alone holds two `.com` and two
+`.net` matches, and every other payload sampled across both Mirai families matched
+too. The literal names could not be extracted — that needs a strings tool run
+against the binaries, which the analysis host was blocked from doing.
+
+**The domain feed for this capture is therefore incomplete.** Treat the ELF
+payloads as having unenumerated domain indicators until
+[`tools/binstrings.py`](tools/binstrings.py) has been run over them.
 
 ---
 
@@ -112,6 +122,7 @@ attribute the abuse, not the tool.
 |------|----------|
 | `blocklist.txt` | **Master feed.** Raw IPs and domains, one per line. No comments, no blank lines, no wildcards — it is machine-read. |
 | `firewalla/drosera_block.txt` | The same indicators, annotated with family, role and confidence, for pasting into Firewalla MSP. |
+| `firewalla/drosera_port_policy.txt` | **Port and egress rules.** A Target List cannot express a port, so these are written to be created manually. Rule 1 blocks outbound IRC — the one control that survives this capture's C2-override evasion. |
 | `ioc/<FAMILY>_ioc.txt` | One IOC feed per family — hashes, IPs, domains, ports, protocol indicators, grep strings. |
 | `yara/<FAMILY>_<campaign>.yar` | One YARA rule per family. |
 | `suricata/<family>.rules` | One Suricata ruleset per family. |

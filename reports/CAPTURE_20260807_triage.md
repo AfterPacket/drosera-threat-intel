@@ -146,6 +146,46 @@ perimeter if policy allows, but `blocklist.txt` takes **individual IPs only**.
 
 ---
 
+## 5b. Domain indicators are INCOMPLETE — correction
+
+An earlier revision of this capture claimed "no domains, every domain observed is
+legitimate." **That was wrong**, and the error was methodological rather than a
+misreading: ripgrep skips binary files during directory traversal, so the sweep
+that produced the claim only ever searched the 13 script samples. The 12 ELF
+payloads were never searched.
+
+When queried individually — ripgrep *does* search a binary when handed an explicit
+file path — every ELF payload sampled matched a domain pattern, across both Mirai
+families:
+
+| Sample | Family | Domain-matching lines |
+|--------|--------|----------------------|
+| `//bot.arm7` (`81ea2a39`) | MIRAI_OHSHIT | 2 × `.com`, 2 × `.net`, +1 other TLD |
+| `//bot.x86_64` (`9d7cd494`) | MIRAI_OHSHIT | 3 |
+| `//bot.ppc` (`98994017`) | MIRAI_OHSHIT | 3 |
+| `/arm5` (`9cbe35b1`) | MIRAI_TELNETCURL | 1 |
+| `/mips` (`3afa3a11`) | MIRAI_TELNETCURL | 1 |
+
+`.org` returned zero on `bot.arm7`, so these are not GNU/licence boilerplate.
+
+**The literal domain names are unknown.** Confirming existence and TLD is possible
+through pattern matching alone; reading the strings requires executing a tool
+against the binaries, which this session was blocked from doing. They may be C2
+domains or artefacts of the statically linked libc — that cannot be settled
+without extraction.
+
+**Next session, do this first.** It is the single highest-value outstanding item:
+
+```
+python3 tools/binstrings.py /path/to/samples/*.bin -n 6 \
+  | grep -aiE '[a-z0-9][a-z0-9.-]{2,}\.(com|net|ru|su|io|xyz|top|cc)'
+```
+
+Any C2 domain found goes into `blocklist.txt`, both Mirai IOC feeds, the YARA
+rules, and the hero counter — which currently reads 0 and will be wrong until then.
+
+---
+
 ## 6. DO NOT BLOCK
 
 These appear in sample source but are legitimate shared infrastructure. Adding

@@ -35,6 +35,13 @@ fd93b4f7bd5e8360ecd6e782dd445356728e698b9f25e335131b28bcdd3e56e3   # /gots, 4027
 # [PORTS]
 6667   # IRC — C2 channel. Cleartext IRC on 6667 to a non-service host is
        #       itself a strong signal on most modern networks.
+       #
+       # *** BLOCK THE PORT, NOT JUST THE IP ***
+       # This bot takes a C2 override as its first argument, so blocking
+       # 213.139.77.150 is defeated by relaunching it against any other
+       # host. An egress block on tcp/6667 is not. See
+       # ../firewalla/drosera_port_policy.txt Rule 1 — also covers
+       # 6660-6669, 6697 (IRC-over-TLS) and 7000.
 
 # [IRC INDICATORS]
 # Server : 213.139.77.150
