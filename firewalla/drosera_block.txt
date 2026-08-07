@@ -1,0 +1,20 @@
+# ==============================================================
+# Drosera Honeypot — Firewalla MSP Block List
+# Author : AfterPacket
+# TLP    : TLP:WHITE
+# Source : Drosera honeypot / static analysis
+# ==============================================================
+#
+# Paste into Firewalla MSP → Rules → Target List.
+# Annotated for human review. The unannotated machine-readable
+# feed is ../blocklist.txt.
+#
+# Confidence tags:
+#   HIGH   — direct honeypot capture (delivery IP) or config-block C2
+#   MEDIUM — hardcoded array C2, not observed live
+#   LOW    — packed/obfuscated sample, extraction uncertain
+#
+# No shared CDN ranges (Cloudflare, AWS, Fastly, GitHub, Akamai)
+# are ever added here — they break legitimate traffic.
+#
+# ── Entries begin below; one section per family ───────────────

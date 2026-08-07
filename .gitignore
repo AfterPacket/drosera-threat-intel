@@ -1,0 +1,18 @@
+# Extracted artifacts and scratch space are never committed.
+# Only the AES-256 encrypted archives under samples/ are tracked.
+*.bin
+*.elf
+/tmp/
+/scratch/
+/work/
+
+# Incoming loot archives live outside the repo
+drosera-loot-*.zip
+
+# OS / editor noise
+Thumbs.db
+desktop.ini
+.DS_Store
+*.swp
+.idea/
+.vscode/
