@@ -258,16 +258,13 @@ legitimate tool. Attribute the abuse, not the tool.
 
 ## 8. Outstanding
 
-- **ELF string extraction for 12 binaries.** No `strings` / `readelf` on this box;
-  ripgrep skips binaries. Use `tools/binstrings.py` (written for exactly this) —
-  `python3 tools/binstrings.py <sample> -n 6` and `--header`. **Untested** — the
-  session that wrote it was blocked from executing anything against the samples.
-  Pending: 7 × `MIRAI_OHSHIT`, 5 × `MIRAI_TELNETCURL`.
-- **Sample zips.** `samples/` is still empty — no AES-256 archives were created.
-  The card and README download rows deliberately omit sample links rather than
-  point at files that do not exist.
-- **MD5 / SHA-1.** Not computed for any sample; hashing tools could not be run.
-  Every IOC file states this rather than silently omitting the fields.
+- ~~ELF string extraction~~ **DONE** via `tools/binstrings.py --ioc`. All 12
+  binaries processed; results in §5b. The tool's `--header` and `--ioc` paths are
+  both verified working against this corpus.
+- ~~Sample zips~~ **DONE.** All 25 in `samples/<sha256>.zip`, AES-256, password
+  `infected`. Verified: `Method = AES-256 Deflate`, `Encrypted = +`, all 25 open
+  with the password, all 25 reject a wrong one. 4.5 MB total.
+- ~~MD5 / SHA-1~~ **DONE.** All 25, in `reports/CAPTURE_20260807_hashes.txt`.
 - Per-family long-form reports (`reports/<FAMILY>_analysis_<sha8>.md`).
 - `drosera-detection-bundle.zip` regeneration.
 - **VT note:** only 3 of 25 samples carry any VT record (29/60, 15/60, 2/60).

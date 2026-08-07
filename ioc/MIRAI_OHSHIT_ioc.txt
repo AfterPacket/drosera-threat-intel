@@ -6,10 +6,9 @@
 # Source   : Drosera honeypot / static analysis
 # ==============================================================
 #
-# NOTE: MD5 and SHA-1 are not listed. The analysis host could not
-# execute hashing tools against the samples; only the SHA-256
-# recorded by the honeypot sidecar is available. Do not infer
-# absence of a hash as a property of the sample.
+# MD5 and SHA-1 for every sample in this capture:
+#   ../reports/CAPTURE_20260807_hashes.txt
+# Encrypted samples: ../samples/<sha256>.zip  (AES-256, password: infected)
 
 # [HASHES — SHA-256]
 # Stage 1 — one-line fetcher, written to /tmp/.p over telnet

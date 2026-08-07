@@ -1,0 +1,58 @@
+# ==============================================================
+# Capture 2026-08-07 — Hash Reference
+# Author : AfterPacket
+# TLP    : TLP:WHITE
+# Source : Drosera honeypot
+# ==============================================================
+#
+# All 25 samples. SHA-256 is the archive/filename key; MD5 and SHA-1 are
+# provided for tools and sharing partners that still key on them.
+#
+# Samples are in ../samples/<sha256>.zip — AES-256, password: infected.
+#
+# Format: SHA-256  MD5  SHA-1  family / filename
+# ==============================================================
+
+# ── MIRAI_OHSHIT ──────────────────────────────────────────────
+de9cfdf7d1330534731e8354ec5927db99e06365850a8fe1d07c6bf8dec97ad0  501a2df822484f079e322f1ddd05f133  2449784f68e1ecf617ab28011b7d413c30d812f7  /tmp/.p stage-1 fetcher
+8b1a2fb6b358484b7769aeeb63209f2b277d91b5015cf28ce471a67e0ef83d28  ffed68702b8dccbccbd3634bb647f603  d4269e7b17f3e05fa1395a59f5f6815c87753bd6  /ohshit.sh loader
+81ea2a392b6d71c7cd381f48ebffb992457a1d3897d1484a3fd7823f2e9f69a3  ac1b52b71229469fa2a87ea8a11db607  537a491b49e4689c71f9d29e491bc69ff7a55359  //bot.arm7   ELF32 ARM
+78a57de8eb7d70af3d44dda3ea3fc11ed44879d34db45fb8c22211b852398763  cbe23c3fd2daf3fd6e455a9589066ac6  2c1d6f4a3fd607fd1516e65f35743045c08866f3  //bot.arm    ELF32 ARM
+15b950d6b732fba9021b829331a2277c1d88609b60b4238a34fcbfea676f465d  9e63906d011406e533987413dc42bbb3  da01c1df1317e192a1a9099f684f91a94a47565f  //bot.sh4    ELF32 Renesas SH
+7b8add306d87da91ed1ff4608ad8f829c83f6035cbc852c73869ec66977d93f8  1c425287090c16337ac59a563d64919e  13a2f751c40d57b66e82c9c2c9613102cd99b4da  //bot.mips   ELF32 MIPS BE
+2ae7dc16ca036cb5c2c7ce2cd8099edb07d96b8846188c92eb39a7feba2fec08  b02e178ecf7de81dd8653a2eb2adc11f  ea9170467efb19648bbe4514097a5ebe6a734ca5  //bot.i686   ELF32 i386
+98994017c070389b3ddfe557847dc6aaa00ce7bc79760faf3dcfe68036b56431  833a416ebe7e2dd26be8d525278b0ae1  05ec4a98792c58b7289527c74fd3c82eea785ffc  //bot.ppc    ELF32 PowerPC BE
+9d7cd4948a1fcbaeadc425752fce9a933bd6fc41eeede030dffd7b99b3bc51d5  9d754cdf176c21649645444b56cb0e0e  ddd07abb4c1077a6b6e54d61a8f6026360ac6379  //bot.x86_64 ELF64 x86-64
+
+# ── MIRAI_TELNETCURL ──────────────────────────────────────────
+3801a288c16a19c57c7a8a7b0f139cf630d2cd0c4bbcb26876e3593c492ffc5d  688c6311320aa416a88cf6eed3d5f8f5  e60491a2e59eb90b797d2db74c8d92bb2b432382  /curl.sh dropper
+e1568cae97252fa9350ef2d2d381975c8bd29e11f126fb06bd64e92a73d7beb9  afc7b029f3a05b97b920d0407791ee68  1d5b8d5858ed9521bc305b362d2a99e24272bfa2  /wget.sh dropper (VT 15/60)
+b6260a8c94f54ff97d7838eee6391c9c32284d4b6f81e36401757cbafdc99a46  82e97ad70c905a8f2fb4ef7dcf4851cf  f02341964eca0d2fa9bfc668a7517d1441f595ee  /arm7   ELF32 ARM
+9cbe35b1d10f55d712738644c60c2cc47eac13e06f23ba849abb1bbdbdfdc5f2  dfbbf96df412f2d3d1358aaae94e1123  6a53354adb09fb16d146c9d5a2b6c30e4ab1b6bf  /arm5   ELF32 ARM
+a834705aedd521b2d75ec51b593ee82f49d8f3b9c61b5ef6034dc8340b70a98b  2c6f5ed88811004f831e4767dccafdf0  bbb39bfe45c689fa179435f99669545f960e6d4a  /arm    ELF32 ARM
+3afa3a117915cf21b105ea9c8aae346af4f733556e6a6fe62e1352901d2b4831  e12deab87ece00740e49b560be7d3cd2  f234cb95c13d5f3f8afcc522db06892738f00479  /mips   ELF32 MIPS BE
+f6f9c5f16c7d2b9e4df3b132c05f356c9abc48a7ee1d5f079016338bc2030e40  4f38e2e725f16b2714d42b583ebed401  462b57f9d7c0ebc9ae976a1c25ef4d9ddea3c428  /mipsel ELF32 MIPS LE
+
+# ── PERLBOT_SHELLBOT ──────────────────────────────────────────
+03a4f492af99d2048f713081560b8fa45312e594e8439eefa714f0c67a1e0550  4c78efb135174df31abadaa95c43d470  c10e7e20d58a02d699d264b001a306f065caa9fe  /duba  29427 B  VT 29/60  C2 213.139.77.150
+fe6b7b4c09ec79caa51ee7a7c46bbfdb11b0c7e0a380292675fb5ac6ce2b26c2  de40e5e1b0bb917193993301f755b02f  542db0845998c8610a362333f6c2a066929e0f5d  /dodu  29427 B  NO VT     C2 213.177.179.11
+fd93b4f7bd5e8360ecd6e782dd445356728e698b9f25e335131b28bcdd3e56e3  ab662f4405d5f5df1a3ec7ddf170572e  d27335e0d27d3d92b7632432ee78e524157a85e0  /gots  40272 B  NO VT     C2 213.177.179.11
+#
+# NOTE — /duba and /dodu are byte-identical in SIZE (29,427) but differ in
+# MD5, SHA-1 and SHA-256. They are different builds of the same bot pointing
+# at different C2 servers, not a re-upload of one file. The size match is what
+# makes the pair easy to miss; the hash difference is what proves two builds.
+
+# ── GSOCKET_SSHIT ─────────────────────────────────────────────
+22585585074dfaf862ab5bf0de958b99f146f0942b651af4f2f3ff3077b2513b  5d3646759b4618540e0eca570f570d5b  d3589e1eba9d1d7308bdefaf252c4b2c7cd7e492  /da  VT 2/60
+
+# ── MIRAI_LOADER ──────────────────────────────────────────────
+246c3c37a0de2987d9352411f22ea4805f7e75287f2782d5ee56770219a096a4  3d39989e0700b86e57f81ef0183b0049  9e013f23ba30f0622fa092372e2abde18b029e7e  /wget  SERVER=77.90.185.66
+
+# ── BOTKILL_PROCWIPE ──────────────────────────────────────────
+41d9a2a07ccfc769854bf71c82258da1f0a622644f12fada54320e7ff310fcfa  c46322e0f680244822fd544be32d6934  7f174a2d0f93429e961ec0b4a307d339354b0141  /home/.k  kills (deleted) exes
+2733d565138186645b2ff2485f88cfdaee2a1cf2cd3af1306273fc0f6191a58c  19ef0a96a53ef4246774c858e163ddca  8f89611f15ad8aeafc734d2a4a2682b3e0c7f65e  /home/.k  kills dvrHelper
+
+# ── WEBROOT_PROBE ─────────────────────────────────────────────
+af77b643964afd794460d28ab8a11b0ec8790cd5463abfde126613a4f3bccd32  2fd06197c21c19fe142f8ff38019c91c  ec6d9d212f7655640392c1e6287230bde81a1054  /var/www/html/filter  26 B  168 sightings
+f3abe9aa18137a8002706fd584b24b4c0d95cbc4f6ad25915bdd7a5ec184e002  2806a6e59843f0f7269e5050ab883898  22f8f814f31ec79cf8df0d6a9531a055200fcffc  /var/www/html/filter  24 B   56 sightings

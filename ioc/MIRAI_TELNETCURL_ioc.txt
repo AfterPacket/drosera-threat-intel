@@ -6,8 +6,8 @@
 # Source   : Drosera honeypot / static analysis
 # ==============================================================
 #
-# NOTE: MD5 and SHA-1 are not listed — the analysis host could not
-# execute hashing tools. Only sidecar SHA-256 is available.
+# MD5 and SHA-1: ../reports/CAPTURE_20260807_hashes.txt
+# Encrypted samples: ../samples/<sha256>.zip  (AES-256, password: infected)
 
 # [HASHES — SHA-256]
 # Droppers — curl and busybox-wget variants of the same script

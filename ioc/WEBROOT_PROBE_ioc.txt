@@ -6,8 +6,8 @@
 # Source   : Drosera honeypot / static analysis
 # ==============================================================
 #
-# NOTE: MD5 and SHA-1 are not listed — the analysis host could not
-# execute hashing tools. Only sidecar SHA-256 is available.
+# MD5 and SHA-1: ../reports/CAPTURE_20260807_hashes.txt
+# Encrypted samples: ../samples/<sha256>.zip  (AES-256, password: infected)
 
 # [HASHES — SHA-256]
 af77b643964afd794460d28ab8a11b0ec8790cd5463abfde126613a4f3bccd32   # 26 B, 168 sightings

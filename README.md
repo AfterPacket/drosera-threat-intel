@@ -210,7 +210,9 @@ take the next free block from this table and update it.
 
 ## Handling samples
 
-Everything in `samples/` is **live malware**.
+Everything in `samples/` is **live malware**. All 25 samples from the 2026-08-07
+capture are present as `samples/<sha256>.zip`, 4.5 MB total. MD5 and SHA-1 for
+each are in [`reports/CAPTURE_20260807_hashes.txt`](reports/CAPTURE_20260807_hashes.txt).
 
 - Archives are AES-256 encrypted with the password `infected`.
 - Extract and analyse only inside an isolated VM with no network path to anything you care about.
