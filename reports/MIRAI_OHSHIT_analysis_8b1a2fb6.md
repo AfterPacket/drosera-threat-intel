@@ -180,5 +180,5 @@ Network: DNS lookups for any of the five C2 FQDNs (Suricata 9001005–9001009);
 | String | `ohshit.sh`, `//bot.`, `>WTF`, `chmod +x *;./WTF` | HIGH |
 | **Do not block** | `bugs.launchpad.net`, `185.199.108.153`, `104.21.234.17`, `workers.dev` apex, the 20 Referer domains | — |
 
-**Artifacts:** `yara/MIRAI_OHSHIT_botloader.yar` (2 rules) ·
+**Artifacts:** `yara/MIRAI_OHSHIT_loader.yar`, `yara/MIRAI_OHSHIT_payload.yar` ·
 `suricata/mirai_ohshit.rules` (9001001–9001012) · `ioc/MIRAI_OHSHIT_ioc.txt`

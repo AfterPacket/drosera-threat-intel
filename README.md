@@ -199,7 +199,7 @@ attribute the abuse, not the tool.
 | `firewalla/drosera_block.txt` | The same indicators, annotated with family, role and confidence, for pasting into Firewalla MSP. |
 | `firewalla/drosera_port_policy.txt` | **Port and egress rules.** A Target List cannot express a port, so these are written to be created manually. Rule 1 blocks outbound IRC — the one control that survives this capture's C2-override evasion. |
 | `ioc/<FAMILY>_ioc.txt` | One IOC feed per family — hashes, IPs, domains, ports, protocol indicators, grep strings. |
-| `yara/<FAMILY>_<campaign>.yar` | One YARA rule per family. |
+| `yara/<FAMILY>_<campaign>.yar` | **Exactly one rule per file** — YARAify rejects multi-rule uploads ("Multiple YARA rules found in a single file"). Families needing both a dropper and a payload rule ship two files. |
 | `suricata/<family>.rules` | One Suricata ruleset per family. |
 | `sigma/<family>_<detection>.yml` | One or more Sigma rules per family. |
 | `reports/<FAMILY>_analysis_<sha256short>.md` | Full structured analysis report, one per family. |

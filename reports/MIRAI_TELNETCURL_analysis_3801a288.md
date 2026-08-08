@@ -165,6 +165,6 @@ zero false-positive rate. `PLXMKJ` or `KFGDFG` indicates an uncaptured variant.
 | **Not blocked** | `www.ikindalikemenbutonlyontuesday.com` | lineage marker |
 | **Not blocked** | `119.0.0.0`, `120.0.0.0`, `121.0.0.0` | scanner range constants |
 
-**Artifacts:** `yara/MIRAI_TELNETCURL_arch5.yar` (2 rules) ·
+**Artifacts:** `yara/MIRAI_TELNETCURL_dropper.yar`, `yara/MIRAI_TELNETCURL_payload.yar` ·
 `suricata/mirai_telnetcurl.rules` (9002001–9002005) ·
 `ioc/MIRAI_TELNETCURL_ioc.txt`
