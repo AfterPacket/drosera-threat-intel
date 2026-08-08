@@ -201,7 +201,7 @@ attribute the abuse, not the tool.
 | `ioc/<FAMILY>_ioc.txt` | One IOC feed per family — hashes, IPs, domains, ports, protocol indicators, grep strings. |
 | `yara/<FAMILY>_<campaign>.yar` | **Exactly one rule per file** — YARAify rejects multi-rule uploads ("Multiple YARA rules found in a single file"). Families needing both a dropper and a payload rule ship two files. |
 | `suricata/<family>.rules` | One Suricata ruleset per family. |
-| `sigma/<family>_<detection>.yml` | One or more Sigma rules per family. |
+| `sigma/<family>_<detection>.yml` | Log-based detection, 8 rules. Covers the two families that ship **no** YARA rule by design, plus host-side behaviour that file signatures cannot see. |
 | `reports/<FAMILY>_analysis_<sha256short>.md` | Full structured analysis report, one per family. |
 | `reports/CAPTURE_<date>_executive_summary.md` | Risk ranking, key findings, immediate actions. **Start here.** |
 | `reports/CAPTURE_<date>_capability_mitigation_framework.md` | Capability matrix, ATT&CK mapping, and mitigation controls rated for effectiveness against this corpus. |
@@ -243,6 +243,30 @@ All rules carry the YARAhub mandatory metadata (`yarahub_uuid`,
 [YARAify](https://yaraify.abuse.ch/). Each `yarahub_reference_md5` points at a
 sample the rule genuinely matches — ELF-conditioned rules reference ELF samples,
 not the shell droppers.
+
+**Sigma** — 8 log-based rules in `sigma/`, targeting Linux `process_creation`
+and `file_event` telemetry. Convert to your SIEM's query language with
+[sigma-cli](https://github.com/SigmaHQ/sigma-cli):
+
+```bash
+sigma convert -t splunk -p sysmon_linux sigma/*.yml
+```
+
+| Rule | Covers |
+|------|--------|
+| `gsocket_sshit_persistence.yml` | `~/.config/prng/`, the systemd unit, PID files — **critical**, no benign explanation |
+| `gsocket_sshit_credential_exfil.yml` | the beacon carrying the gs-netcat secret |
+| `botkill_procwipe_rival_removal.yml` | `/home/.k` and the `dvrHelper` hunt — this family ships **no YARA rule** |
+| `webroot_probe_rce_confirmation.yml` | webroot script drops — also **no YARA rule** by design |
+| `mirai_ohshit_multiarch_staging.yml` | `WTF` staging, doubled-slash fetch, busybox copy |
+| `mirai_telnetcurl_dropper.yml` | all 7 fixed filenames, incl. the 2 uncaptured-build hunt strings |
+| `mirai_loader_dvrhelper.yml` | `dvrHelper tscan`, the `.f` write-exec probe |
+| `perlbot_shellbot_irc_c2.yml` | `#mot` / `MAD` operator constants — survive the C2 override |
+
+Rules were checked for YAML validity, required fields, UUIDv4 ids, and that
+every selection referenced in a `condition` exists and every defined selection
+is used. **They have not been run through `sigma-cli` or any backend** — that
+tool is not installed on the analysis workstation.
 
 **Suricata** — drop the `.rules` files into your rules directory and add them to
 `suricata.yaml`, then validate before reload:

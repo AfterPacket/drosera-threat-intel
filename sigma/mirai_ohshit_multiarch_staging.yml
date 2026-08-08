@@ -1,0 +1,53 @@
+title: MIRAI_OHSHIT multi-architecture loader staging
+id: e63c05b9-8a41-4d7f-b592-2e70a4c86f31
+status: experimental
+description: |
+  Detects the MIRAI_OHSHIT loader chain staging payloads on a host.
+
+  The loader performs no target fingerprinting: it fetches and executes all
+  15 architecture builds in sequence and lets the wrong ones fail. A single
+  successful telnet session therefore produces a burst of up to 15 outbound
+  HTTP requests and 15 executions of a file named WTF, which is the most
+  reliable behavioural signal this family offers.
+
+  The doubled slash in http://94.154.43.123//bot.<arch> is an artefact of the
+  loader's URL construction and is low-noise enough to match on directly.
+
+  Note this family also propagates over SSH - the payloads embed a complete
+  SSH client - even though the loader chain itself is telnet-only. Do not
+  scope containment from this rule alone.
+references:
+    - https://github.com/Afterpacket/drosera-threat-intel
+    - https://github.com/Afterpacket/drosera-threat-intel/blob/main/reports/MIRAI_OHSHIT_analysis_8b1a2fb6.md
+author: AfterPacket
+date: 2026-08-08
+tags:
+    - attack.execution
+    - attack.t1059.004
+    - attack.t1129
+    - attack.t1105
+    - tlp.white
+logsource:
+    product: linux
+    category: process_creation
+detection:
+    staging_host:
+        CommandLine|contains: '94.154.43.123'
+    loader_name:
+        CommandLine|contains: 'ohshit.sh'
+    doubled_slash_fetch:
+        CommandLine|contains: '//bot.'
+    staging_idiom:
+        CommandLine|contains|all:
+            - 'cat bot.'
+            - 'WTF'
+    busybox_copy:
+        CommandLine|contains|all:
+            - 'cp /bin/busybox'
+            - '/tmp/'
+    condition: staging_host or loader_name or doubled_slash_fetch or staging_idiom or busybox_copy
+falsepositives:
+    - Unlikely. 'WTF' as an output filename and the doubled-slash URL are
+      distinctive. The busybox_copy branch could theoretically fire on
+      embedded-device provisioning scripts.
+level: critical

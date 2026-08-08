@@ -83,6 +83,12 @@
 # scripts across any fleet. The durable indicators are the file path
 # /home/.k and the literal target string "dvrHelper", both better served
 # by the Sigma rule and host hunt below than by file signatures.
+#
+# Sigma: ../sigma/botkill_procwipe_rival_removal.yml
+#   Three selections - the /home/.k drop path (no benign explanation), the
+#   dvrHelper cmdline hunt, and the generic (deleted)-exe sweep. Note the
+#   third branch WILL fire on legitimate cleanup tooling that reaps daemons
+#   still running from an upgraded package's deleted inode; tune it.
 
 # [HOST-BASED GREP STRINGS]
 # "/home/.k"

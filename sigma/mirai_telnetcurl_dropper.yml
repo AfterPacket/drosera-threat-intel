@@ -1,0 +1,54 @@
+title: MIRAI_TELNETCURL dropper fixed-filename staging
+id: 1d78f3a4-6b95-4c02-8ea3-5f41b7d09c26
+status: experimental
+description: |
+  Detects the MIRAI_TELNETCURL droppers staging payloads under their fixed
+  per-architecture filenames.
+
+  The filenames are non-dictionary six-character tokens, stable across both
+  the curl and busybox-wget variants of the dropper, which makes them
+  effectively zero-false-positive strings.
+
+  VFASXC (arm), WQZRTY (arm5), YUIOXC (arm7), GHJKLB (mips), MNCXOP (mipsel)
+  are fetched. PLXMKJ and KFGDFG appear ONLY in the dropper's rm -rf preamble
+  and are never downloaded from the observed hosts - they are cleanup targets
+  for architecture builds this kit ships but these two hosts did not serve.
+  A host carrying PLXMKJ or KFGDFG was hit by a dropper variant that has not
+  been captured, which makes those two the higher-value hunt strings.
+
+  The exec argument telnet.curl is the operator's infection-vector tag.
+references:
+    - https://github.com/Afterpacket/drosera-threat-intel
+    - https://github.com/Afterpacket/drosera-threat-intel/blob/main/reports/MIRAI_TELNETCURL_analysis_3801a288.md
+author: AfterPacket
+date: 2026-08-08
+tags:
+    - attack.execution
+    - attack.t1059.004
+    - attack.t1105
+    - attack.t1222.002
+    - tlp.white
+logsource:
+    product: linux
+    category: process_creation
+detection:
+    staging_host:
+        CommandLine|contains: '205.237.110.232'
+    exec_tag:
+        CommandLine|contains: 'telnet.curl'
+    fetched_names:
+        CommandLine|contains:
+            - 'VFASXC'
+            - 'WQZRTY'
+            - 'YUIOXC'
+            - 'GHJKLB'
+            - 'MNCXOP'
+    uncaptured_build_names:
+        CommandLine|contains:
+            - 'PLXMKJ'
+            - 'KFGDFG'
+    condition: staging_host or exec_tag or fetched_names or uncaptured_build_names
+falsepositives:
+    - None expected. All seven filenames are non-dictionary tokens with no
+      benign usage.
+level: critical

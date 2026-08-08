@@ -1,0 +1,49 @@
+title: GSOCKET_SSHIT watchdog persistence installation
+id: 7c3e9a12-5f84-4b27-9d61-3a8e2f0c5b74
+status: experimental
+description: |
+  Detects the attacker wrapper from the Drosera 2026-08-07 capture installing
+  its self-healing gsocket watchdog. The wrapper abuses THC Global Socket, a
+  legitimate tool, so file-based detection is weak and behaviour is the
+  reliable signal.
+
+  ~/.config/prng/ is the wrapper's own staging directory and collides with
+  nothing legitimate, making it the single strongest indicator. The systemd
+  unit name gsocket-watchdog.service is likewise invented by the attacker,
+  not by upstream gsocket.
+
+  IMPORTANT: killing gs-netcat before removing all five persistence
+  mechanisms causes the watchdog to reinstall gsocket, derive a NEW secret
+  and upload it to the operator. Removal order matters.
+references:
+    - https://github.com/Afterpacket/drosera-threat-intel
+    - https://github.com/Afterpacket/drosera-threat-intel/blob/main/reports/GSOCKET_SSHIT_analysis_22585585.md
+author: AfterPacket
+date: 2026-08-08
+tags:
+    - attack.persistence
+    - attack.t1543.002
+    - attack.t1053.003
+    - attack.t1546.004
+    - tlp.white
+logsource:
+    product: linux
+    category: file_event
+detection:
+    staging_dir:
+        TargetFilename|contains:
+            - '/.config/prng/watchdog.sh'
+            - '/.config/prng/gs_output.log'
+            - '/.config/prng/gs_line.txt'
+            - '/.config/prng/thc_cli'
+    systemd_unit:
+        TargetFilename|endswith: '/gsocket-watchdog.service'
+    pid_files:
+        TargetFilename:
+            - '/tmp/gsocket_watchdog.pid'
+            - '/tmp/gsocket_restart_count.txt'
+    condition: staging_dir or systemd_unit or pid_files
+falsepositives:
+    - None expected. None of these paths are used by upstream gsocket or by
+      any packaged software. A hit should be treated as confirmed compromise.
+level: critical

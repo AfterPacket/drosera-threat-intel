@@ -1,0 +1,54 @@
+title: BOTKILL_PROCWIPE competitor-removal script on host
+id: 4f81a67c-3d29-4e5b-a074-6c8f1b93d2e5
+status: experimental
+description: |
+  Detects the competitor-removal scripts from the Drosera 2026-08-07 capture.
+  These are not payloads: they are one botnet operator clearing rival malware
+  off a box it intends to keep.
+
+  Sample 41d9a2a0 kills any process whose /proc/$pid/exe symlink ends in
+  "(deleted)" - self-deletion after execution is standard IoT-botnet hygiene,
+  so this reliably kills other people's bots. Sample 2733d565 targets the
+  literal string "dvrHelper", the exact output filename used by MIRAI_LOADER
+  elsewhere in the same capture.
+
+  This rule exists because no YARA rule ships for this family: a signature on
+  a generic /proc-walking kill loop would false-positive across any estate.
+  The durable indicators are the drop path and the target string, which are
+  log-visible rather than file-visible.
+
+  *** A host with /home/.k present has been compromised by at least TWO
+  separate actors. The rival's presence proves an earlier infestation that
+  has not yet been scoped. Reimage rather than clean. ***
+references:
+    - https://github.com/Afterpacket/drosera-threat-intel
+    - https://github.com/Afterpacket/drosera-threat-intel/blob/main/reports/BOTKILL_PROCWIPE_analysis_41d9a2a0.md
+author: AfterPacket
+date: 2026-08-08
+tags:
+    - attack.impact
+    - attack.t1489
+    - attack.t1057
+    - attack.t1518.001
+    - tlp.white
+logsource:
+    product: linux
+detection:
+    drop_path:
+        TargetFilename: '/home/.k'
+    dvrhelper_hunt:
+        CommandLine|contains|all:
+            - '/proc/'
+            - 'dvrHelper'
+    deleted_exe_sweep:
+        CommandLine|contains|all:
+            - '/proc/'
+            - '(deleted)'
+            - 'kill'
+    condition: drop_path or dvrhelper_hunt or deleted_exe_sweep
+falsepositives:
+    - Legitimate process-management and cleanup tooling can walk /proc and
+      kill matched processes. The deleted_exe_sweep branch in particular will
+      fire on scripts that reap daemons still running from an upgraded
+      package's deleted inode. The /home/.k branch has no benign explanation.
+level: high

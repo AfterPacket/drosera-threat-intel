@@ -1,0 +1,65 @@
+title: PERLBOT_SHELLBOT IRC shellbot activity
+id: 5a2fc836-7e14-4b90-a3d6-1c95f8027e4b
+status: experimental
+description: |
+  Detects the Perl IRC shellbots from the Drosera 2026-08-07 capture.
+
+  All three samples accept a C2 override as their first argument:
+
+      $server="$ARGV[0]" if $ARGV[0];
+
+  so any detection keyed on the two known C2 IPs is defeated by relaunching
+  the bot against a different host. The operator constants are not:
+
+      my @admins   = ("MAD");
+      my @channels = ("#mot");
+
+  These are identical in all three samples across BOTH C2 servers, which is
+  what proves one operator runs both. They are hardcoded and unrandomised, so
+  unlike the nick they can be signatured and unlike the server they survive
+  the override. Network-side, the equivalent is Suricata SID 9003005, which
+  matches JOIN #mot on any destination and port.
+
+  The bot also masquerades its process name, rewriting $0 to one of eleven
+  plausible daemons (httpd, sshd, syslogd, acpid, cron). Cross-check any such
+  process whose executable path does not match the package manager's record.
+
+  Note SIG{TERM} is set to IGNORE - plain kill will not stop this bot.
+references:
+    - https://github.com/Afterpacket/drosera-threat-intel
+    - https://github.com/Afterpacket/drosera-threat-intel/blob/main/reports/PERLBOT_SHELLBOT_analysis_03a4f492.md
+author: AfterPacket
+date: 2026-08-08
+tags:
+    - attack.command_and_control
+    - attack.t1071
+    - attack.t1036.004
+    - attack.t1562.001
+    - tlp.white
+logsource:
+    product: linux
+    category: process_creation
+detection:
+    known_c2:
+        CommandLine|contains:
+            - '213.139.77.150'
+            - '213.177.179.11'
+    operator_constants:
+        CommandLine|contains:
+            - '@channels = ("#mot")'
+            - '@admins = ("MAD")'
+    dropped_names:
+        CommandLine|endswith:
+            - '/duba'
+            - '/dodu'
+            - '/gots'
+    perl_structure:
+        CommandLine|contains|all:
+            - 'rircname'
+            - 'rand scalar'
+    condition: known_c2 or operator_constants or dropped_names or perl_structure
+falsepositives:
+    - The dropped_names selection is short and could collide with unrelated
+      filenames; it is included because /dodu has NO VirusTotal record at all
+      and is therefore invisible to hash-based hunting.
+level: high

@@ -1,0 +1,52 @@
+title: WEBROOT_PROBE write-and-execute capability probe
+id: c417d0b3-9f52-4e86-b71c-04a8d36e2f95
+status: experimental
+description: |
+  Detects the webroot capability probes from the Drosera 2026-08-07 capture -
+  the two most-seen samples in the corpus, 224 sightings combined.
+
+  Each is two lines: a shebang and echo "xxxxxx". They are planted in the
+  webroot, requested over HTTP, and the operator looks for xxxxxx in the
+  response. A hit confirms webroot write access AND script execution in one
+  step, after which the operator returns with a real payload.
+
+  *** THE FILE IS HARMLESS. WHAT IT PROVES IS NOT. ***
+  Finding one means someone has ALREADY confirmed remote code execution on
+  that host. The correct response is to scope how webroot write access was
+  obtained, not to delete the file and move on.
+
+  No YARA rule ships for this family, deliberately: a signature on a two-line
+  script containing echo "xxxxxx" would fire on test fixtures, scaffolding
+  and throwaway debug scripts across any estate. File-creation telemetry
+  scoped to the webroot is a far better fit, which is what this rule uses.
+references:
+    - https://github.com/Afterpacket/drosera-threat-intel
+    - https://github.com/Afterpacket/drosera-threat-intel/blob/main/reports/WEBROOT_PROBE_analysis_af77b643.md
+author: AfterPacket
+date: 2026-08-08
+tags:
+    - attack.initial_access
+    - attack.t1190
+    - attack.t1505.003
+    - tlp.white
+logsource:
+    product: linux
+    category: file_event
+detection:
+    observed_path:
+        TargetFilename: '/var/www/html/filter'
+    webroot_script_drop:
+        TargetFilename|startswith:
+            - '/var/www/'
+            - '/usr/share/nginx/html/'
+            - '/srv/http/'
+        TargetFilename|endswith:
+            - '.sh'
+            - '/filter'
+    condition: observed_path or webroot_script_drop
+falsepositives:
+    - The webroot_script_drop selection will fire on legitimate deployments
+      that place shell scripts under a web root. Tune to your estate, or rely
+      on observed_path alone if deployment noise is high. The exact path
+      /var/www/html/filter has no benign explanation.
+level: high

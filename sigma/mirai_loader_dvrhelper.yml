@@ -1,0 +1,54 @@
+title: MIRAI_LOADER dvrHelper staging and write-exec probe
+id: 90b4e751-2c68-4a3d-95f7-8b03e6c41d92
+status: experimental
+description: |
+  Detects the MIRAI_LOADER shell loader staging its dvrHelper payload.
+
+  The loader is self-identifying: it fetches a path literally named
+  mirai.<arch> and writes the result to dvrHelper. It then executes it with
+  the argument "tscan", this family's equivalent of MIRAI_TELNETCURL's
+  telnet.curl tag.
+
+  "dvrHelper" alone is deliberately NOT sufficient here. It is a widely
+  reused Mirai artefact name that appears in unrelated samples, in detection
+  content, and - in this same capture - inside a rival operator's kill
+  script. It is paired with other evidence in every selection below.
+
+  Before staging, the loader runs a write-and-execute probe across six
+  directories: it creates .f, chmods it 777, EXECUTES it, and only then
+  settles in that directory. Mounting /tmp, /var/tmp and /dev/shm noexec
+  therefore genuinely defeats this family - the probe fails and it moves on.
+
+  Note /data/local/tmp in the directory list: this loader targets Android and
+  Android-derived embedded devices as well as conventional Linux.
+references:
+    - https://github.com/Afterpacket/drosera-threat-intel
+    - https://github.com/Afterpacket/drosera-threat-intel/blob/main/reports/MIRAI_LOADER_analysis_246c3c37.md
+author: AfterPacket
+date: 2026-08-08
+tags:
+    - attack.execution
+    - attack.t1059.004
+    - attack.t1105
+    - attack.t1083
+    - tlp.white
+logsource:
+    product: linux
+    category: process_creation
+detection:
+    staging_host:
+        CommandLine|contains: '77.90.185.66'
+    self_identifying_path:
+        CommandLine|contains: 'mirai.'
+    exec_tag:
+        CommandLine|contains: 'dvrHelper tscan'
+    write_exec_probe:
+        CommandLine|contains|all:
+            - '/.f'
+            - 'chmod 777'
+    condition: staging_host or exec_tag or (self_identifying_path and write_exec_probe)
+falsepositives:
+    - The self_identifying_path selection is only used in combination, since
+      'mirai.' could appear in security tooling, detection content or
+      research material on an analyst workstation.
+level: high
