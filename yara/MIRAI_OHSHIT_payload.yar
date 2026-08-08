@@ -40,7 +40,12 @@ rule MIRAI_OHSHIT_payload
         yarahub_reference_link    = "https://github.com/Afterpacket/drosera-threat-intel"
         yarahub_author_twitter    = "@AfterPacket"
         yarahub_author_email      = "AfterPacketTru@protonmail.com"
-        malpedia_family           = "elf.mirai"
+        /* malpedia_family intentionally omitted. "elf.mirai" is a real
+         * Malpedia slug (malpedia.caad.fkie.fraunhofer.de/details/elf.mirai
+         * resolves) but YARAify rejects it with "Illegal value for field
+         * malpedia_family", and its guidelines do not document what the
+         * validator accepts. The field is optional, so it is dropped rather
+         * than guessed at. Do not re-add without testing against YARAify. */
 
     strings:
         /* C2 domains -- identical across all 7 captured builds.

@@ -37,7 +37,9 @@ rule MIRAI_TELNETCURL_payload
         yarahub_reference_link    = "https://github.com/Afterpacket/drosera-threat-intel"
         yarahub_author_twitter    = "@AfterPacket"
         yarahub_author_email      = "AfterPacketTru@protonmail.com"
-        malpedia_family           = "elf.mirai"
+        /* malpedia_family intentionally omitted -- see the note in
+         * MIRAI_OHSHIT_payload.yar. "elf.mirai" is a valid Malpedia slug but
+         * YARAify rejects it as an illegal value. The field is optional. */
 
     strings:
         /* The decoy domain from the leaked Mirai source, present in all five
