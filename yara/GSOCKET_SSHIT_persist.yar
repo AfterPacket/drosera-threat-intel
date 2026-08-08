@@ -1,11 +1,11 @@
 /*
- * GSOCKET_SSHIT — abuse of THC Global Socket / ssh-it for persistent access
+ * GSOCKET_SSHIT -- abuse of THC Global Socket / ssh-it for persistent access
  * Drosera honeypot capture, 2026-08-02
  *
  * IMPORTANT: the tool being deployed here is legitimate. THC gsocket and
  * ssh-it are published security tools with lawful uses. This rule targets
- * the ATTACKER'S DEPLOYMENT WRAPPER — specifically the exfil callback to
- * 192.253.248.9 — not gsocket itself.
+ * the ATTACKER'S DEPLOYMENT WRAPPER -- specifically the exfil callback to
+ * 192.253.248.9 -- not gsocket itself.
  *
  * Do NOT broaden this rule to match gsocket.io URLs or the gsocket binary.
  * Doing so will fire on legitimate administrator use.
@@ -25,7 +25,7 @@ rule GSOCKET_SSHIT_deployer
         note         = "Targets the attacker wrapper only. THC gsocket is a legitimate tool."
 
         /* YARAhub / YARAify submission metadata.
-         * reference_md5 is /da (sha256 22585585…), carrying the exfil
+         * reference_md5 is /da (sha256 22585585...), carrying the exfil
          * endpoint 192.253.248.9/gsocket/up.php. */
         yarahub_uuid              = "e7b02a58-4c1f-4d93-a6b7-8e05f2c47d31"
         yarahub_license           = "CC0 1.0"
@@ -37,14 +37,14 @@ rule GSOCKET_SSHIT_deployer
         yarahub_author_email      = "AfterPacketTru@protonmail.com"
 
     strings:
-        /* High-confidence — the operator's own infrastructure */
+        /* High-confidence -- the operator's own infrastructure */
         $uniq1 = "192.253.248.9/gsocket/up.php" ascii
         $uniq2 = "http://192.253.248.9/gsocket/up.php" ascii
 
         /* C2 indicator */
         $c2_1 = "192.253.248.9" ascii
 
-        /* Wrapper-specific variables — not part of upstream gsocket */
+        /* Wrapper-specific variables -- not part of upstream gsocket */
         $cap1 = "GS_UPLOAD_URL" ascii
         $cap2 = "URL_DEPLOY" ascii
         $cap3 = "GS_OUTPUT_FILE" ascii
@@ -53,7 +53,7 @@ rule GSOCKET_SSHIT_deployer
         $cap4 = "ifconfig.me" ascii
 
         /* Persistence artefacts. ~/.config/prng is the wrapper's own staging
-         * directory — it collides with nothing legitimate and is the best
+         * directory -- it collides with nothing legitimate and is the best
          * single host indicator for this family. The systemd unit name is
          * likewise invented by the attacker, not by upstream gsocket. */
         $cap5 = ".config/prng" ascii

@@ -1,9 +1,12 @@
 /*
- * MIRAI_TELNETCURL — telnet-propagated Mirai variant, 5 architectures
+ * MIRAI_TELNETCURL -- telnet-propagated Mirai variant, 5 architectures
  * Drosera honeypot capture, 2026-08-01 .. 2026-08-07
  *
- * SCOPE: dropper scripts only. The 5 captured ELF payloads are NOT
- * covered — no strings were extracted from them.
+ * SCOPE: both tiers. MIRAI_TELNETCURL_dropper covers the two shell
+ * droppers; MIRAI_TELNETCURL_payload covers the 5 ELF builds. (An earlier
+ * revision of this header said the payloads were not covered because no
+ * strings had been extracted from them -- that was true then and is not
+ * now. The payload rule below has existed since strings were recovered.)
  *
  * The per-architecture output filenames are non-dictionary six-character
  * tokens, stable across both the curl and busybox-wget variants. They are
@@ -24,7 +27,7 @@ rule MIRAI_TELNETCURL_dropper
         status       = "PRODUCTION"
 
         /* YARAhub / YARAify submission metadata.
-         * reference_md5 is /curl.sh (sha256 3801a288…), carrying $uniq1
+         * reference_md5 is /curl.sh (sha256 3801a288...), carrying $uniq1
          * "telnet.curl" plus the staging host. */
         yarahub_uuid              = "6d2f9a45-b13c-4e78-8f05-7a9d3b6c1e24"
         yarahub_license           = "CC0 1.0"
@@ -45,7 +48,7 @@ rule MIRAI_TELNETCURL_dropper
 
         /* Fixed per-architecture output filenames.
          * name1-5 are fetched. name6-7 appear ONLY in the dropper's rm -rf
-         * preamble and are never downloaded — they are cleanup targets for
+         * preamble and are never downloaded -- they are cleanup targets for
          * architecture builds this kit ships but these two hosts did not
          * serve. They are hunt strings for builds we have not captured. */
         $name1 = "VFASXC" ascii
@@ -87,10 +90,10 @@ rule MIRAI_TELNETCURL_payload
         tlp          = "TLP:WHITE"
         reference    = "https://github.com/Afterpacket/drosera-threat-intel"
         status       = "PRODUCTION"
-        note         = "Lineage marker, not a family discriminator — see condition"
+        note         = "Lineage marker, not a family discriminator -- see condition"
 
         /* YARAhub / YARAify submission metadata.
-         * reference_md5 is /arm5 (sha256 9cbe35b1…), an ELF carrying the
+         * reference_md5 is /arm5 (sha256 9cbe35b1...), an ELF carrying the
          * leaked-source decoy domain this rule matches on. */
         yarahub_uuid              = "a45e8b71-2f6d-4c09-b83a-5d1e7f4a9c60"
         yarahub_license           = "CC0 1.0"

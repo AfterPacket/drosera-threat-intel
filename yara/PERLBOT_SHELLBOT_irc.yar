@@ -1,9 +1,9 @@
 /*
- * PERLBOT_SHELLBOT — Perl IRC shellbot
+ * PERLBOT_SHELLBOT -- Perl IRC shellbot
  * Drosera honeypot capture, 2026-08-02 .. 2026-08-07
  *
  * Covers all three captured samples (/duba, /dodu, /gots), including
- * /dodu — which carries NO VirusTotal record despite being the same size
+ * /dodu -- which carries NO VirusTotal record despite being the same size
  * as /duba, which 29 of 60 engines flag. The undetected twin is the
  * higher-value hunt target.
  *
@@ -27,7 +27,7 @@ rule PERLBOT_SHELLBOT_irc
         status       = "PRODUCTION"
 
         /* YARAhub / YARAify submission metadata.
-         * reference_md5 is /duba (sha256 03a4f492…), the VT 29/60 sample
+         * reference_md5 is /duba (sha256 03a4f492...), the VT 29/60 sample
          * whose config block satisfies $c2_2 outright. */
         yarahub_uuid              = "18c3d6f2-9e7b-4a45-90d8-3b62e5f7a1c9"
         yarahub_license           = "CC0 1.0"
@@ -39,19 +39,19 @@ rule PERLBOT_SHELLBOT_irc
         yarahub_author_email      = "AfterPacketTru@protonmail.com"
 
     strings:
-        /* C2 indicators — defeated by an $ARGV[0] override, so never sole-condition */
+        /* C2 indicators -- defeated by an $ARGV[0] override, so never sole-condition */
         $c2_1 = "213.139.77.150" ascii
         $c2_2 = "my $server = '213.139.77.150'" ascii
         $c2_3 = "my $port = '6667'" ascii
 
-        /* Structural markers — survive C2 redirection */
+        /* Structural markers -- survive C2 redirection */
         $s1 = "rircname" ascii
         $s2 = "$rps[rand scalar" ascii
         $s3 = "[rand scalar @rircname]" ascii
         $s4 = "$server=\"$ARGV[0]\" if $ARGV[0]" ascii
 
         /* Operator constants. Identical in all three samples across BOTH C2
-         * servers (213.139.77.150 and 213.177.179.11) — which is what proves
+         * servers (213.139.77.150 and 213.177.179.11) -- which is what proves
          * one operator runs both. Unlike the nick, these are not randomised,
          * and unlike the server they survive the $ARGV[0] override. They are
          * the most durable indicators this family has. */
@@ -72,7 +72,7 @@ rule PERLBOT_SHELLBOT_irc
              * after an $ARGV[0] override that defeats every IP-based branch. */
             all of ($op*) or
 
-            /* HIGH: two structural markers — C2-redirection resistant */
+            /* HIGH: two structural markers -- C2-redirection resistant */
             2 of ($s*) or
 
             /* MEDIUM: Perl script carrying the C2 and one structural marker */
