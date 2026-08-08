@@ -241,13 +241,22 @@ them breaks legitimate traffic.
 yara -r yara/*.yar /path/to/scan
 ```
 
-> **⚠ Rule syntax is currently UNVERIFIED.** `yara` is not installed on the
-> analysis workstation, so these files have **not** been compile-checked, and
-> they were substantially edited on 2026-08-08 (YARAhub metadata, `xor(0x22)`
-> strings, new indicators). Run `yara -r yara/*.yar /dev/null` on a host that
-> has YARA before relying on them. A previous revision of this README claimed
-> validation against YARA 4.5.5 with zero errors and a clean corpus run; that
-> claim could not be substantiated and has been withdrawn.
+> **⚠ Rule syntax is currently UNVERIFIED.** These files have **not** been
+> compile-checked. Run `yara -r yara/*.yar /dev/null` on a host with YARA
+> before relying on them.
+>
+> A previous revision of this README claimed validation against YARA 4.5.5 with
+> zero errors and a clean corpus run. That claim could not be substantiated and
+> has been withdrawn.
+>
+> *Why it is still unverified (checked 2026-08-08, so nobody re-treads this):*
+> `yara` is not installed and cannot readily be. `pip install yara-python`
+> finds **no wheel** for CPython 3.14 on Windows and falls back to a source
+> build, which fails in the Windows SDK — `specstrings.h` includes
+> `specstrings_strict.h`, which is absent from SDK 10.0.26100.0. Note also that
+> `import yara` from the repo root silently resolves to this repository's own
+> `yara/` **directory** as an empty namespace package, so an import succeeding
+> proves nothing. Verify on a Linux host or a box with a working MSVC/SDK pair.
 
 All rules carry the YARAhub mandatory metadata (`yarahub_uuid`,
 `yarahub_license`, `yarahub_reference_md5`, `yarahub_rule_matching_tlp`,
@@ -275,10 +284,11 @@ sigma convert -t splunk -p sysmon_linux sigma/*.yml
 | `mirai_loader_dvrhelper.yml` | `dvrHelper tscan`, the `.f` write-exec probe |
 | `perlbot_shellbot_irc_c2.yml` | `#mot` / `MAD` operator constants — survive the C2 override |
 
-Rules were checked for YAML validity, required fields, UUIDv4 ids, and that
-every selection referenced in a `condition` exists and every defined selection
-is used. **They have not been run through `sigma-cli` or any backend** — that
-tool is not installed on the analysis workstation.
+**Validated 2026-08-08.** All 8 rules parse under **pysigma 1.5.0** and convert
+cleanly to Splunk SPL via **pysigma-backend-splunk 2.1.0** — every rule produces
+a working query. Also checked: YAML validity, required fields, unique UUIDv4
+ids, and that every selection referenced in a `condition` exists with no
+selection left unused.
 
 **Suricata** — drop the `.rules` files into your rules directory and add them to
 `suricata.yaml`, then validate before reload:
