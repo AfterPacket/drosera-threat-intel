@@ -93,11 +93,45 @@ fd93b4f7bd5e8360ecd6e782dd445356728e698b9f25e335131b28bcdd3e56e3   # /gots, 4027
 # Note /gots guards the assignment with `unless $server` where the other two
 # assign unconditionally: a small build variant, same operator.
 
+# [OPERATOR CONSTANTS — the most durable indicators in this family]
+# Verified identical in ALL THREE samples, across BOTH C2 servers:
+#   my @admins   = ("MAD");
+#   my @channels = ("#mot");
+#
+# This is the strongest evidence available that ONE operator runs both
+# 213.139.77.150 and 213.177.179.11 — the servers differ, the operator
+# constants do not.
+#
+# Operationally these beat every other indicator this family has:
+#   - the NICK is randomised per run, so it cannot be signatured
+#   - the SERVER is defeated by the $ARGV[0] override
+#   - "#mot" and "MAD" are hardcoded, unrandomised, and survive both
+# A bot pointed at an attacker's new server still joins #mot.
+# Shipped as Suricata SID 9003005 (any destination, any port) and as
+# $op1/$op2 in the YARA rule.
+
+# [VERSION STRINGS — build discriminator]
+# /duba and /dodu : $version = 'v.02'          (identical builds; the ONLY
+#                                               byte-level difference between
+#                                               the two files is the C2 IP)
+# /gots           : $version = 'Hello To This WOrld'
+#
+# /gots is a different, larger build: it spoofs CTCP VERSION replies from an
+# 11-entry mIRC version list and carries a several-hundred-entry nick list,
+# where /duba and /dodu use a single-entry @rircname ("bad"). Its help menu
+# self-describes as "[alavojda's dd0s b0ts]" and takes commands prefixed
+# "!u @" (@system, @version, @channel, @flood, @utils). "alavojda" is a
+# campaign handle worth tracking.
+
 # [HOST-BASED GREP STRINGS]
 # "213.139.77.150"
+# "213.177.179.11"
 # "rircname"
 # "@rps"
 # "$rps[rand scalar"
+# "#mot"                <- C2-independent
+# "MAD"                 <- use with context; too short to grep alone
+# "alavojda"            <- /gots only
 
 # [HOST HUNT]
 # grep -rl "213.139.77.150" / 2>/dev/null

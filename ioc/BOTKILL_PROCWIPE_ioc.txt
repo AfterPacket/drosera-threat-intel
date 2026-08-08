@@ -43,9 +43,26 @@
 # bots while leaving normal daemons alone. Broad, indiscriminate, effective.
 
 # [CAPABILITY — 2733d565, 390 B]
-# Iterates /proc/*, skips non-numeric entries, reads /proc/$pid/cmdline,
-# translates NULs to spaces, and kills -9 any process whose cmdline
-# contains the literal string "dvrHelper".
+# INTENT: iterate /proc/*, skip non-numeric entries, read /proc/$pid/cmdline,
+# translate NULs to spaces, and kill -9 any process whose cmdline contains
+# the literal string "dvrHelper".
+#
+# *** AS CAPTURED, THIS SAMPLE IS CORRUPT AND CANNOT EXECUTE ***
+# Verified at byte level 2026-08-08. Offset 0x22 carries the three bytes
+#   5c 33 42   =   \ 3 B
+# where a single ';' (0x3B) belongs:
+#   for proc_dir in /proc/*\3B  pid=${proc_dir##*/}
+# The separator was escaped into its own hex representation somewhere in the
+# delivery path — a shell/URL-escaping artefact of writing the script over
+# telnet. The result is a `for` loop with no `do` and a trailing `done` with
+# no opener: /bin/sh rejects it with a syntax error before executing anything.
+#
+# Consequences for reporting:
+#   - This particular drop was INERT. It never killed anything.
+#   - The operator's INTENT is still fully evidenced by the source, and the
+#     dvrHelper linkage below stands.
+#   - Do not cite this sample as evidence of successful bot-killing activity.
+#   - The sibling sample 41d9a2a0 is INTACT and does execute correctly.
 #
 #   *** dvrHelper is the exact output filename used by MIRAI_LOADER
 #   *** (246c3c37, SERVER="77.90.185.66") elsewhere in this same capture.

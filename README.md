@@ -11,7 +11,7 @@ Author: **AfterPacket** · Site: <https://afterpacket.github.io/drosera-threat-i
 
 ## Samples
 
-### Capture 2026-08-07 — 25 samples, 6 families
+### Capture 2026-08-07 — 25 samples, 7 families
 
 | Date | Family | Lead SHA-256 | Type | Severity | Artifacts |
 |------|--------|--------------|------|----------|-----------|
@@ -27,7 +27,7 @@ Author: **AfterPacket** · Site: <https://afterpacket.github.io/drosera-threat-i
 complete; the domain feed is no longer partial.
 
 The MIRAI_OHSHIT payloads carry a compiled-in C2 set, identical across all seven
-architecture builds — so the same indicators cover the nine architectures the
+architecture builds — so the same indicators cover the eight architectures the
 loader fetches but we never captured:
 
 ```
@@ -59,9 +59,22 @@ blocked.
 
 Multi-architecture IoT botnet, staged entirely from `94.154.43.123`. Full chain
 recovered: a 104-byte fetcher written to `/tmp/.p` over telnet pulls `ohshit.sh`,
-which loops 16 architectures, `cat`s each payload into a file named `WTF`, runs
-`chmod +x *`, and executes. Seven of the sixteen architecture builds were captured.
+which loops 15 architectures, `cat`s each payload into a file named `WTF`, runs
+`chmod +x *`, and executes. Seven of the fifteen architecture builds were captured.
 The doubled slash in `http://94.154.43.123//bot.<arch>` is a reliable detection string.
+
+**Hidden L7 flood module (XOR 0x22).** All seven payloads carry a single-byte-XOR
+obfuscated config region — Mirai's `table.c` scheme, where the leaked-source
+`TABLE_KEY` `0xdeadbeef` collapses to one effective byte
+(`0xef^0xbe^0xad^0xde = 0x22`). It holds a full HTTP flood kit: header templates,
+a rotating User-Agent pool, and 20 Referer URLs. **This family is a DDoS platform,
+not just a loader.** Plaintext string extraction cannot see any of it.
+
+⚠ The 20 Referer domains recovered are `google.com`, `facebook.com`,
+`cloudflare.com` and similar — **legitimate sites used as flood header values.**
+They are *not* infrastructure and must never be blocklisted. The XOR region
+contains **no C2 at all**, verified across all seven builds, which independently
+confirms `blocklist.txt` complete.
 
 **SSH propagation.** The payloads embed a full SSH client — `ssh-ed25519`,
 `curve25519`, `chacha20`, `aes128-ctr` and `hmac-sha2` algorithm strings are all
@@ -78,6 +91,15 @@ non-dictionary output filenames per architecture (`VFASXC`, `WQZRTY`, `YUIOXC`,
 by `205.237.110.232` match the five dropped directly by `60.185.49.73` exactly:
 one kit, two hosts.
 
+Both droppers `rm -rf` **seven** filenames but fetch only five. `PLXMKJ` and
+`KFGDFG` are cleanup targets for architecture builds this kit ships but these two
+hosts did not serve — hunt strings for a variant not yet captured.
+
+Verified **not obfuscated**: a sweep of the full single-byte XOR keyspace across
+all five payloads returned nothing at `0x22` or any other key. Unlike
+MIRAI_OHSHIT, this family really is IP-only — established by negative result
+rather than by the absence of plaintext domains.
+
 ### PERLBOT_SHELLBOT
 
 Perl IRC shellbot, C2 `213.139.77.150:6667`, with randomised nick and process-name
@@ -87,19 +109,42 @@ masquerade. **Contains an undetected twin:** `/duba` and `/dodu` are both exactl
 a C2 override via `$ARGV[0]`, so the hardcoded server is a default, not a guarantee —
 the shipped YARA rule includes C2-independent structural matches.
 
+**One operator, two servers.** All three samples share `@admins = ("MAD")` and
+`@channels = ("#mot")` — identical across both C2 hosts. The nick is randomised
+and the server is overridable, but these two are hardcoded and survive both.
+`JOIN #mot` is therefore the durable detection (Suricata 9003005, any destination,
+any port) and `$op1`/`$op2` in YARA. `/duba` and `/dodu` differ by **exactly one
+line** — the C2 IP. `/gots` is a larger, distinct build that spoofs mIRC CTCP
+VERSION replies and self-describes as `[alavojda's dd0s b0ts]`.
+
 ### GSOCKET_SSHIT
 
 Abuse of **THC Global Socket / ssh-it**, a legitimate published security tool, for
-persistent remote access. Installs a systemd unit plus watchdog script and beacons
-the victim's public IP to `POST http://192.253.248.9/gsocket/up.php`. Detection here
-targets the attacker's wrapper and exfil callback only — never gsocket itself.
-VirusTotal 2/60, very low for a working persistent backdoor installer.
+persistent remote access. Beacons to `POST http://192.253.248.9/gsocket/up.php`.
+Detection here targets the attacker's wrapper and exfil callback only — never
+gsocket itself. VirusTotal 2/60, very low for a working persistent backdoor installer.
+
+**Five persistence mechanisms**, not two: a systemd unit
+(`gsocket-watchdog.service`, `Restart=always`), a per-minute crontab, an `@reboot`
+crontab, injections into `.bashrc`/`.profile`/`.zshrc`/`.bash_profile`, and the
+watchdog script itself. **Kill the process last, not first** — the watchdog polls
+every 30 s and, if `gs-netcat` is absent, reinstalls it, derives a *new* secret and
+uploads that to the operator. Killing it regenerates access and re-notifies the
+attacker. Best host indicator: `~/.config/prng/`, which collides with nothing
+legitimate. The beacon carries hostname, public IP **and the gs-netcat credential**,
+making `192.253.248.9` the richest sinkhole target in this capture.
 
 ### MIRAI_LOADER
 
 Unobfuscated Mirai loader, `SERVER="77.90.185.66"`, fetching `mirai.<arch>` and
-writing `dvrHelper`. Self-identifying and trivially detected. Notable for being
-actively targeted by BOTKILL_PROCWIPE below.
+writing `dvrHelper`, executed with the tag `tscan`. Self-identifying and trivially
+detected. Notable for being actively targeted by BOTKILL_PROCWIPE below.
+
+**Targets Android.** Its directory list includes `/data/local/tmp` alongside the
+usual Linux paths — scoping an investigation to Linux hosts alone misses part of
+the affected estate. The directory loop is a write-and-execute probe, not a plain
+`chdir`: it creates `.f`, chmods it 777, *runs* it, and only then settles there,
+selecting the first location permitting both write and exec.
 
 ### BOTKILL_PROCWIPE
 
@@ -111,6 +156,13 @@ bot. The other greps process cmdlines specifically for `dvrHelper` and kills mat
 `/home/.k` present has been compromised by at least two separate actors; reimage
 rather than clean. No YARA rule ships: generic `/proc`-walking kill loops would
 false-positive on legitimate process management.
+
+**The dvrHelper-killer was delivered corrupt and never ran.** At offset `0x22` it
+carries the bytes `5c 33 42` (`\3B`) where a `;` (`0x3B`) belongs — a shell-escaping
+artefact of writing the script over telnet. That leaves a `for` loop with no `do`
+and a `done` with no opener, so `/bin/sh` rejects it outright. The operator's intent
+stands and the MIRAI_LOADER linkage holds, but this drop was inert. The sibling
+sample `41d9a2a0` is intact and does execute.
 
 ### WEBROOT_PROBE
 
@@ -150,7 +202,11 @@ attribute the abuse, not the tool.
 | `yara/<FAMILY>_<campaign>.yar` | One YARA rule per family. |
 | `suricata/<family>.rules` | One Suricata ruleset per family. |
 | `sigma/<family>_<detection>.yml` | One or more Sigma rules per family. |
-| `reports/<FAMILY>_analysis_<sha256short>.md` | Full structured analysis report. |
+| `reports/<FAMILY>_analysis_<sha256short>.md` | Full structured analysis report, one per family. |
+| `reports/CAPTURE_<date>_executive_summary.md` | Risk ranking, key findings, immediate actions. **Start here.** |
+| `reports/CAPTURE_<date>_capability_mitigation_framework.md` | Capability matrix, ATT&CK mapping, and mitigation controls rated for effectiveness against this corpus. |
+| `reports/CAPTURE_<date>_infrastructure_and_sinkhole.md` | Per-sample C2 channel, namespace dependency, and sinkhole viability. |
+| `reports/CAPTURE_<date>_hashes.txt` | SHA-256 / MD5 / SHA-1 for every sample. |
 | `samples/<sha256>.zip` | The sample itself — AES-256, password `infected`. |
 | `drosera-detection-bundle.zip` | Everything above except samples, regenerated after each capture. |
 
@@ -173,11 +229,20 @@ them breaks legitimate traffic.
 yara -r yara/*.yar /path/to/scan
 ```
 
-All rules are validated against **YARA 4.5.5**: every file compiles with zero
-errors and zero warnings, and each rule was run against the capture corpus and
-matches exactly its intended family with **no cross-family false positives**.
-The two Mirai payload rules were checked specifically against each other's
-binaries, since both target Mirai-derived ELF files of similar size.
+> **⚠ Rule syntax is currently UNVERIFIED.** `yara` is not installed on the
+> analysis workstation, so these files have **not** been compile-checked, and
+> they were substantially edited on 2026-08-08 (YARAhub metadata, `xor(0x22)`
+> strings, new indicators). Run `yara -r yara/*.yar /dev/null` on a host that
+> has YARA before relying on them. A previous revision of this README claimed
+> validation against YARA 4.5.5 with zero errors and a clean corpus run; that
+> claim could not be substantiated and has been withdrawn.
+
+All rules carry the YARAhub mandatory metadata (`yarahub_uuid`,
+`yarahub_license`, `yarahub_reference_md5`, `yarahub_rule_matching_tlp`,
+`yarahub_rule_sharing_tlp`) and are formatted for direct submission to
+[YARAify](https://yaraify.abuse.ch/). Each `yarahub_reference_md5` points at a
+sample the rule genuinely matches — ELF-conditioned rules reference ELF samples,
+not the shell droppers.
 
 **Suricata** — drop the `.rules` files into your rules directory and add them to
 `suricata.yaml`, then validate before reload:
@@ -203,9 +268,9 @@ take the next free block from this table and update it.
 
 | Family | SID block | Status |
 |--------|-----------|--------|
-| MIRAI_OHSHIT | `9001001–9001999` | in use (9001001–9001010) |
+| MIRAI_OHSHIT | `9001001–9001999` | in use (9001001–9001012) |
 | MIRAI_TELNETCURL | `9002001–9002999` | in use (9002001–9002005) |
-| PERLBOT_SHELLBOT | `9003001–9003999` | in use (9003001–9003004) |
+| PERLBOT_SHELLBOT | `9003001–9003999` | in use (9003001–9003005) |
 | GSOCKET_SSHIT | `9004001–9004999` | in use (9004001–9004003) |
 | MIRAI_LOADER | `9005001–9005999` | in use (9005001–9005003) |
 | BOTKILL_PROCWIPE | `9006001–9006999` | reserved — no network activity, no rules |
@@ -226,6 +291,23 @@ each are in [`reports/CAPTURE_20260807_hashes.txt`](reports/CAPTURE_20260807_has
   scanner mid-analysis, and can get the storage account actioned.
 
 ---
+
+## Analysis reports
+
+Capture 2026-08-07, all 25 samples read directly from source:
+
+| Report | Contents |
+|--------|----------|
+| [Executive summary](reports/CAPTURE_20260807_executive_summary.md) | Risk ranking, what changed, immediate actions |
+| [Capability & mitigation framework](reports/CAPTURE_20260807_capability_mitigation_framework.md) | Capability matrix, ATT&CK, controls rated P1–P3/D, residual risk |
+| [Infrastructure & sinkhole](reports/CAPTURE_20260807_infrastructure_and_sinkhole.md) | C2 channel per sample, sinkhole viability, priority of action |
+| [MIRAI_OHSHIT](reports/MIRAI_OHSHIT_analysis_8b1a2fb6.md) | 9 samples — 15 arch, SSH propagation, XOR-0x22 L7 flood |
+| [MIRAI_TELNETCURL](reports/MIRAI_TELNETCURL_analysis_3801a288.md) | 7 samples — fixed filenames, obfuscation ruled out |
+| [PERLBOT_SHELLBOT](reports/PERLBOT_SHELLBOT_analysis_03a4f492.md) | 3 samples — undetected twin, one operator/two C2 |
+| [GSOCKET_SSHIT](reports/GSOCKET_SSHIT_analysis_22585585.md) | 1 sample — 5× persistence, credential exfil |
+| [MIRAI_LOADER](reports/MIRAI_LOADER_analysis_246c3c37.md) | 1 sample — Android targeting, `tscan` |
+| [BOTKILL_PROCWIPE](reports/BOTKILL_PROCWIPE_analysis_41d9a2a0.md) | 2 samples — turf war, one corrupt on delivery |
+| [WEBROOT_PROBE](reports/WEBROOT_PROBE_analysis_af77b643.md) | 2 samples — 224 sightings, RCE precursor |
 
 ## Reporting
 

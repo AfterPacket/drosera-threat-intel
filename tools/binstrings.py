@@ -190,6 +190,84 @@ def elf_header(data):
     return fields
 
 
+# ---------------------------------------------------------------------------
+# Single-byte XOR deobfuscation
+#
+# Mirai's table.c XORs its config with the four bytes of TABLE_KEY. The
+# leaked-source default 0xdeadbeef collapses to one effective byte, since
+# each byte is XORed with all four in turn: 0xef^0xbe^0xad^0xde == 0x22.
+# The MIRAI_OHSHIT payloads in this corpus hide an HTTP flood kit there, and
+# a plaintext-only scan cannot see any of it.
+# ---------------------------------------------------------------------------
+
+# A run that reads as real text AFTER the XOR is a genuine find. XOR also maps
+# ordinary plaintext onto other printable bytes, so a naive dump is swamped by
+# strings that were never obfuscated at all.
+#
+# Scoring on "looks like a word" does NOT work here, and the failure is not
+# subtle: XORing with any letter maps letters onto other letters, so keys like
+# 0x69 ('i') and 0x4f ('O') manufacture thousands of pronounceable-looking
+# runs and bury the real key. Score on structural tokens instead — protocol
+# keywords, URL scheme punctuation and absolute paths do not survive being
+# XORed with the wrong byte, so only the correct key produces them.
+MARKERS = (
+    b"http://", b"https://", b"www.", b"HTTP/1", b"User-Agent", b"Accept",
+    b"Referer", b"Cookie", b"Content-Type", b"Mozilla", b"GET /", b"POST /",
+    b"/bin/", b"/proc/", b"/dev/", b"/tmp/", b"busybox", b"password",
+    b"login", b"admin", b"root", b"telnet", b"shell", b"enable", b"system",
+)
+
+
+def xor_view(data, key):
+    """data XORed with a single byte.
+
+    translate() runs at C speed. A per-byte generator over a multi-megabyte
+    image, repeated across the keyspace, is minutes of pure-Python looping.
+    """
+    return data.translate(bytes(b ^ key for b in range(256)))
+
+
+def novel_runs(data, key, minlen):
+    """Runs revealed by `key` that were not already present in the plaintext.
+
+    Subtracting the plaintext set is what makes this usable: without it every
+    result is dominated by ordinary strings the XOR merely scrambled.
+    """
+    base = {text for _, text in ascii_runs(data, minlen)}
+    for offset, text in ascii_runs(xor_view(data, key), minlen):
+        if text not in base:
+            yield offset, text
+
+
+def xor_sweep(data, minlen, top=5):
+    """Score every single-byte key by how much real text it reveals.
+
+    Note 0x20 will always score: it case-flips ASCII, so it 'reveals' a
+    lowercase twin of every uppercase string already in the file. It is
+    reported but flagged, because it is never a real obfuscation key.
+    """
+    scored = []
+    for key in range(1, 256):
+        hits = 0
+        for _, text in novel_runs(data, key, minlen):
+            raw = text.encode("ascii", "ignore")
+            hits += sum(1 for marker in MARKERS if marker in raw)
+        if hits:
+            scored.append((hits, key))
+    scored.sort(reverse=True)
+    return scored[:top]
+
+
+def parse_key(text):
+    """Accept 0x22, 22h, or plain decimal. Returns None for 'sweep'."""
+    if text.lower() == "sweep":
+        return None
+    value = int(text, 16) if text.lower().startswith("0x") else int(text, 0)
+    if not 0 <= value <= 255:
+        raise ValueError(f"XOR key must be a single byte, got {text}")
+    return value
+
+
 def process(path, args, prefix):
     try:
         with open(path, "rb") as handle:
@@ -197,6 +275,30 @@ def process(path, args, prefix):
     except OSError as exc:
         print(f"error: {exc}", file=sys.stderr)
         return 1
+
+    if args.xor is not None:
+        key = parse_key(args.xor)
+        if key is None:
+            for hits, found in xor_sweep(data, args.min_len):
+                note = "  <- case-flip artefact, not obfuscation" if found == 0x20 else ""
+                print(f"{prefix}key 0x{found:02x}: {hits} marker hits{note}")
+            return 0
+        # Deobfuscate in place; everything downstream sees the plaintext view.
+        revealed = list(novel_runs(data, key, args.min_len))
+        if args.ioc:
+            iocs = extract_iocs(revealed)
+            for label, kind in (("URL", "url"), ("IPv4", "ipv4"),
+                                ("DOMAIN", "domain"),
+                                ("DOMAIN (known-benign, do not block)", "benign")):
+                for value in sorted(iocs.get(kind, ())):
+                    print(f"{prefix}{label:<36} {value}")
+            return 0
+        for offset, text in revealed:
+            if args.radix:
+                print(f"{prefix}{offset:>8x}  {text}")
+            else:
+                print(f"{prefix}{text}")
+        return 0
 
     header = elf_header(data)
 
@@ -261,6 +363,12 @@ def main():
                         help="also scan for UTF-16LE strings")
     parser.add_argument("-t", "--radix", action="store_true",
                         help="prefix each run with its hex offset, like strings -t x")
+    parser.add_argument("--xor", metavar="KEY",
+                        help="XOR with KEY (e.g. 0x22) before scanning and "
+                             "report only runs absent from the plaintext; "
+                             "combines with --ioc. Use --xor sweep to score "
+                             "all 255 single-byte keys. 0x22 is Mirai's "
+                             "effective table.c key under TABLE_KEY 0xdeadbeef")
     parser.add_argument("--ioc", action="store_true",
                         help="report only URLs, routable IPv4 addresses and domains")
     args = parser.parse_args()

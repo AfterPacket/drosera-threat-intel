@@ -7,7 +7,15 @@
  * The payload rule is architecture-independent by design. The C2 domain set
  * is compiled identically into all seven builds (ARM, ARM7, SH4, MIPS, i686,
  * PowerPC, x86-64), so matching on strings rather than code covers builds we
- * never captured — 9 of the 16 architectures the loader fetches.
+ * never captured — 8 of the 15 architectures the loader fetches.
+ *
+ * (Corrected 2026-08-08: ohshit.sh loops 15 architectures, not 16. Counted
+ * directly from the script — lines 4-18, one fetch per line.)
+ *
+ * The payload rule also carries XOR-0x22 strings. Mirai's table.c XORs its
+ * config with the four bytes of TABLE_KEY; the leaked default 0xdeadbeef
+ * collapses to one effective byte, 0xef^0xbe^0xad^0xde == 0x22. These builds
+ * hide a Layer-7 HTTP flood kit there, invisible to plaintext extraction.
  */
 
 rule MIRAI_OHSHIT_loader
@@ -22,6 +30,18 @@ rule MIRAI_OHSHIT_loader
         tlp          = "TLP:WHITE"
         reference    = "https://github.com/Afterpacket/drosera-threat-intel"
         status       = "PRODUCTION"
+
+        /* YARAhub / YARAify submission metadata.
+         * reference_md5 is /ohshit.sh (sha256 8b1a2fb6…), which carries
+         * $uniq2 "94.154.43.123//bot." — this rule matches it. */
+        yarahub_uuid              = "3f7a1c92-8d4e-4b61-9a3f-2c5e8d017b46"
+        yarahub_license           = "CC0 1.0"
+        yarahub_rule_matching_tlp = "TLP:WHITE"
+        yarahub_rule_sharing_tlp  = "TLP:WHITE"
+        yarahub_reference_md5     = "ffed68702b8dccbccbd3634bb647f603"
+        yarahub_reference_link    = "https://github.com/Afterpacket/drosera-threat-intel"
+        yarahub_author_twitter    = "@AfterPacket"
+        yarahub_author_email      = "AfterPacketTru@protonmail.com"
 
     strings:
         /* High-confidence unique strings */
@@ -65,6 +85,19 @@ rule MIRAI_OHSHIT_payload
         reference    = "https://github.com/Afterpacket/drosera-threat-intel"
         status       = "PRODUCTION"
 
+        /* YARAhub / YARAify submission metadata.
+         * reference_md5 is //bot.arm7 (sha256 81ea2a39…), an ELF carrying the
+         * compiled-in C2 domain set this rule matches on. */
+        yarahub_uuid              = "c81b4e07-5a29-4d3f-b7e6-1f04a9c2d85b"
+        yarahub_license           = "CC0 1.0"
+        yarahub_rule_matching_tlp = "TLP:WHITE"
+        yarahub_rule_sharing_tlp  = "TLP:WHITE"
+        yarahub_reference_md5     = "ac1b52b71229469fa2a87ea8a11db607"
+        yarahub_reference_link    = "https://github.com/Afterpacket/drosera-threat-intel"
+        yarahub_author_twitter    = "@AfterPacket"
+        yarahub_author_email      = "AfterPacketTru@protonmail.com"
+        malpedia_family           = "elf.mirai"
+
     strings:
         /* C2 domains — identical across all 7 captured builds.
          * Each is individually rare enough to stand alone. */
@@ -86,16 +119,34 @@ rule MIRAI_OHSHIT_payload
         /* Retrieval template used by the payload itself */
         $cap1 = "/bins.sh" ascii
 
+        /* XOR-0x22 obfuscated Layer-7 flood config. Present in all 7 builds
+         * and invisible to plaintext string extraction. The UA-scrape URL is
+         * the highest-confidence member — it has no benign reason to appear
+         * inside an IoT binary, obfuscated or otherwise. */
+        $x1 = "www.useragentstring.com" xor(0x22)
+        $x2 = "Accept-Language:" xor(0x22)
+        $x3 = "Accept-Encoding:" xor(0x22)
+        $x4 = "https://news.ycombinator.com/" xor(0x22)
+
         /* Deliberately NOT matched on: bugs.launchpad.net (glibc
          * boilerplate), 185.199.108.153 (GitHub Pages) and 104.21.234.17
          * (Cloudflare) all appear in these binaries and would drag in
-         * unrelated software. */
+         * unrelated software. Nor on the 20 Referer domains recovered from
+         * the XOR region — they are google.com, facebook.com and similar,
+         * and matching them would fire on ordinary software. */
 
     condition:
         uint32be(0) == 0x7F454C46 and
         (
             /* HIGH: any single C2 domain — none occur in benign software */
             any of ($d*) or
+
+            /* HIGH: the obfuscated UA-scrape URL is unambiguous on its own */
+            $x1 or
+
+            /* HIGH: obfuscated flood scaffolding, two or more members.
+             * Plaintext HTTP headers are everywhere; XOR-0x22 ones are not. */
+            2 of ($x*) or
 
             /* MEDIUM: two hardcoded C2 IPs together */
             2 of ($ip*) or

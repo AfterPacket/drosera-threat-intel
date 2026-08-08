@@ -26,6 +26,18 @@ rule PERLBOT_SHELLBOT_irc
         reference    = "https://github.com/Afterpacket/drosera-threat-intel"
         status       = "PRODUCTION"
 
+        /* YARAhub / YARAify submission metadata.
+         * reference_md5 is /duba (sha256 03a4f492…), the VT 29/60 sample
+         * whose config block satisfies $c2_2 outright. */
+        yarahub_uuid              = "18c3d6f2-9e7b-4a45-90d8-3b62e5f7a1c9"
+        yarahub_license           = "CC0 1.0"
+        yarahub_rule_matching_tlp = "TLP:WHITE"
+        yarahub_rule_sharing_tlp  = "TLP:WHITE"
+        yarahub_reference_md5     = "4c78efb135174df31abadaa95c43d470"
+        yarahub_reference_link    = "https://github.com/Afterpacket/drosera-threat-intel"
+        yarahub_author_twitter    = "@AfterPacket"
+        yarahub_author_email      = "AfterPacketTru@protonmail.com"
+
     strings:
         /* C2 indicators — defeated by an $ARGV[0] override, so never sole-condition */
         $c2_1 = "213.139.77.150" ascii
@@ -38,6 +50,14 @@ rule PERLBOT_SHELLBOT_irc
         $s3 = "[rand scalar @rircname]" ascii
         $s4 = "$server=\"$ARGV[0]\" if $ARGV[0]" ascii
 
+        /* Operator constants. Identical in all three samples across BOTH C2
+         * servers (213.139.77.150 and 213.177.179.11) — which is what proves
+         * one operator runs both. Unlike the nick, these are not randomised,
+         * and unlike the server they survive the $ARGV[0] override. They are
+         * the most durable indicators this family has. */
+        $op1 = "@admins = (\"MAD\")" ascii
+        $op2 = "@channels = (\"#mot\")" ascii
+
         /* Perl script anchor */
         $perl = "#!/usr/bin/perl" ascii
 
@@ -47,10 +67,18 @@ rule PERLBOT_SHELLBOT_irc
             /* HIGH: the full config-block assignment */
             $c2_2 or
 
+            /* HIGH: both operator constants together. Catches every sample in
+             * this campaign regardless of which C2 it points at, including
+             * after an $ARGV[0] override that defeats every IP-based branch. */
+            all of ($op*) or
+
             /* HIGH: two structural markers — C2-redirection resistant */
             2 of ($s*) or
 
             /* MEDIUM: Perl script carrying the C2 and one structural marker */
-            ($perl and any of ($c2_*) and any of ($s*))
+            ($perl and any of ($c2_*) and any of ($s*)) or
+
+            /* MEDIUM: Perl script joining the operator's channel */
+            ($perl and any of ($op*))
         )
 }

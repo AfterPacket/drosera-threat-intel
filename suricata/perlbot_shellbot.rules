@@ -47,3 +47,18 @@ alert tcp $HOME_NET any -> $EXTERNAL_NET 6667 ( \
   sid:9003003; rev:1; \
   metadata:affected_product Any, created_at 2026-08-07, tag PERLBOT_SHELLBOT; \
 )
+
+# The durable one. @channels=("#mot") is identical in all three samples and
+# across BOTH C2 servers, and unlike the nick it is not randomised. This fires
+# on ANY destination, so it survives the $ARGV[0] C2 override that defeats
+# 9003001/9003002/9003004 — and it survives the operator moving servers.
+# Any port, because the override can redirect to a non-standard one.
+alert tcp $HOME_NET any -> $EXTERNAL_NET any ( \
+  msg:"ET MALWARE PERLBOT_SHELLBOT joining operator channel #mot (C2-independent)"; \
+  flow:established,to_server; \
+  content:"JOIN"; depth:8; \
+  content:"#mot"; distance:0; within:12; \
+  classtype:trojan-activity; \
+  sid:9003005; rev:1; \
+  metadata:affected_product Any, created_at 2026-08-08, tag PERLBOT_SHELLBOT; \
+)

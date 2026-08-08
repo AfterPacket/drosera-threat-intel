@@ -203,16 +203,22 @@ footer p{margin:0 0 6px}
 
         <p class="desc">Multi-architecture IoT botnet staged entirely from 94.154.43.123, with the full
           chain recovered. A 104-byte fetcher written to <code>/tmp/.p</code> over telnet pulls
-          <code>ohshit.sh</code>, which loops 16 architectures, cats each payload into a file named
-          <code>WTF</code>, and executes it. Seven of the sixteen builds were captured; the doubled slash
+          <code>ohshit.sh</code>, which loops 15 architectures, cats each payload into a file named
+          <code>WTF</code>, and executes it. Seven of the fifteen builds were captured; the doubled slash
           in <code>//bot.&lt;arch&gt;</code> makes a reliable detection string.
           <strong>The payloads also embed a full SSH client</strong> — <code>ssh-ed25519</code>,
           <code>curve25519</code>, <code>chacha20</code> — so this family propagates over SSH as well as
           telnet. The loader chain is telnet-only, so containment scoped from the dropper alone misses
-          that vector.</p>
+          that vector.
+          <strong>All seven payloads also hide a Layer-7 HTTP flood module behind XOR&nbsp;0x22</strong>
+          — Mirai's <code>table.c</code> scheme — carrying header templates, a rotating User-Agent pool
+          and 20 Referer URLs. Plaintext string extraction cannot see it. The hidden region contains
+          <em>no C2</em>: the 20 domains it yields are google.com, facebook.com and similar, used as
+          flood header values, and must never be blocklisted.</p>
 
         <ul class="tags">
-          <li>Mirai-derived</li><li>16 architectures</li><li>telnet propagation</li><li>busybox staging</li>
+          <li>Mirai-derived</li><li>15 architectures</li><li>telnet propagation</li><li>busybox staging</li>
+          <li>SSH propagation</li><li>L7 HTTP flood</li><li>XOR 0x22</li>
         </ul>
 
         <dl class="iocs">
@@ -337,12 +343,20 @@ footer p{margin:0 0 6px}
         </div>
 
         <p class="desc">Abuse of THC Global Socket / ssh-it — a legitimate published security tool — for
-          persistent remote access. Installs a systemd unit plus watchdog script and beacons the victim's
-          public IP to <code>POST /gsocket/up.php</code> on the operator's own host. Detection targets the
-          attacker's wrapper and exfil callback only, never gsocket itself.</p>
+          persistent remote access. Beacons to <code>POST /gsocket/up.php</code> on the operator's own
+          host. Detection targets the attacker's wrapper and exfil callback only, never gsocket itself.
+          <strong>Five persistence mechanisms</strong>, not two: a systemd unit
+          (<code>gsocket-watchdog.service</code>, <code>Restart=always</code>), a per-minute crontab, an
+          <code>@reboot</code> crontab, injections into <code>.bashrc</code>/<code>.profile</code>/
+          <code>.zshrc</code>/<code>.bash_profile</code>, and the watchdog itself.
+          <strong>Kill the process last, not first</strong> — the watchdog polls every 30&nbsp;s and, if
+          <code>gs-netcat</code> is gone, reinstalls it, derives a <em>new</em> secret and uploads that to
+          the operator. The beacon carries hostname, public IP and the access credential itself. Best host
+          indicator: <code>~/.config/prng/</code>.</p>
 
         <ul class="tags">
-          <li>tool abuse</li><li>systemd persistence</li><li>watchdog</li><li>IP exfil</li><li>VT 2/60</li>
+          <li>tool abuse</li><li>5× persistence</li><li>self-healing watchdog</li><li>credential exfil</li>
+          <li>VT 2/60</li>
         </ul>
 
         <dl class="iocs">
@@ -379,12 +393,17 @@ footer p{margin:0 0 6px}
         </div>
 
         <p class="desc">Unobfuscated Mirai loader with <code>SERVER="77.90.185.66"</code>, fetching
-          <code>mirai.&lt;arch&gt;</code> and writing the classic <code>dvrHelper</code> binary name.
-          Self-identifying and trivially detected. Notable chiefly for being actively hunted by the
-          BOTKILL_PROCWIPE scripts in this same capture.</p>
+          <code>mirai.&lt;arch&gt;</code> and writing the classic <code>dvrHelper</code> binary name,
+          executed with the tag <code>tscan</code>. Self-identifying and trivially detected. Notable
+          chiefly for being actively hunted by the BOTKILL_PROCWIPE scripts in this same capture.
+          <strong>It targets Android too</strong> — <code>/data/local/tmp</code> sits in its directory
+          list alongside the usual Linux paths, so an investigation scoped to Linux misses part of the
+          estate. The directory loop is a write-and-execute probe: it creates <code>.f</code>, chmods it
+          777, <em>runs</em> it, and only then settles there.</p>
 
         <ul class="tags">
           <li>Mirai</li><li>dvrHelper</li><li>self-identifying</li><li>targeted by rivals</li>
+          <li>Android</li><li>exec tag tscan</li>
         </ul>
 
         <dl class="iocs">

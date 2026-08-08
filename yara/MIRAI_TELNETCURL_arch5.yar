@@ -23,6 +23,18 @@ rule MIRAI_TELNETCURL_dropper
         reference    = "https://github.com/Afterpacket/drosera-threat-intel"
         status       = "PRODUCTION"
 
+        /* YARAhub / YARAify submission metadata.
+         * reference_md5 is /curl.sh (sha256 3801a288…), carrying $uniq1
+         * "telnet.curl" plus the staging host. */
+        yarahub_uuid              = "6d2f9a45-b13c-4e78-8f05-7a9d3b6c1e24"
+        yarahub_license           = "CC0 1.0"
+        yarahub_rule_matching_tlp = "TLP:WHITE"
+        yarahub_rule_sharing_tlp  = "TLP:WHITE"
+        yarahub_reference_md5     = "688c6311320aa416a88cf6eed3d5f8f5"
+        yarahub_reference_link    = "https://github.com/Afterpacket/drosera-threat-intel"
+        yarahub_author_twitter    = "@AfterPacket"
+        yarahub_author_email      = "AfterPacketTru@protonmail.com"
+
     strings:
         /* High-confidence unique strings */
         $uniq1 = "telnet.curl" ascii
@@ -31,12 +43,18 @@ rule MIRAI_TELNETCURL_dropper
         $c2_1 = "205.237.110.232" ascii
         $c2_2 = "http://205.237.110.232/" ascii
 
-        /* Fixed per-architecture output filenames */
+        /* Fixed per-architecture output filenames.
+         * name1-5 are fetched. name6-7 appear ONLY in the dropper's rm -rf
+         * preamble and are never downloaded — they are cleanup targets for
+         * architecture builds this kit ships but these two hosts did not
+         * serve. They are hunt strings for builds we have not captured. */
         $name1 = "VFASXC" ascii
         $name2 = "WQZRTY" ascii
         $name3 = "YUIOXC" ascii
         $name4 = "GHJKLB" ascii
         $name5 = "MNCXOP" ascii
+        $name6 = "PLXMKJ" ascii
+        $name7 = "KFGDFG" ascii
 
         /* Capability markers */
         $cap1 = "chmod 777" ascii
@@ -70,6 +88,19 @@ rule MIRAI_TELNETCURL_payload
         reference    = "https://github.com/Afterpacket/drosera-threat-intel"
         status       = "PRODUCTION"
         note         = "Lineage marker, not a family discriminator — see condition"
+
+        /* YARAhub / YARAify submission metadata.
+         * reference_md5 is /arm5 (sha256 9cbe35b1…), an ELF carrying the
+         * leaked-source decoy domain this rule matches on. */
+        yarahub_uuid              = "a45e8b71-2f6d-4c09-b83a-5d1e7f4a9c60"
+        yarahub_license           = "CC0 1.0"
+        yarahub_rule_matching_tlp = "TLP:WHITE"
+        yarahub_rule_sharing_tlp  = "TLP:WHITE"
+        yarahub_reference_md5     = "dfbbf96df412f2d3d1358aaae94e1123"
+        yarahub_reference_link    = "https://github.com/Afterpacket/drosera-threat-intel"
+        yarahub_author_twitter    = "@AfterPacket"
+        yarahub_author_email      = "AfterPacketTru@protonmail.com"
+        malpedia_family           = "elf.mirai"
 
     strings:
         /* The decoy domain from the leaked Mirai source, present in all five

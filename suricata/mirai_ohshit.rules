@@ -105,3 +105,45 @@ alert ip $HOME_NET any -> [45.61.161.207,45.83.140.28,5.101.221.87,51.15.68.114,
   sid:9001010; rev:1; \
   metadata:affected_product Any, created_at 2026-08-07, tag MIRAI_OHSHIT; \
 )
+
+# ------------------------------------------------------------
+# Layer-7 HTTP flood — added 2026-08-08.
+# The payloads carry an HTTP flood kit XOR-0x22 obfuscated in the config
+# table: a rotating User-Agent pool and 20 Referer values taken from real
+# sites (google.com, facebook.com, ...).
+#
+# DETECTION IS INHERENTLY RATE-BASED. Any single flood request is, by
+# construction, indistinguishable from a legitimate browser request — that
+# is the whole point of the Referer and UA rotation. Both rules below are
+# therefore thresholded and describe OUTBOUND flooding by an infected host.
+# Do not deploy them unthresholded.
+# ------------------------------------------------------------
+
+# The UA pool is entirely pre-Trident-7 Internet Explorer. A modern Linux
+# server emitting MSIE 8/9/10 user agents at volume is not browsing.
+alert http $HOME_NET any -> $EXTERNAL_NET any ( \
+  msg:"ET MALWARE MIRAI_OHSHIT possible L7 flood (archaic MSIE UA at volume from server subnet)"; \
+  flow:established,to_server; \
+  http.method; content:"GET"; \
+  http.user_agent; content:"compatible|3b| MSIE "; \
+  http.user_agent; content:"Trident/"; distance:0; \
+  threshold:type threshold, track by_src, count 100, seconds 60; \
+  classtype:attempted-dos; \
+  sid:9001011; rev:1; \
+  metadata:affected_product Any, created_at 2026-08-08, tag MIRAI_OHSHIT; \
+)
+
+# Same traffic seen from the Referer side. The pool is fixed, so a host
+# cycling several of these at rate is running the flood loop, not browsing.
+# news.ycombinator.com and t.co are used because they are the least likely
+# of the twenty to appear as a Referer in ordinary server-subnet egress.
+alert http $HOME_NET any -> $EXTERNAL_NET any ( \
+  msg:"ET MALWARE MIRAI_OHSHIT possible L7 flood (embedded Referer pool at volume)"; \
+  flow:established,to_server; \
+  http.method; content:"GET"; \
+  http.referer; content:"https://news.ycombinator.com/"; \
+  threshold:type threshold, track by_src, count 50, seconds 60; \
+  classtype:attempted-dos; \
+  sid:9001012; rev:1; \
+  metadata:affected_product Any, created_at 2026-08-08, tag MIRAI_OHSHIT; \
+)

@@ -32,7 +32,7 @@
 # ══════════════════════════════════════════════════════════════
 
 # ── MIRAI_OHSHIT — telnet dropper + payload host (HIGH — direct capture) ──
-# Serves /ohshit.sh and //bot.<arch> across 16 architectures.
+# Serves /ohshit.sh and //bot.<arch> across 15 architectures.
 94.154.43.123
 
 # ── MIRAI_TELNETCURL — payload server (HIGH — hardcoded in curl.sh/wget.sh) ──
@@ -156,3 +156,42 @@ glibc.malloc.top
 # original leaked Mirai source. Useful for attribution; blocking it
 # achieves nothing:
 #   www.ikindalikemenbutonlyontuesday.com
+#
+# ══════════════════════════════════════════════════════════════
+# ⚠⚠ CRITICAL — DO NOT BLOCK — added 2026-08-08
+# ══════════════════════════════════════════════════════════════
+# The MIRAI_OHSHIT ELF payloads carry an XOR-0x22 obfuscated HTTP flood
+# module. Deobfuscating it yields twenty domain names. THEY ARE ALL
+# LEGITIMATE SITES, used as randomised Referer header values by the
+# flood — they are not infrastructure and must never reach this file:
+#
+#   www.google.com     www.facebook.com   twitter.com
+#   www.instagram.com  www.reddit.com     www.youtube.com
+#   www.bing.com       www.linkedin.com   t.co
+#   duckduckgo.com     search.yahoo.com   www.tiktok.com
+#   www.pinterest.com  www.baidu.com      www.cloudflare.com
+#   github.com         stackoverflow.com  news.ycombinator.com
+#   discord.com        telegram.org       www.useragentstring.com
+#
+# Any pipeline that extracts domains from malware and appends them to a
+# blocklist WILL ingest these. Blocking them takes the estate off the
+# internet. This is the single most damaging error available in this
+# dataset — more damaging than missing a C2, because it is self-inflicted
+# and immediate.
+#
+# ══════════════════════════════════════════════════════════════
+# SINKHOLE NOTE
+# ══════════════════════════════════════════════════════════════
+# Blocking is containment; sinkholing is intelligence. The five
+# MIRAI_OHSHIT C2 domains above are compiled identically into every
+# architecture build, so DNS-level control of the four attacker-owned
+# apexes (metrics-collector.io, hostcloud-eu.net, serverstats-daemon.com,
+# malloc.top) covers all 15 architectures — including the 8 never
+# captured. Do NOT attempt this on workers.dev: that apex is Cloudflare
+# shared infrastructure, and the correct route is a Cloudflare abuse
+# report against sync.softwaremirror.workers.dev alone.
+#
+# The GSOCKET exfil endpoint 192.253.248.9 is the richest sinkhole
+# target here: every beacon carries victim hostname, public IP and the
+# gs-netcat access credential. See
+# ../reports/CAPTURE_20260807_infrastructure_and_sinkhole.md
