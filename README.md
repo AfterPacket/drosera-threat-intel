@@ -214,6 +214,18 @@ attribute the abuse, not the tool.
 
 ## Consuming the feeds
 
+**Everything at once** — `drosera-detection-bundle.zip` (117 KB, 44 files) packs
+every YARA rule, Suricata ruleset, Sigma rule, IOC feed, the Firewalla lists,
+`blocklist.txt`, all reports and this README. Plain zip, no password:
+
+```
+https://raw.githubusercontent.com/Afterpacket/drosera-threat-intel/main/drosera-detection-bundle.zip
+```
+
+It contains **no samples** — nothing in it is malware, and it is safe to unpack
+anywhere. Live samples remain in `samples/`, AES-256 encrypted, and are never
+bundled. Regenerated after every capture.
+
 **Blocklist** — plain newline-delimited IPs and domains, safe to `curl` on a cron:
 
 ```
