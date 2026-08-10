@@ -10,8 +10,18 @@
 # Encrypted samples: ../samples/<sha256>.zip  (AES-256, password: infected)
 
 # [HASHES — SHA-256]
-41d9a2a07ccfc769854bf71c82258da1f0a622644f12fada54320e7ff310fcfa   # /home/.k, 200 B, 3 sightings
-2733d565138186645b2ff2485f88cfdaee2a1cf2cd3af1306273fc0f6191a58c   # /home/.k, 390 B, 1 sighting
+# *** SENSOR-ARTEFACT DIGESTS — DO NOT MATCH ON THESE ***
+# Both samples were transcribed by the honeypot's shell emulator, which had
+# two defects at capture time (fixed 2026-08-08): it stripped the trailing
+# newline from every echo-written file, and it did not decode bare octal
+# escapes. The bytes on disk are therefore the sensor's rendering, not the
+# attacker's. No other collector will reproduce these digests. Detail in
+# ../reports/BOTKILL_PROCWIPE_analysis_41d9a2a0.md section 4.2.
+#
+# Everything else in this file — paths, strings, IPs, capability, linkage —
+# was verified from content and is unaffected. Hunt on those, not on these.
+41d9a2a07ccfc769854bf71c82258da1f0a622644f12fada54320e7ff310fcfa   # /home/.k, 200 B, 3 sightings — sensor artefact, one byte short
+2733d565138186645b2ff2485f88cfdaee2a1cf2cd3af1306273fc0f6191a58c   # /home/.k, 390 B, 1 sighting — sensor artefact, see 4.2
 
 # [WHAT THIS IS]
 # Neither sample is a bot. Both are COMPETITOR-REMOVAL scripts written to
@@ -47,22 +57,31 @@
 # translate NULs to spaces, and kill -9 any process whose cmdline contains
 # the literal string "dvrHelper".
 #
-# *** AS CAPTURED, THIS SAMPLE IS CORRUPT AND CANNOT EXECUTE ***
-# Verified at byte level 2026-08-08. Offset 0x22 carries the three bytes
+# *** AS DELIVERED, THIS SAMPLE WAS INERT AND COULD NOT EXECUTE ***
+# Offset 0x22 carries the three bytes
 #   5c 33 42   =   \ 3 B
 # where a single ';' (0x3B) belongs:
 #   for proc_dir in /proc/*\3B  pid=${proc_dir##*/}
-# The separator was escaped into its own hex representation somewhere in the
-# delivery path — a shell/URL-escaping artefact of writing the script over
-# telnet. The result is a `for` loop with no `do` and a trailing `done` with
-# no opener: /bin/sh rejects it with a syntax error before executing anything.
+#
+# CORRECTED 2026-08-08. An earlier revision blamed the attacker's delivery
+# path for that escaping. It was the sensor. The operator typed \3B — their
+# own typo for \x3B — inside a `busybox echo -ne` argument. BusyBox decodes
+# bare octal, so a real target writes 0x03 followed by 'B' (two bytes); the
+# honeypot's shell emulator did not implement bare octal and wrote three
+# characters literally.
+#
+# The conclusion is unchanged, because 0x03 'B' is not a ';' either: a `for`
+# loop with no `do` and a trailing `done` with no opener, which /bin/sh
+# rejects with a syntax error before executing anything. The drop was inert
+# on a real host too — for the operator's own typo, not for ours.
 #
 # Consequences for reporting:
 #   - This particular drop was INERT. It never killed anything.
 #   - The operator's INTENT is still fully evidenced by the source, and the
 #     dvrHelper linkage below stands.
 #   - Do not cite this sample as evidence of successful bot-killing activity.
-#   - The sibling sample 41d9a2a0 is INTACT and does execute correctly.
+#   - Do not match on either SHA-256 above; they are sensor artefacts.
+#   - The sibling sample 41d9a2a0 does execute correctly.
 #
 #   *** dvrHelper is the exact output filename used by MIRAI_LOADER
 #   *** (246c3c37, SERVER="77.90.185.66") elsewhere in this same capture.

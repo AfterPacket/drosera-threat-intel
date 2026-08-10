@@ -441,6 +441,14 @@ footer p{margin:0 0 6px}
           <button class="copy" data-copy="h-botkill" type="button">Copy</button>
         </div>
 
+        <p class="desc"><strong>⚠ Do not match on this digest.</strong> Both BOTKILL samples were
+          transcribed by the honeypot's shell emulator, which until 2026-08-08 stripped the trailing
+          newline from <code>echo</code>-written files and did not decode bare octal escapes. These
+          bytes are the sensor's rendering, not the attacker's, and no other collector will reproduce
+          them. The behavioural indicators — <code>/home/.k</code>, <code>dvrHelper</code>,
+          <code>${result%(deleted)}</code> and the four source IPs — were read from content and are
+          unaffected. Hunt on those.</p>
+
         <p class="desc">Not malware — competitor-removal scripts written to <code>/home/.k</code> by an
           operator clearing rivals off a box it wants to keep. One kills any process whose
           <code>/proc/$pid/exe</code> ends in <code>(deleted)</code>, the standard tell of a self-deleting

@@ -157,12 +157,19 @@ bot. The other greps process cmdlines specifically for `dvrHelper` and kills mat
 rather than clean. No YARA rule ships: generic `/proc`-walking kill loops would
 false-positive on legitimate process management.
 
-**The dvrHelper-killer was delivered corrupt and never ran.** At offset `0x22` it
-carries the bytes `5c 33 42` (`\3B`) where a `;` (`0x3B`) belongs — a shell-escaping
-artefact of writing the script over telnet. That leaves a `for` loop with no `do`
-and a `done` with no opener, so `/bin/sh` rejects it outright. The operator's intent
-stands and the MIRAI_LOADER linkage holds, but this drop was inert. The sibling
-sample `41d9a2a0` is intact and does execute.
+**The dvrHelper-killer was inert and never ran.** At offset `0x22` it carries the
+bytes `5c 33 42` (`\3B`) where a `;` (`0x3B`) belongs, leaving a `for` loop with no
+`do` and a `done` with no opener, so `/bin/sh` rejects it outright. The operator's
+intent stands and the MIRAI_LOADER linkage holds, but this drop was inert. The
+sibling sample `41d9a2a0` does execute.
+
+> **Corrected 2026-08-08.** This previously read "a shell-escaping artefact of
+> writing the script over telnet", attributing those bytes to the attacker's
+> delivery. They were the **sensor's**. The operator typed `\3B` — their own
+> typo for `\x3B` — and BusyBox would have decoded that bare octal to `0x03`
+> plus `B`, two bytes; the honeypot's shell emulator did not implement bare
+> octal and wrote three characters. The script was inert either way, because
+> `0x03 B` is not a `;` either. See [Sample digests](#sample-digests).
 
 ### WEBROOT_PROBE
 
@@ -176,6 +183,35 @@ someone has already confirmed RCE on that host.
 No YARA rule ships, deliberately — a signature on `echo "xxxxxx"` would false-positive
 across any estate. The value is the 18 source IPs, rotating ~2/day inside five /24s:
 `2.57.122.0/24`, `92.118.39.0/24`, `80.94.92.0/24`, `195.178.110.0/24`, `193.32.162.0/24`.
+
+### Sample digests
+
+Twenty of the twenty-six captured samples arrived by HTTP retrieval or SFTP
+upload and are byte-exact — that is **every ELF payload**, and all of
+MIRAI_TELNETCURL, PERLBOT_SHELLBOT, GSOCKET_SSHIT and MIRAI_LOADER. Match on
+those freely.
+
+Six arrived by shell-write, passing through the honeypot's shell emulator,
+which until 2026-08-08 stripped the trailing newline from `echo`-written files
+and did not decode bare octal escapes. Three carry a detectable defect and
+**their SHA-256 must not be used for matching** — they are digests of this
+sensor's transcription, which no other collector will reproduce:
+
+| SHA-256 | File | Defect |
+|---|---|---|
+| `2733d565…` | `/home/.k` | undecoded octal at `0x22`, and one byte short |
+| `41d9a2a0…` | `/home/.k` | one byte short |
+| `de9cfdf7…` | `/tmp/.p` | one byte short |
+
+The two WEBROOT_PROBE samples (`af77b643…`, `f3abe9aa…`) came the same way but
+show no detectable defect and are probably exact. They are marked in
+`CAPTURE_20260807_hashes.txt` rather than silently trusted.
+
+**Only file digests are affected.** Every string, path, IP, domain, capability
+and cross-family linkage in this capture was read from content, not from a
+hash, and none of it changes. The XOR 0x22 flood config, the compiled-in C2
+set, the SSH propagation vector, the Perl twin and the `dvrHelper` linkage all
+stand.
 
 ### Do not block
 

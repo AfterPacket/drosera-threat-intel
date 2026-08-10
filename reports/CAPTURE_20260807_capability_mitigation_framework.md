@@ -195,8 +195,10 @@ HTTP, look for `xxxxxx`. **Finding one means someone already confirmed RCE.**
 
 **BOTKILL_PROCWIPE** — competitor removal. `41d9a2a0` kills any process whose
 `/proc/$pid/exe` ends `(deleted)`; `2733d565` targets `dvrHelper` by name — the
-exact payload of MIRAI_LOADER in this same capture. `2733d565` is **corrupt as
-delivered** (bytes `5c 33 42` where `;` belongs) and could not execute.
+exact payload of MIRAI_LOADER in this same capture. `2733d565` was **inert as
+delivered** (bytes `5c 33 42` where `;` belongs — the operator typed `\3B` for
+`\x3B`) and could not execute. Its SHA-256 is a sensor artefact; hunt on
+`/home/.k` and `dvrHelper`, not on the digest.
 
 ---
 

@@ -32,7 +32,7 @@ neutralises the botnet rather than merely inconveniencing it.
 | 6 | MIRAI_LOADER targets **Android** (`/data/local/tmp`) and passes exec tag `tscan` | Scope and detection both widen |
 | 7 | All three Perl bots share `@admins=("MAD")` and `@channels=("#mot")` | Proves one operator across two C2 servers; survives the C2-override evasion |
 | 8 | GSOCKET installs **five** persistence mechanisms, not two | Containment guidance was materially incomplete |
-| 9 | BOTKILL sample `2733d565` is **corrupted and inert** (`\3B` where `;` belongs) | That drop never ran; do not infer capability from it |
+| 9 | BOTKILL sample `2733d565` was **inert as delivered** (`\3B` where `;` belongs — the operator's own typo) | That drop never ran; do not infer capability from it. Its SHA-256 is a sensor artefact — do not match on it |
 
 ## 3. Risk ranking
 

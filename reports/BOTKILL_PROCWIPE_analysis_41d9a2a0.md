@@ -105,9 +105,22 @@ cmdline contains `dvrHelper`.
 ```
 
 At offset `0x22` the three bytes `5c 33 42` — literal `\`, `3`, `B` — sit where
-a single `;` (`0x3B`) belongs. The separator was escaped into its own hex
-representation somewhere in the delivery path, a shell- or URL-escaping artefact
-of writing the script over telnet.
+a single `;` (`0x3B`) belongs.
+
+> **Correction, 2026-08-08.** An earlier revision of this report attributed
+> those bytes to "a shell- or URL-escaping artefact of writing the script over
+> telnet" — that is, to the attacker's delivery. **It was the sensor.**
+>
+> The operator sent `\3B` — their own typo for `\x3B` — inside a
+> `busybox echo -ne` argument. BusyBox decodes bare octal, so a real target
+> writes `\3` as the single byte `0x03` followed by `B`: **two bytes**. The
+> honeypot's shell emulator did not implement bare octal and wrote the three
+> characters literally. The three bytes above are therefore **this sensor's
+> output, not the attacker's**.
+>
+> The finding is unchanged: `0x03 B` is not a `;` either, so the script was
+> inert on a real host too, for the operator's own reason rather than ours.
+> What changes is the hash — see below.
 
 The result is `for proc_dir in /proc/*\3B  pid=...` — a `for` loop with no `do`,
 and a trailing `done` with no opener. `/bin/sh` rejects it with a syntax error
@@ -116,7 +129,19 @@ before executing anything.
 **Consequences for reporting.** This drop was inert; it never killed anything.
 The operator's *intent* is still fully evidenced by the source, and the
 MIRAI_LOADER linkage stands. But do not cite this sample as evidence of
-successful bot-killing activity. The sibling `41d9a2a0` is intact and does run.
+successful bot-killing activity. The sibling `41d9a2a0` does run.
+
+**⚠ Do not match on the SHA-256 of `2733d565`.** It is a hash of the sensor's
+transcription, and no other collector will reproduce it. A real target's copy
+differs in two places: `5c 33 42` → `03 42` at offset `0x22`, and a trailing
+newline that the emulator's `echo` handling stripped. The two changes cancel
+in length, so the corrected file is also 390 bytes — with a different digest.
+`41d9a2a0` and the MIRAI_OHSHIT `/tmp/.p` fetcher (`de9cfdf7`) are affected by
+the trailing-newline issue alone and are likewise one byte short as captured.
+
+Everything these samples *did*, named and targeted is unaffected — the
+`/home/.k` path, the two-actor conclusion, the `dvrHelper` linkage and all
+four source IPs stand. It is the file digests alone that cannot be quoted.
 
 ## 5. Phase 4 — C2 protocol
 

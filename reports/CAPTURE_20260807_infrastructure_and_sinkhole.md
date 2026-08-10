@@ -275,10 +275,12 @@ Value is the 18 source IPs rotating ~2/day inside five bulletproof /24s:
 `193.32.162.0/24`. Perimeter-block the ranges if policy allows.
 
 **BOTKILL_PROCWIPE** (`41d9a2a0`, `2733d565`) — no network code at all.
-Note `2733d565` is **corrupted in delivery**: byte sequence `5c 33 42` (`\3B`)
-appears where a `;` (0x3B) belongs, leaving a `for` loop with no `do` and a
-`done` with no opener. **That drop was inert and could not have executed.** Do
-not infer capability from it; the intent is still evidenced by the source.
+Note `2733d565` was **inert as delivered**: byte sequence `5c 33 42` (`\3B`)
+appears where a `;` (0x3B) belongs — the operator's own typo for `\x3B` —
+leaving a `for` loop with no `do` and a `done` with no opener. **That drop was
+inert and could not have executed.** Do not infer capability from it; the
+intent is still evidenced by the source. Its SHA-256 is a sensor artefact and
+must not be used for matching; see the README's *Sample digests* section.
 
 ---
 

@@ -11,10 +11,30 @@
 # Samples are in ../samples/<sha256>.zip — AES-256, password: infected.
 #
 # Format: SHA-256  MD5  SHA-1  family / filename
+#
+# ── PROVENANCE ────────────────────────────────────────────────
+# Lines marked [SENSOR-ARTEFACT] are digests of the honeypot's transcription
+# rather than of the attacker's file, and no other collector will reproduce
+# them. Do not add them to a matching feed.
+#
+# Lines marked [SHELL-WRITE] came through the same path but show no detectable
+# defect — they end with a newline and carry no undecoded escapes. They are
+# probably byte-exact. "Probably" is the honest word, so they are marked
+# rather than silently trusted.
+#
+# Cause: samples that arrived by shell-write passed through the honeypot's
+# shell emulator, which until 2026-08-08 stripped the trailing newline from
+# echo-written files and did not decode bare octal escapes. Samples that
+# arrived by HTTP retrieval or SFTP upload never touched that path and are
+# byte-exact — that is every ELF payload here, and all of MIRAI_TELNETCURL,
+# PERLBOT_SHELLBOT, GSOCKET_SSHIT and MIRAI_LOADER.
+#
+# Only file digests are affected. Every string, path, IP, domain and
+# capability in this capture was read from content and stands unchanged.
 # ==============================================================
 
 # ── MIRAI_OHSHIT ──────────────────────────────────────────────
-de9cfdf7d1330534731e8354ec5927db99e06365850a8fe1d07c6bf8dec97ad0  501a2df822484f079e322f1ddd05f133  2449784f68e1ecf617ab28011b7d413c30d812f7  /tmp/.p stage-1 fetcher
+de9cfdf7d1330534731e8354ec5927db99e06365850a8fe1d07c6bf8dec97ad0  501a2df822484f079e322f1ddd05f133  2449784f68e1ecf617ab28011b7d413c30d812f7  /tmp/.p stage-1 fetcher  [SENSOR-ARTEFACT: one byte short, trailing newline]
 8b1a2fb6b358484b7769aeeb63209f2b277d91b5015cf28ce471a67e0ef83d28  ffed68702b8dccbccbd3634bb647f603  d4269e7b17f3e05fa1395a59f5f6815c87753bd6  /ohshit.sh loader
 81ea2a392b6d71c7cd381f48ebffb992457a1d3897d1484a3fd7823f2e9f69a3  ac1b52b71229469fa2a87ea8a11db607  537a491b49e4689c71f9d29e491bc69ff7a55359  //bot.arm7   ELF32 ARM
 78a57de8eb7d70af3d44dda3ea3fc11ed44879d34db45fb8c22211b852398763  cbe23c3fd2daf3fd6e455a9589066ac6  2c1d6f4a3fd607fd1516e65f35743045c08866f3  //bot.arm    ELF32 ARM
@@ -50,9 +70,9 @@ fd93b4f7bd5e8360ecd6e782dd445356728e698b9f25e335131b28bcdd3e56e3  ab662f4405d5f5
 246c3c37a0de2987d9352411f22ea4805f7e75287f2782d5ee56770219a096a4  3d39989e0700b86e57f81ef0183b0049  9e013f23ba30f0622fa092372e2abde18b029e7e  /wget  SERVER=77.90.185.66
 
 # ── BOTKILL_PROCWIPE ──────────────────────────────────────────
-41d9a2a07ccfc769854bf71c82258da1f0a622644f12fada54320e7ff310fcfa  c46322e0f680244822fd544be32d6934  7f174a2d0f93429e961ec0b4a307d339354b0141  /home/.k  kills (deleted) exes
-2733d565138186645b2ff2485f88cfdaee2a1cf2cd3af1306273fc0f6191a58c  19ef0a96a53ef4246774c858e163ddca  8f89611f15ad8aeafc734d2a4a2682b3e0c7f65e  /home/.k  kills dvrHelper
+41d9a2a07ccfc769854bf71c82258da1f0a622644f12fada54320e7ff310fcfa  c46322e0f680244822fd544be32d6934  7f174a2d0f93429e961ec0b4a307d339354b0141  /home/.k  kills (deleted) exes  [SENSOR-ARTEFACT: one byte short, trailing newline]
+2733d565138186645b2ff2485f88cfdaee2a1cf2cd3af1306273fc0f6191a58c  19ef0a96a53ef4246774c858e163ddca  8f89611f15ad8aeafc734d2a4a2682b3e0c7f65e  /home/.k  kills dvrHelper  [SENSOR-ARTEFACT: undecoded octal at 0x22 + trailing newline]
 
 # ── WEBROOT_PROBE ─────────────────────────────────────────────
-af77b643964afd794460d28ab8a11b0ec8790cd5463abfde126613a4f3bccd32  2fd06197c21c19fe142f8ff38019c91c  ec6d9d212f7655640392c1e6287230bde81a1054  /var/www/html/filter  26 B  168 sightings
-f3abe9aa18137a8002706fd584b24b4c0d95cbc4f6ad25915bdd7a5ec184e002  2806a6e59843f0f7269e5050ab883898  22f8f814f31ec79cf8df0d6a9531a055200fcffc  /var/www/html/filter  24 B   56 sightings
+af77b643964afd794460d28ab8a11b0ec8790cd5463abfde126613a4f3bccd32  2fd06197c21c19fe142f8ff38019c91c  ec6d9d212f7655640392c1e6287230bde81a1054  /var/www/html/filter  26 B  168 sightings  [SHELL-WRITE: no defect detected, but unconfirmed]
+f3abe9aa18137a8002706fd584b24b4c0d95cbc4f6ad25915bdd7a5ec184e002  2806a6e59843f0f7269e5050ab883898  22f8f814f31ec79cf8df0d6a9531a055200fcffc  /var/www/html/filter  24 B   56 sightings  [SHELL-WRITE: no defect detected, but unconfirmed]
