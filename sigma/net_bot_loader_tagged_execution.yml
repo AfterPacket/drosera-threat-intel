@@ -1,0 +1,43 @@
+title: NET_BOT_LOADER Payload Execution With Architecture Tag
+id: 2e092b5a-f38b-483b-9347-56a859db944b
+status: experimental
+description: |
+    Detects execution of a file named net_bot with one of the architecture tags
+    passed by the 39be6853 shell loader. NET_BOT_LOADER is a descriptive source
+    cluster label; no named botnet attribution is implied. The loader's argv
+    strings are observed in source; process telemetry below is synthetic-tested,
+    not an assertion that the samples ran successfully on a victim.
+references:
+    - https://github.com/AfterPacket/drosera-threat-intel/blob/main/reports/NET_BOT_LOADER_analysis_39be6853.md
+author: AfterPacket
+date: 2026-10-29
+tags:
+    - attack.execution
+    - attack.t1059.004
+    - tlp.white
+logsource:
+    product: linux
+    category: process_creation
+detection:
+    image:
+        Image|endswith: '/net_bot'
+    architecture_argument:
+        CommandLine|contains:
+            - ' net.x86_64'
+            - ' net.x86'
+            - ' net.mips'
+            - ' net.mpsl'
+            - ' net.arm'
+            - ' net.ppc'
+            - ' net.m68k'
+            - ' net.sh4'
+            - ' net.spc'
+            - ' net.arc'
+            - ' net.i686'
+            - ' net.i486'
+    condition: image and architecture_argument
+falsepositives:
+    - Authorized replay or analysis of this loader, or unrelated software that
+      happens to reuse both the net_bot executable basename and net.<arch>
+      argument convention. A net_bot filename alone does not match.
+level: high

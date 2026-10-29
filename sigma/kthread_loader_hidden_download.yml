@@ -1,0 +1,46 @@
+title: KTHREAD_LOADER Download To Hidden Kernel Thread Named File
+id: 431dcf58-cac3-4c48-ad5f-c93f5d1c43f0
+status: experimental
+description: |
+    Detects wget or curl process creation containing both the observed /bins/
+    payload path and a hidden destination with a kernel-thread-like basename.
+    Derived from b1a84cfd source lines 14-26, 54 and 58. KTHREAD_LOADER is a
+    descriptive cluster label, not actor or botnet attribution. This targets
+    expanded downloader argv, not script variables or source text in telemetry.
+    It does not detect genuine kernel threads by their names alone.
+references:
+    - https://github.com/AfterPacket/drosera-threat-intel/blob/main/reports/KTHREAD_LOADER_analysis_b1a84cfd.md
+author: AfterPacket
+date: 2026-10-29
+tags:
+    - attack.command_and_control
+    - attack.t1105
+    - attack.defense_evasion
+    - attack.t1036
+    - tlp.white
+logsource:
+    product: linux
+    category: process_creation
+detection:
+    downloader:
+        Image|endswith:
+            - '/wget'
+            - '/curl'
+    payload_path:
+        CommandLine|contains:
+            - '/bins/kworker_u8'
+            - '/bins/jbd2_sda1d'
+            - '/bins/zswap_shrinkd'
+            - '/bins/cfg80211d'
+    hidden_destination:
+        CommandLine|contains:
+            - '/.kworker_u8'
+            - '/.jbd2_sda1d'
+            - '/.zswap_shrinkd'
+            - '/.cfg80211d'
+    condition: downloader and payload_path and hidden_destination
+falsepositives:
+    - Authorized malware analysis, replay exercises, or red-team tooling using
+      the same URL paths and hidden filenames. Legitimate kernel-thread names
+      alone do not satisfy the downloader and paired-path requirements.
+level: high
