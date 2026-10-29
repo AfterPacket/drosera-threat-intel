@@ -48,6 +48,20 @@ in the [full validation report](reports/CAPTURE_20261029_triage.md).
   `www.ikindalikemenbutonlyontuesday.com` remains excluded; no new domain/IP block
   was introduced by this review.
 
+## Deep-analysis follow-up — batch 1
+
+The [bounded static-analysis follow-up](reports/DEEP_STATIC_BATCH1_analysis.md)
+reviews **five additional Perl variants and one loader in full source**, plus
+**partial ELF findings for 13 metadata-linked payloads** (configuration in all
+13; selected-function disassembly in one representative). It identifies a
+simulated-exploit reporting stub rather than claiming a real CVE exploit.
+
+The [96-row review tracker](reports/DEEP_STATIC_BATCH1_coverage.csv) distinguishes
+existing reports, completed source review, partial ELF review and **50 still
+pending** samples. This is not completion of the corpus. No new archives,
+detectors or blocks are added; this report is separate from the packaged release
+and is not included in its existing detection bundle.
+
 ## Original samples and family findings
 
 ### Capture 2026-08-07 — 25 samples, 7 families

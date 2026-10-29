@@ -1,0 +1,2368 @@
+{
+  "method": "Static PT_LOAD mapping and symbol-backed pointer recovery; selected x86-64 disassembly only",
+  "samples": [
+    {
+      "sha256": "05aea199775e5214c7b970acd4e2e1171fcb96d0c36ba8ac9cf16d5c10e54ca8",
+      "bytes": 109952,
+      "machine": "EM_X86_64",
+      "elfclass": 64,
+      "little_endian": true,
+      "entry": "0x400194",
+      "has_interpreter": false,
+      "config": {
+        "commServer": {
+          "va": "0x512060",
+          "size": 8,
+          "hex": "e0e7400000000000",
+          "strings": [
+            "64.89.160.222:65481"
+          ]
+        },
+        "currentServer": {
+          "va": "0x512148",
+          "size": 4,
+          "hex": "ffffffff"
+        },
+        "telnet_scanner_enabled": {
+          "va": "0x512150",
+          "size": 4,
+          "hex": "01000000"
+        },
+        "exploit_scanner_enabled": {
+          "va": "0x5131f8",
+          "size": 4,
+          "hex": ""
+        }
+      },
+      "functions": [
+        [
+          "send_retry",
+          "0x40178a",
+          170
+        ],
+        [
+          "SendUDPBypass",
+          "0x402f96",
+          786
+        ],
+        [
+          "initConnection",
+          "0x406015",
+          449
+        ],
+        [
+          "sendHTTPtwo",
+          "0x40275b",
+          424
+        ],
+        [
+          "SendUDP",
+          "0x401834",
+          646
+        ],
+        [
+          "vseattack",
+          "0x4021f9",
+          735
+        ],
+        [
+          "telnet_scanner",
+          "0x4045af",
+          1209
+        ],
+        [
+          "tcpcsum",
+          "0x4015c0",
+          179
+        ],
+        [
+          "killer_loop",
+          "0x404157",
+          644
+        ],
+        [
+          "send",
+          "0x409294",
+          11
+        ],
+        [
+          "__GI_send",
+          "0x409294",
+          11
+        ],
+        [
+          "SendUDPL2",
+          "0x402cf7",
+          671
+        ],
+        [
+          "SendSTDHEX",
+          "0x402024",
+          267
+        ],
+        [
+          "SendTLS",
+          "0x4038b4",
+          1662
+        ],
+        [
+          "sendto",
+          "0x4092a0",
+          48
+        ],
+        [
+          "__libc_send",
+          "0x409294",
+          11
+        ],
+        [
+          "__uClibc_main",
+          "0x40af42",
+          489
+        ],
+        [
+          "ftcp",
+          "0x401aba",
+          1386
+        ],
+        [
+          "start_killer",
+          "0x4043db",
+          54
+        ],
+        [
+          "processCmd",
+          "0x404bab",
+          5226
+        ],
+        [
+          "SendTCPSYNACK",
+          "0x4035ae",
+          774
+        ],
+        [
+          "main",
+          "0x4061d6",
+          1291
+        ],
+        [
+          "SendGRE",
+          "0x402903",
+          484
+        ],
+        [
+          "__GI_sendto",
+          "0x4092a0",
+          48
+        ],
+        [
+          "SendHTTPHex",
+          "0x4025b3",
+          424
+        ],
+        [
+          "SendTCPACK",
+          "0x4032a8",
+          774
+        ],
+        [
+          "__libc_sendto",
+          "0x4092a0",
+          48
+        ],
+        [
+          "exploit_scanner",
+          "0x404a68",
+          181
+        ],
+        [
+          "SendICMP",
+          "0x402ae7",
+          528
+        ]
+      ]
+    },
+    {
+      "sha256": "11040b3b2a24379975f6f618adc4d6943d54a7964ce40985b00a8824f248b76e",
+      "bytes": 119547,
+      "machine": "EM_SPARC",
+      "elfclass": 32,
+      "little_endian": false,
+      "entry": "0x101a4",
+      "has_interpreter": false,
+      "config": {
+        "commServer": {
+          "va": "0x36028",
+          "size": 4,
+          "hex": "00022e78",
+          "strings": [
+            "64.89.160.222:65481"
+          ]
+        },
+        "currentServer": {
+          "va": "0x3608c",
+          "size": 4,
+          "hex": "ffffffff"
+        },
+        "telnet_scanner_enabled": {
+          "va": "0x36094",
+          "size": 4,
+          "hex": "00000001"
+        },
+        "exploit_scanner_enabled": {
+          "va": "0x36a28",
+          "size": 4,
+          "hex": ""
+        }
+      },
+      "functions": [
+        [
+          "send_retry",
+          "0x120c4",
+          296
+        ],
+        [
+          "SendUDPBypass",
+          "0x13e88",
+          964
+        ],
+        [
+          "initConnection",
+          "0x17d3c",
+          652
+        ],
+        [
+          "sendHTTPtwo",
+          "0x13458",
+          432
+        ],
+        [
+          "SendUDP",
+          "0x121ec",
+          844
+        ],
+        [
+          "vseattack",
+          "0x12dd8",
+          900
+        ],
+        [
+          "telnet_scanner",
+          "0x15cd4",
+          1632
+        ],
+        [
+          "tcpcsum",
+          "0x11e68",
+          232
+        ],
+        [
+          "killer_loop",
+          "0x1566c",
+          920
+        ],
+        [
+          "send",
+          "0x1d9e0",
+          32
+        ],
+        [
+          "__GI_send",
+          "0x1d9e0",
+          32
+        ],
+        [
+          "SendUDPL2",
+          "0x13b04",
+          900
+        ],
+        [
+          "SendSTDHEX",
+          "0x12b68",
+          368
+        ],
+        [
+          "SendTLS",
+          "0x14a50",
+          2352
+        ],
+        [
+          "sendto",
+          "0x1da00",
+          88
+        ],
+        [
+          "__libc_send",
+          "0x1d9e0",
+          32
+        ],
+        [
+          "__uClibc_main",
+          "0x1ecf0",
+          620
+        ],
+        [
+          "ftcp",
+          "0x12538",
+          1584
+        ],
+        [
+          "start_killer",
+          "0x15a04",
+          100
+        ],
+        [
+          "processCmd",
+          "0x164e4",
+          6232
+        ],
+        [
+          "SendTCPSYNACK",
+          "0x14650",
+          1024
+        ],
+        [
+          "main",
+          "0x17fc8",
+          2020
+        ],
+        [
+          "SendGRE",
+          "0x13608",
+          604
+        ],
+        [
+          "__GI_sendto",
+          "0x1da00",
+          88
+        ],
+        [
+          "SendHTTPHex",
+          "0x132a8",
+          432
+        ],
+        [
+          "SendTCPACK",
+          "0x1424c",
+          1028
+        ],
+        [
+          "__libc_sendto",
+          "0x1da00",
+          88
+        ],
+        [
+          "exploit_scanner",
+          "0x16334",
+          172
+        ],
+        [
+          "SendICMP",
+          "0x13864",
+          672
+        ]
+      ]
+    },
+    {
+      "sha256": "34b7558c823dce388432fe16b997c0a02646956d171f72eb7557774a1e1d66b3",
+      "bytes": 143488,
+      "machine": "EM_MIPS",
+      "elfclass": 32,
+      "little_endian": false,
+      "entry": "0x4002a0",
+      "has_interpreter": false,
+      "config": {
+        "commServer": {
+          "va": "0x45a0a0",
+          "size": 4,
+          "hex": "00417430",
+          "strings": [
+            "64.89.160.222:65481"
+          ]
+        },
+        "currentServer": {
+          "va": "0x45a060",
+          "size": 4,
+          "hex": "ffffffff"
+        },
+        "telnet_scanner_enabled": {
+          "va": "0x45a068",
+          "size": 4,
+          "hex": "00000001"
+        },
+        "exploit_scanner_enabled": {
+          "va": "0x45b018",
+          "size": 4,
+          "hex": ""
+        }
+      },
+      "functions": [
+        [
+          "send_retry",
+          "0x402bbc",
+          380
+        ],
+        [
+          "__GI_send",
+          "0x40fd30",
+          84
+        ],
+        [
+          "SendUDPBypass",
+          "0x40557c",
+          1368
+        ],
+        [
+          "initConnection",
+          "0x40adc4",
+          832
+        ],
+        [
+          "sendHTTPtwo",
+          "0x4046f8",
+          640
+        ],
+        [
+          "SendUDP",
+          "0x402d38",
+          1196
+        ],
+        [
+          "vseattack",
+          "0x403dbc",
+          1280
+        ],
+        [
+          "telnet_scanner",
+          "0x407fb4",
+          2080
+        ],
+        [
+          "tcpcsum",
+          "0x4027f4",
+          336
+        ],
+        [
+          "killer_loop",
+          "0x407610",
+          1224
+        ],
+        [
+          "send",
+          "0x40fd30",
+          84
+        ],
+        [
+          "SendUDPL2",
+          "0x405094",
+          1256
+        ],
+        [
+          "SendSTDHEX",
+          "0x403a34",
+          540
+        ],
+        [
+          "SendTLS",
+          "0x406620",
+          3020
+        ],
+        [
+          "sendto",
+          "0x40fd90",
+          128
+        ],
+        [
+          "__libc_send",
+          "0x40fd30",
+          84
+        ],
+        [
+          "__uClibc_main",
+          "0x411a28",
+          864
+        ],
+        [
+          "ftcp",
+          "0x4031e4",
+          2128
+        ],
+        [
+          "start_killer",
+          "0x407ad8",
+          168
+        ],
+        [
+          "processCmd",
+          "0x408a94",
+          9008
+        ],
+        [
+          "SendTCPSYNACK",
+          "0x40607c",
+          1444
+        ],
+        [
+          "main",
+          "0x40b104",
+          2560
+        ],
+        [
+          "SendGRE",
+          "0x404978",
+          868
+        ],
+        [
+          "__GI_sendto",
+          "0x40fd90",
+          128
+        ],
+        [
+          "SendHTTPHex",
+          "0x404478",
+          640
+        ],
+        [
+          "SendTCPACK",
+          "0x405ad4",
+          1448
+        ],
+        [
+          "__libc_sendto",
+          "0x40fd90",
+          128
+        ],
+        [
+          "exploit_scanner",
+          "0x4087d4",
+          324
+        ],
+        [
+          "SendICMP",
+          "0x404cdc",
+          952
+        ]
+      ]
+    },
+    {
+      "sha256": "46741363ec3bdf4e30df9a50cd55392595d537193149752345659b17153cb680",
+      "bytes": 105320,
+      "machine": "EM_SH",
+      "elfclass": 32,
+      "little_endian": true,
+      "entry": "0x4001a0",
+      "has_interpreter": false,
+      "config": {
+        "commServer": {
+          "va": "0x423020",
+          "size": 4,
+          "hex": "44fc4000",
+          "strings": [
+            "64.89.160.222:65481"
+          ]
+        },
+        "currentServer": {
+          "va": "0x423084",
+          "size": 4,
+          "hex": "ffffffff"
+        },
+        "telnet_scanner_enabled": {
+          "va": "0x42308c",
+          "size": 4,
+          "hex": "01000000"
+        },
+        "exploit_scanner_enabled": {
+          "va": "0x423a18",
+          "size": 4,
+          "hex": ""
+        }
+      },
+      "functions": [
+        [
+          "send_retry",
+          "0x401fe8",
+          240
+        ],
+        [
+          "SendUDPBypass",
+          "0x403ea4",
+          1012
+        ],
+        [
+          "initConnection",
+          "0x407e80",
+          496
+        ],
+        [
+          "sendHTTPtwo",
+          "0x403380",
+          512
+        ],
+        [
+          "SendUDP",
+          "0x4020d8",
+          892
+        ],
+        [
+          "vseattack",
+          "0x402ca4",
+          952
+        ],
+        [
+          "telnet_scanner",
+          "0x405d90",
+          1572
+        ],
+        [
+          "tcpcsum",
+          "0x401d5c",
+          260
+        ],
+        [
+          "killer_loop",
+          "0x405730",
+          916
+        ],
+        [
+          "send",
+          "0x40b3a8",
+          40
+        ],
+        [
+          "__GI_send",
+          "0x40b3a8",
+          40
+        ],
+        [
+          "SendUDPL2",
+          "0x403b00",
+          932
+        ],
+        [
+          "SendSTDHEX",
+          "0x402a28",
+          376
+        ],
+        [
+          "SendTLS",
+          "0x404ab8",
+          2516
+        ],
+        [
+          "sendto",
+          "0x40b3d0",
+          48
+        ],
+        [
+          "__libc_send",
+          "0x40b3a8",
+          40
+        ],
+        [
+          "__uClibc_main",
+          "0x40c534",
+          468
+        ],
+        [
+          "ftcp",
+          "0x402454",
+          1492
+        ],
+        [
+          "start_killer",
+          "0x405ac4",
+          92
+        ],
+        [
+          "processCmd",
+          "0x406504",
+          6524
+        ],
+        [
+          "SendTCPSYNACK",
+          "0x4046a8",
+          1040
+        ],
+        [
+          "main",
+          "0x408070",
+          1572
+        ],
+        [
+          "SendGRE",
+          "0x403580",
+          668
+        ],
+        [
+          "__GI_sendto",
+          "0x40b3d0",
+          48
+        ],
+        [
+          "SendHTTPHex",
+          "0x403180",
+          512
+        ],
+        [
+          "SendTCPACK",
+          "0x404298",
+          1040
+        ],
+        [
+          "__libc_sendto",
+          "0x40b3d0",
+          48
+        ],
+        [
+          "exploit_scanner",
+          "0x4063b4",
+          184
+        ],
+        [
+          "SendICMP",
+          "0x40381c",
+          740
+        ]
+      ]
+    },
+    {
+      "sha256": "54f07e4c8358c4947e5fba61c9a3fe0e66e31abdb8fd9e39b8962df6e9bbfa6c",
+      "bytes": 111421,
+      "machine": "EM_68K",
+      "elfclass": 32,
+      "little_endian": false,
+      "entry": "0x80000144",
+      "has_interpreter": false,
+      "config": {
+        "commServer": {
+          "va": "0x80016604",
+          "size": 4,
+          "hex": "80011d0a",
+          "strings": [
+            "64.89.160.222:65481"
+          ]
+        },
+        "currentServer": {
+          "va": "0x80016668",
+          "size": 4,
+          "hex": "ffffffff"
+        },
+        "telnet_scanner_enabled": {
+          "va": "0x80016670",
+          "size": 4,
+          "hex": "00000001"
+        },
+        "exploit_scanner_enabled": {
+          "va": "0x80016fea",
+          "size": 4,
+          "hex": ""
+        }
+      },
+      "functions": [
+        [
+          "send_retry",
+          "0x800014ea",
+          160
+        ],
+        [
+          "SendUDPBypass",
+          "0x80002a22",
+          696
+        ],
+        [
+          "initConnection",
+          "0x800055f0",
+          502
+        ],
+        [
+          "sendHTTPtwo",
+          "0x800022c0",
+          350
+        ],
+        [
+          "SendUDP",
+          "0x8000158a",
+          602
+        ],
+        [
+          "vseattack",
+          "0x80001de6",
+          650
+        ],
+        [
+          "telnet_scanner",
+          "0x80003f40",
+          1220
+        ],
+        [
+          "tcpcsum",
+          "0x80001310",
+          188
+        ],
+        [
+          "killer_loop",
+          "0x80003a5e",
+          716
+        ],
+        [
+          "send",
+          "0x8000a2b0",
+          56
+        ],
+        [
+          "__GI_send",
+          "0x8000a2b0",
+          56
+        ],
+        [
+          "SendUDPL2",
+          "0x800027ac",
+          630
+        ],
+        [
+          "SendSTDHEX",
+          "0x80001c2e",
+          284
+        ],
+        [
+          "SendTLS",
+          "0x8000327e",
+          1516
+        ],
+        [
+          "sendto",
+          "0x8000a2e8",
+          70
+        ],
+        [
+          "__libc_send",
+          "0x8000a2b0",
+          56
+        ],
+        [
+          "__uClibc_main",
+          "0x8000be36",
+          584
+        ],
+        [
+          "ftcp",
+          "0x800017e4",
+          1098
+        ],
+        [
+          "start_killer",
+          "0x80003d2a",
+          52
+        ],
+        [
+          "processCmd",
+          "0x80004540",
+          4272
+        ],
+        [
+          "SendTCPSYNACK",
+          "0x80002fac",
+          722
+        ],
+        [
+          "main",
+          "0x800057e6",
+          1126
+        ],
+        [
+          "SendGRE",
+          "0x8000241e",
+          426
+        ],
+        [
+          "__GI_sendto",
+          "0x8000a2e8",
+          70
+        ],
+        [
+          "SendHTTPHex",
+          "0x80002162",
+          350
+        ],
+        [
+          "SendTCPACK",
+          "0x80002cda",
+          722
+        ],
+        [
+          "__libc_sendto",
+          "0x8000a2e8",
+          70
+        ],
+        [
+          "exploit_scanner",
+          "0x80004404",
+          166
+        ],
+        [
+          "SendICMP",
+          "0x800025c8",
+          484
+        ]
+      ]
+    },
+    {
+      "sha256": "5c84dbb875ee198050a661a9f0182462b34e745f1c8e31026f23c0ea6fb2e15e",
+      "bytes": 91331,
+      "machine": "EM_386",
+      "elfclass": 32,
+      "little_endian": true,
+      "entry": "0x8048164",
+      "has_interpreter": false,
+      "config": {
+        "commServer": {
+          "va": "0x80588e0",
+          "size": 4,
+          "hex": "e04c0508",
+          "strings": [
+            "64.89.160.222:65481"
+          ]
+        },
+        "currentServer": {
+          "va": "0x8058944",
+          "size": 4,
+          "hex": "ffffffff"
+        },
+        "telnet_scanner_enabled": {
+          "va": "0x805894c",
+          "size": 4,
+          "hex": "01000000"
+        },
+        "exploit_scanner_enabled": {
+          "va": "0x80591f8",
+          "size": 4,
+          "hex": ""
+        }
+      },
+      "functions": [
+        [
+          "send_retry",
+          "0x804930e",
+          154
+        ],
+        [
+          "SendUDPBypass",
+          "0x804a8a0",
+          657
+        ],
+        [
+          "initConnection",
+          "0x804d57c",
+          441
+        ],
+        [
+          "sendHTTPtwo",
+          "0x804a171",
+          317
+        ],
+        [
+          "SendUDP",
+          "0x80493a8",
+          598
+        ],
+        [
+          "vseattack",
+          "0x8049cad",
+          678
+        ],
+        [
+          "telnet_scanner",
+          "0x804bd13",
+          1158
+        ],
+        [
+          "tcpcsum",
+          "0x8049161",
+          176
+        ],
+        [
+          "killer_loop",
+          "0x804b854",
+          691
+        ],
+        [
+          "send",
+          "0x804ffe8",
+          51
+        ],
+        [
+          "__GI_send",
+          "0x804ffe8",
+          51
+        ],
+        [
+          "SendUDPL2",
+          "0x804a636",
+          618
+        ],
+        [
+          "SendSTDHEX",
+          "0x8049af5",
+          273
+        ],
+        [
+          "SendTLS",
+          "0x804b0b1",
+          1468
+        ],
+        [
+          "sendto",
+          "0x805001c",
+          67
+        ],
+        [
+          "__libc_send",
+          "0x804ffe8",
+          51
+        ],
+        [
+          "__uClibc_main",
+          "0x8051a03",
+          441
+        ],
+        [
+          "ftcp",
+          "0x80495fe",
+          1271
+        ],
+        [
+          "start_killer",
+          "0x804bb07",
+          51
+        ],
+        [
+          "processCmd",
+          "0x804c2e6",
+          4758
+        ],
+        [
+          "SendTCPSYNACK",
+          "0x804adf1",
+          704
+        ],
+        [
+          "main",
+          "0x804d735",
+          1241
+        ],
+        [
+          "SendGRE",
+          "0x804a2ae",
+          432
+        ],
+        [
+          "__GI_sendto",
+          "0x805001c",
+          67
+        ],
+        [
+          "SendHTTPHex",
+          "0x804a034",
+          317
+        ],
+        [
+          "SendTCPACK",
+          "0x804ab31",
+          704
+        ],
+        [
+          "__libc_sendto",
+          "0x805001c",
+          67
+        ],
+        [
+          "exploit_scanner",
+          "0x804c199",
+          187
+        ],
+        [
+          "SendICMP",
+          "0x804a45e",
+          472
+        ]
+      ]
+    },
+    {
+      "sha256": "6955d78197fe503a53c57ffff66643de59c4bea21d79fbc95f2c24ec5ae89a82",
+      "bytes": 118011,
+      "machine": "EM_ARM",
+      "elfclass": 32,
+      "little_endian": true,
+      "entry": "0x8190",
+      "has_interpreter": false,
+      "config": {
+        "commServer": {
+          "va": "0x24024",
+          "size": 4,
+          "hex": "b8870100",
+          "strings": [
+            "64.89.160.222:65481"
+          ]
+        },
+        "currentServer": {
+          "va": "0x24088",
+          "size": 4,
+          "hex": "ffffffff"
+        },
+        "telnet_scanner_enabled": {
+          "va": "0x24090",
+          "size": 4,
+          "hex": "01000000"
+        },
+        "exploit_scanner_enabled": {
+          "va": "0x24a10",
+          "size": 4,
+          "hex": ""
+        }
+      },
+      "functions": [
+        [
+          "send_retry",
+          "0x9ea0",
+          232
+        ],
+        [
+          "SendUDPBypass",
+          "0xbb6c",
+          980
+        ],
+        [
+          "initConnection",
+          "0xf578",
+          560
+        ],
+        [
+          "sendHTTPtwo",
+          "0xb180",
+          404
+        ],
+        [
+          "SendUDP",
+          "0x9f88",
+          844
+        ],
+        [
+          "vseattack",
+          "0xab18",
+          904
+        ],
+        [
+          "telnet_scanner",
+          "0xd988",
+          1492
+        ],
+        [
+          "tcpcsum",
+          "0x9c10",
+          240
+        ],
+        [
+          "killer_loop",
+          "0xd3f4",
+          816
+        ],
+        [
+          "send",
+          "0x12eb4",
+          44
+        ],
+        [
+          "__GI_send",
+          "0x12eb4",
+          44
+        ],
+        [
+          "SendUDPL2",
+          "0xb7dc",
+          912
+        ],
+        [
+          "SendSTDHEX",
+          "0xa86c",
+          364
+        ],
+        [
+          "SendTLS",
+          "0xc6f0",
+          2700
+        ],
+        [
+          "sendto",
+          "0x12ee0",
+          52
+        ],
+        [
+          "__libc_send",
+          "0x12eb4",
+          44
+        ],
+        [
+          "__uClibc_main",
+          "0x14240",
+          588
+        ],
+        [
+          "ftcp",
+          "0xa2d4",
+          1432
+        ],
+        [
+          "start_killer",
+          "0xd724",
+          84
+        ],
+        [
+          "processCmd",
+          "0xe0b8",
+          5312
+        ],
+        [
+          "SendTCPSYNACK",
+          "0xc318",
+          984
+        ],
+        [
+          "main",
+          "0xf7a8",
+          1644
+        ],
+        [
+          "SendGRE",
+          "0xb314",
+          576
+        ],
+        [
+          "__GI_sendto",
+          "0x12ee0",
+          52
+        ],
+        [
+          "SendHTTPHex",
+          "0xafec",
+          404
+        ],
+        [
+          "SendTCPACK",
+          "0xbf40",
+          984
+        ],
+        [
+          "__libc_sendto",
+          "0x12ee0",
+          52
+        ],
+        [
+          "exploit_scanner",
+          "0xdf5c",
+          144
+        ],
+        [
+          "SendICMP",
+          "0xb554",
+          648
+        ]
+      ]
+    },
+    {
+      "sha256": "9334bd5e315feaae8317952ab96080f1063d3b8443d38086b381460bc975bd43",
+      "bytes": 173331,
+      "machine": "EM_ARM",
+      "elfclass": 32,
+      "little_endian": true,
+      "entry": "0x81d0",
+      "has_interpreter": false,
+      "config": {
+        "commServer": {
+          "va": "0x2a0c8",
+          "size": 4,
+          "hex": "a0f20100",
+          "strings": [
+            "64.89.160.222:65481"
+          ]
+        },
+        "currentServer": {
+          "va": "0x2a12c",
+          "size": 4,
+          "hex": "ffffffff"
+        },
+        "telnet_scanner_enabled": {
+          "va": "0x2a134",
+          "size": 4,
+          "hex": "01000000"
+        },
+        "exploit_scanner_enabled": {
+          "va": "0x2a960",
+          "size": 4,
+          "hex": ""
+        }
+      },
+      "functions": [
+        [
+          "send_retry",
+          "0x9ef0",
+          236
+        ],
+        [
+          "__sys_send",
+          "0x13a60",
+          68
+        ],
+        [
+          "__sys_sendto",
+          "0x13b14",
+          76
+        ],
+        [
+          "SendUDPBypass",
+          "0xbbe8",
+          968
+        ],
+        [
+          "initConnection",
+          "0xf60c",
+          556
+        ],
+        [
+          "sendHTTPtwo",
+          "0xb22c",
+          424
+        ],
+        [
+          "SendUDP",
+          "0x9fdc",
+          796
+        ],
+        [
+          "vseattack",
+          "0xac00",
+          856
+        ],
+        [
+          "telnet_scanner",
+          "0xda08",
+          1464
+        ],
+        [
+          "tcpcsum",
+          "0x9c60",
+          200
+        ],
+        [
+          "killer_loop",
+          "0xd45c",
+          808
+        ],
+        [
+          "send",
+          "0x13aa4",
+          112
+        ],
+        [
+          "__GI_send",
+          "0x13aa4",
+          112
+        ],
+        [
+          "SendUDPL2",
+          "0xb888",
+          864
+        ],
+        [
+          "SendSTDHEX",
+          "0xa97c",
+          344
+        ],
+        [
+          "SendTLS",
+          "0xc774",
+          2632
+        ],
+        [
+          "sendto",
+          "0x13b60",
+          136
+        ],
+        [
+          "__libc_send",
+          "0x13aa4",
+          112
+        ],
+        [
+          "__uClibc_main",
+          "0x16d20",
+          1004
+        ],
+        [
+          "ftcp",
+          "0xa2f8",
+          1668
+        ],
+        [
+          "start_killer",
+          "0xd784",
+          92
+        ],
+        [
+          "processCmd",
+          "0xe150",
+          5308
+        ],
+        [
+          "SendTCPSYNACK",
+          "0xc390",
+          996
+        ],
+        [
+          "main",
+          "0xf838",
+          1636
+        ],
+        [
+          "SendGRE",
+          "0xb3d4",
+          568
+        ],
+        [
+          "__GI_sendto",
+          "0x13b60",
+          136
+        ],
+        [
+          "SendHTTPHex",
+          "0xb084",
+          424
+        ],
+        [
+          "SendTCPACK",
+          "0xbfb0",
+          992
+        ],
+        [
+          "__libc_sendto",
+          "0x13b60",
+          136
+        ],
+        [
+          "exploit_scanner",
+          "0xdfc0",
+          188
+        ],
+        [
+          "SendICMP",
+          "0xb60c",
+          636
+        ]
+      ]
+    },
+    {
+      "sha256": "bb08fd9ce1f3508bc30a33646aeb66df3024e5c7da843cabd09ed19ae07bd8d1",
+      "bytes": 121461,
+      "machine": "EM_ARM",
+      "elfclass": 32,
+      "little_endian": true,
+      "entry": "0x8190",
+      "has_interpreter": false,
+      "config": {
+        "commServer": {
+          "va": "0x24024",
+          "size": 4,
+          "hex": "f0930100",
+          "strings": [
+            "64.89.160.222:65481"
+          ]
+        },
+        "currentServer": {
+          "va": "0x24088",
+          "size": 4,
+          "hex": "ffffffff"
+        },
+        "telnet_scanner_enabled": {
+          "va": "0x24090",
+          "size": 4,
+          "hex": "01000000"
+        },
+        "exploit_scanner_enabled": {
+          "va": "0x24a10",
+          "size": 4,
+          "hex": ""
+        }
+      },
+      "functions": [
+        [
+          "send_retry",
+          "0x9ea0",
+          232
+        ],
+        [
+          "SendUDPBypass",
+          "0xbb6c",
+          980
+        ],
+        [
+          "initConnection",
+          "0xf578",
+          560
+        ],
+        [
+          "sendHTTPtwo",
+          "0xb180",
+          404
+        ],
+        [
+          "SendUDP",
+          "0x9f88",
+          844
+        ],
+        [
+          "vseattack",
+          "0xab18",
+          904
+        ],
+        [
+          "telnet_scanner",
+          "0xd988",
+          1492
+        ],
+        [
+          "tcpcsum",
+          "0x9c10",
+          240
+        ],
+        [
+          "killer_loop",
+          "0xd3f4",
+          816
+        ],
+        [
+          "send",
+          "0x12eb4",
+          44
+        ],
+        [
+          "__GI_send",
+          "0x12eb4",
+          44
+        ],
+        [
+          "SendUDPL2",
+          "0xb7dc",
+          912
+        ],
+        [
+          "SendSTDHEX",
+          "0xa86c",
+          364
+        ],
+        [
+          "SendTLS",
+          "0xc6f0",
+          2700
+        ],
+        [
+          "sendto",
+          "0x12ee0",
+          52
+        ],
+        [
+          "__libc_send",
+          "0x12eb4",
+          44
+        ],
+        [
+          "__uClibc_main",
+          "0x14240",
+          588
+        ],
+        [
+          "ftcp",
+          "0xa2d4",
+          1432
+        ],
+        [
+          "start_killer",
+          "0xd724",
+          84
+        ],
+        [
+          "processCmd",
+          "0xe0b8",
+          5312
+        ],
+        [
+          "SendTCPSYNACK",
+          "0xc318",
+          984
+        ],
+        [
+          "main",
+          "0xf7a8",
+          1644
+        ],
+        [
+          "SendGRE",
+          "0xb314",
+          576
+        ],
+        [
+          "__GI_sendto",
+          "0x12ee0",
+          52
+        ],
+        [
+          "SendHTTPHex",
+          "0xafec",
+          404
+        ],
+        [
+          "SendTCPACK",
+          "0xbf40",
+          984
+        ],
+        [
+          "__libc_sendto",
+          "0x12ee0",
+          52
+        ],
+        [
+          "exploit_scanner",
+          "0xdf5c",
+          144
+        ],
+        [
+          "SendICMP",
+          "0xb554",
+          648
+        ]
+      ]
+    },
+    {
+      "sha256": "c220d6eee6083d31de215defb91161812ba3d998bad7d8babf258c9af4bdcee2",
+      "bytes": 143488,
+      "machine": "EM_MIPS",
+      "elfclass": 32,
+      "little_endian": true,
+      "entry": "0x4002a0",
+      "has_interpreter": false,
+      "config": {
+        "commServer": {
+          "va": "0x45a0a0",
+          "size": 4,
+          "hex": "30744100",
+          "strings": [
+            "64.89.160.222:65481"
+          ]
+        },
+        "currentServer": {
+          "va": "0x45a060",
+          "size": 4,
+          "hex": "ffffffff"
+        },
+        "telnet_scanner_enabled": {
+          "va": "0x45a068",
+          "size": 4,
+          "hex": "01000000"
+        },
+        "exploit_scanner_enabled": {
+          "va": "0x45b018",
+          "size": 4,
+          "hex": ""
+        }
+      },
+      "functions": [
+        [
+          "send_retry",
+          "0x402bac",
+          380
+        ],
+        [
+          "__GI_send",
+          "0x40fd30",
+          84
+        ],
+        [
+          "SendUDPBypass",
+          "0x40553c",
+          1368
+        ],
+        [
+          "initConnection",
+          "0x40ad48",
+          832
+        ],
+        [
+          "sendHTTPtwo",
+          "0x4046b8",
+          640
+        ],
+        [
+          "SendUDP",
+          "0x402d28",
+          1196
+        ],
+        [
+          "vseattack",
+          "0x403d7c",
+          1280
+        ],
+        [
+          "telnet_scanner",
+          "0x407f38",
+          2080
+        ],
+        [
+          "tcpcsum",
+          "0x4027f4",
+          336
+        ],
+        [
+          "killer_loop",
+          "0x407594",
+          1224
+        ],
+        [
+          "send",
+          "0x40fd30",
+          84
+        ],
+        [
+          "SendUDPL2",
+          "0x405054",
+          1256
+        ],
+        [
+          "SendSTDHEX",
+          "0x403a04",
+          540
+        ],
+        [
+          "SendTLS",
+          "0x4065bc",
+          2996
+        ],
+        [
+          "sendto",
+          "0x40fd90",
+          128
+        ],
+        [
+          "__libc_send",
+          "0x40fd30",
+          84
+        ],
+        [
+          "__uClibc_main",
+          "0x411a28",
+          864
+        ],
+        [
+          "ftcp",
+          "0x4031d4",
+          2096
+        ],
+        [
+          "start_killer",
+          "0x407a5c",
+          168
+        ],
+        [
+          "processCmd",
+          "0x408a18",
+          9008
+        ],
+        [
+          "SendTCPSYNACK",
+          "0x406028",
+          1428
+        ],
+        [
+          "main",
+          "0x40b088",
+          2560
+        ],
+        [
+          "SendGRE",
+          "0x404938",
+          868
+        ],
+        [
+          "__GI_sendto",
+          "0x40fd90",
+          128
+        ],
+        [
+          "SendHTTPHex",
+          "0x404438",
+          640
+        ],
+        [
+          "SendTCPACK",
+          "0x405a94",
+          1428
+        ],
+        [
+          "__libc_sendto",
+          "0x40fd90",
+          128
+        ],
+        [
+          "exploit_scanner",
+          "0x408758",
+          324
+        ],
+        [
+          "SendICMP",
+          "0x404c9c",
+          952
+        ]
+      ]
+    },
+    {
+      "sha256": "c458e443759ea633cde8929b4337726136675141d82251158f973f54008e20ac",
+      "bytes": 132978,
+      "machine": "EM_ARM",
+      "elfclass": 32,
+      "little_endian": true,
+      "entry": "0x81b0",
+      "has_interpreter": false,
+      "config": {
+        "commServer": {
+          "va": "0x264d4",
+          "size": 4,
+          "hex": "30b90100",
+          "strings": [
+            "64.89.160.222:65481"
+          ]
+        },
+        "currentServer": {
+          "va": "0x26538",
+          "size": 4,
+          "hex": "ffffffff"
+        },
+        "telnet_scanner_enabled": {
+          "va": "0x26540",
+          "size": 4,
+          "hex": "01000000"
+        },
+        "exploit_scanner_enabled": {
+          "va": "0x26dc0",
+          "size": 4,
+          "hex": ""
+        }
+      },
+      "functions": [
+        [
+          "send_retry",
+          "0x9ee8",
+          236
+        ],
+        [
+          "SendUDPBypass",
+          "0xbbe0",
+          968
+        ],
+        [
+          "initConnection",
+          "0xf60c",
+          556
+        ],
+        [
+          "sendHTTPtwo",
+          "0xb224",
+          424
+        ],
+        [
+          "SendUDP",
+          "0x9fd4",
+          796
+        ],
+        [
+          "vseattack",
+          "0xabf8",
+          856
+        ],
+        [
+          "telnet_scanner",
+          "0xda00",
+          1472
+        ],
+        [
+          "tcpcsum",
+          "0x9c58",
+          200
+        ],
+        [
+          "killer_loop",
+          "0xd454",
+          808
+        ],
+        [
+          "send",
+          "0x13120",
+          56
+        ],
+        [
+          "__GI_send",
+          "0x13120",
+          56
+        ],
+        [
+          "SendUDPL2",
+          "0xb880",
+          864
+        ],
+        [
+          "SendSTDHEX",
+          "0xa974",
+          344
+        ],
+        [
+          "SendTLS",
+          "0xc76c",
+          2632
+        ],
+        [
+          "sendto",
+          "0x13158",
+          64
+        ],
+        [
+          "__libc_send",
+          "0x13120",
+          56
+        ],
+        [
+          "__uClibc_main",
+          "0x15684",
+          724
+        ],
+        [
+          "ftcp",
+          "0xa2f0",
+          1668
+        ],
+        [
+          "start_killer",
+          "0xd77c",
+          92
+        ],
+        [
+          "processCmd",
+          "0xe150",
+          5308
+        ],
+        [
+          "SendTCPSYNACK",
+          "0xc388",
+          996
+        ],
+        [
+          "main",
+          "0xf838",
+          1636
+        ],
+        [
+          "SendGRE",
+          "0xb3cc",
+          568
+        ],
+        [
+          "__GI_sendto",
+          "0x13158",
+          64
+        ],
+        [
+          "SendHTTPHex",
+          "0xb07c",
+          424
+        ],
+        [
+          "SendTCPACK",
+          "0xbfa8",
+          992
+        ],
+        [
+          "__libc_sendto",
+          "0x13158",
+          64
+        ],
+        [
+          "exploit_scanner",
+          "0xdfc0",
+          188
+        ],
+        [
+          "SendICMP",
+          "0xb604",
+          636
+        ]
+      ]
+    },
+    {
+      "sha256": "ca4b5afd66233bd10a41fd11bcd56554283e945c461e2fd9f5673df4bcebbeb3",
+      "bytes": 93219,
+      "machine": "EM_386",
+      "elfclass": 32,
+      "little_endian": true,
+      "entry": "0x8048168",
+      "has_interpreter": false,
+      "config": {
+        "commServer": {
+          "va": "0x8058040",
+          "size": 4,
+          "hex": "40530508",
+          "strings": [
+            "64.89.160.222:65481"
+          ]
+        },
+        "currentServer": {
+          "va": "0x80580a4",
+          "size": 4,
+          "hex": "ffffffff"
+        },
+        "telnet_scanner_enabled": {
+          "va": "0x80580ac",
+          "size": 4,
+          "hex": "01000000"
+        },
+        "exploit_scanner_enabled": {
+          "va": "0x8058958",
+          "size": 4,
+          "hex": ""
+        }
+      },
+      "functions": [
+        [
+          "send_retry",
+          "0x804945b",
+          165
+        ],
+        [
+          "SendUDPBypass",
+          "0x804abeb",
+          769
+        ],
+        [
+          "initConnection",
+          "0x804db0a",
+          490
+        ],
+        [
+          "sendHTTPtwo",
+          "0x804a3e9",
+          388
+        ],
+        [
+          "SendUDP",
+          "0x8049500",
+          643
+        ],
+        [
+          "vseattack",
+          "0x8049e91",
+          726
+        ],
+        [
+          "telnet_scanner",
+          "0x804c1ba",
+          1264
+        ],
+        [
+          "tcpcsum",
+          "0x804929a",
+          173
+        ],
+        [
+          "killer_loop",
+          "0x804bcdc",
+          728
+        ],
+        [
+          "send",
+          "0x80505ec",
+          51
+        ],
+        [
+          "__GI_send",
+          "0x80505ec",
+          51
+        ],
+        [
+          "SendUDPL2",
+          "0x804a957",
+          660
+        ],
+        [
+          "SendSTDHEX",
+          "0x8049cb1",
+          303
+        ],
+        [
+          "SendTLS",
+          "0x804b4d2",
+          1529
+        ],
+        [
+          "sendto",
+          "0x8050620",
+          67
+        ],
+        [
+          "__libc_send",
+          "0x80505ec",
+          51
+        ],
+        [
+          "__uClibc_main",
+          "0x805203f",
+          443
+        ],
+        [
+          "ftcp",
+          "0x8049783",
+          1326
+        ],
+        [
+          "start_killer",
+          "0x804bfb4",
+          53
+        ],
+        [
+          "processCmd",
+          "0x804c815",
+          4853
+        ],
+        [
+          "SendTCPSYNACK",
+          "0x804b1df",
+          755
+        ],
+        [
+          "main",
+          "0x804dcf4",
+          1236
+        ],
+        [
+          "SendGRE",
+          "0x804a56d",
+          480
+        ],
+        [
+          "__GI_sendto",
+          "0x8050620",
+          67
+        ],
+        [
+          "SendHTTPHex",
+          "0x804a265",
+          388
+        ],
+        [
+          "SendTCPACK",
+          "0x804aeec",
+          755
+        ],
+        [
+          "__libc_sendto",
+          "0x8050620",
+          67
+        ],
+        [
+          "exploit_scanner",
+          "0x804c6aa",
+          209
+        ],
+        [
+          "SendICMP",
+          "0x804a74d",
+          522
+        ]
+      ]
+    },
+    {
+      "sha256": "e16117e61605d82e9f61aac203effbe8baf8acebb3390859759e48da2d070c53",
+      "bytes": 109461,
+      "machine": "EM_PPC",
+      "elfclass": 32,
+      "little_endian": false,
+      "entry": "0x100001f0",
+      "has_interpreter": false,
+      "config": {
+        "commServer": {
+          "va": "0x10024990",
+          "size": 4,
+          "hex": "10010ae0",
+          "strings": [
+            "64.89.160.222:65481"
+          ]
+        },
+        "currentServer": {
+          "va": "0x10024994",
+          "size": 4,
+          "hex": "ffffffff"
+        },
+        "telnet_scanner_enabled": {
+          "va": "0x10024998",
+          "size": 4,
+          "hex": "00000001"
+        },
+        "exploit_scanner_enabled": {
+          "va": "0x100249f8",
+          "size": 4,
+          "hex": ""
+        }
+      },
+      "functions": [
+        [
+          "send_retry",
+          "0x10002300",
+          280
+        ],
+        [
+          "SendUDPBypass",
+          "0x10003e38",
+          892
+        ],
+        [
+          "initConnection",
+          "0x10007638",
+          604
+        ],
+        [
+          "sendHTTPtwo",
+          "0x100034d8",
+          428
+        ],
+        [
+          "SendUDP",
+          "0x10002418",
+          756
+        ],
+        [
+          "vseattack",
+          "0x10002eb4",
+          816
+        ],
+        [
+          "telnet_scanner",
+          "0x10005a10",
+          1508
+        ],
+        [
+          "tcpcsum",
+          "0x10002038",
+          260
+        ],
+        [
+          "killer_loop",
+          "0x1000541c",
+          784
+        ],
+        [
+          "send",
+          "0x1000b418",
+          56
+        ],
+        [
+          "__GI_send",
+          "0x1000b418",
+          56
+        ],
+        [
+          "SendUDPL2",
+          "0x10003b10",
+          808
+        ],
+        [
+          "SendSTDHEX",
+          "0x10002c3c",
+          360
+        ],
+        [
+          "SendTLS",
+          "0x100048ac",
+          2196
+        ],
+        [
+          "sendto",
+          "0x1000b450",
+          64
+        ],
+        [
+          "__libc_send",
+          "0x1000b418",
+          56
+        ],
+        [
+          "__uClibc_main",
+          "0x1000c8e0",
+          620
+        ],
+        [
+          "ftcp",
+          "0x1000270c",
+          1328
+        ],
+        [
+          "start_killer",
+          "0x1000572c",
+          104
+        ],
+        [
+          "processCmd",
+          "0x100061bc",
+          5244
+        ],
+        [
+          "SendTCPSYNACK",
+          "0x10004530",
+          892
+        ],
+        [
+          "main",
+          "0x10007894",
+          1592
+        ],
+        [
+          "SendGRE",
+          "0x10003684",
+          552
+        ],
+        [
+          "__GI_sendto",
+          "0x1000b450",
+          64
+        ],
+        [
+          "SendHTTPHex",
+          "0x1000332c",
+          428
+        ],
+        [
+          "SendTCPACK",
+          "0x100041b4",
+          892
+        ],
+        [
+          "__libc_sendto",
+          "0x1000b450",
+          64
+        ],
+        [
+          "exploit_scanner",
+          "0x10005ff4",
+          200
+        ],
+        [
+          "SendICMP",
+          "0x100038ac",
+          612
+        ]
+      ]
+    }
+  ]
+}
