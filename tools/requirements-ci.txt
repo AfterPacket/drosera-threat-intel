@@ -1,0 +1,6 @@
+# Direct validation dependencies pinned to the locally tested versions.
+# Transitive dependencies are not a fully locked/hash-pinned environment.
+yara-python==4.5.4
+PyYAML==6.0.3
+pysigma==2.0.1
+pysigma-backend-splunk==3.0.0

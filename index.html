@@ -144,6 +144,13 @@ footer p{margin:0 0 6px}
       <p class="desc"><strong>Observed:</strong> all nine YARA files compiled warning-free under YARA 4.5.4;
         864 rule/sample evaluations were recorded over 96 unique samples. Each new rule matched only its
         intended loader in that corpus. All ten Sigma files parsed and converted in offline validation.</p>
+      <p class="desc"><strong>Deep-review status:</strong> among the 69 previously unpublished samples,
+        six source reviews are complete, 13 ELF reviews are partial, and <strong>50 still await deep review</strong>.
+        The nine YARA rules <strong>do not provide comprehensive coverage</strong> of the corpus.
+        Configuration recovery and detection hits are not complete behavioral analysis.</p>
+      <p class="desc"><strong>Automation:</strong> sample-free rule, IOC, SID and bundle checks plus a
+        Suricata engine-test workflow are configured in the repository. A passing GitHub Actions engine run
+        has not yet been verified; this does not establish live SIEM behavior or broad false-positive rates.</p>
       <p class="desc"><strong>Unverified:</strong> broad benign-software false-positive rates, YARAify acceptance,
         live SIEM behavior and infrastructure ownership. This was static-only analysis; samples were not executed
         and their infrastructure was not contacted.</p>
@@ -151,6 +158,9 @@ footer p{margin:0 0 6px}
         <code>www.ikindalikemenbutonlyontuesday.com</code> remains excluded from the blocklist.</p>
       <div class="dl"><a href="reports/CAPTURE_20261029_triage.md">Validation report and full hit table</a>
         <span class="sep">·</span> <a href="drosera-detection-bundle.zip">Sample-free detection bundle</a>
+        <span class="sep">·</span> <a href="reports/DEEP_STATIC_BATCH1_analysis.md">Deep-review findings</a>
+        <span class="sep">·</span> <a href="reports/DEEP_STATIC_BATCH1_coverage.csv">96-sample review tracker</a>
+        <span class="sep">·</span> <a href="reports/AUTOMATION_AND_LIMITS.md">Automation and validation limits</a>
         <span class="sep">·</span> <a href="README.md">Repository overview</a></div>
     </section>
 
@@ -330,7 +340,7 @@ footer p{margin:0 0 6px}
           <div class="ioc-stat"><span class="ioc-num">9</span><span class="ioc-cap">Samples</span></div>
           <div class="ioc-stat"><span class="ioc-num">7</span><span class="ioc-cap">IPs blocked</span></div>
           <div class="ioc-stat"><span class="ioc-num">5</span><span class="ioc-cap">C2 domains</span></div>
-          <div class="ioc-stat"><span class="ioc-num">7/16</span><span class="ioc-cap">Arches captured</span></div>
+          <div class="ioc-stat"><span class="ioc-num">7/15</span><span class="ioc-cap">Arches captured</span></div>
         </dl>
 
         <div class="dl">

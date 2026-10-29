@@ -15,6 +15,10 @@ drosera-loot-*.zip
 .zed/
 .claude/
 
+# Python validation caches (never bundle or commit)
+__pycache__/
+*.py[cod]
+
 # OS / editor noise
 Thumbs.db
 desktop.ini
