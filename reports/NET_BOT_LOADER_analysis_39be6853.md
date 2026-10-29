@@ -68,6 +68,13 @@ in this loader's readable source. No child C2 was extracted by this review.
 
 ### Offline infrastructure disposition
 
+**Observed — contextual IOC follow-up:** [NET_BOT_LOADER IOC feed](../ioc/NET_BOT_LOADER_ioc.txt)
+now publishes the source-observed retrieval host, all 15 literal retrieval URLs,
+loader hashes and host-hunting context. Capture-source sidecars are separately
+labeled; the metadata-only address is not promoted to a payload host. This is an
+investigation feed, not a deny list; current activity and C2 remain unverified.
+The blocking exclusions below remain unchanged.
+
 | Indicator | Existing IOC/blocklist comparison | Disposition and one-line reason |
 |---|---|---|
 | `160.119.66.206`; its 15 `/bins/net.<suffix>` URLs | NEW | EXCLUDED from blocking: source proves a retrieval role, not dedicated malicious ownership or absence of legitimate co-tenants |
@@ -183,9 +190,9 @@ representative clean-corpus false-positive rate and YARAify acceptance.
 **Observed:** static analysis only; no sample was run and no endpoint was
 contacted. Only the loader's encrypted archive is added; the 28 linked ELFs remain
 in the supplied loot, with hashes recorded above. No Suricata rule is shipped
-because engine syntax validation is unavailable. No SID allocation, IOC-feed,
-firewall or blocklist addition is made. The staging literal is not claimed as
-verified command infrastructure.
+because engine syntax validation is unavailable. The contextual IOC follow-up
+publishes retrieval evidence without a SID allocation, firewall or blocklist
+addition. The staging literal is not claimed as verified command infrastructure.
 
 ## Hunting notes
 

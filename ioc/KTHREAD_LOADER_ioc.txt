@@ -1,0 +1,57 @@
+# ==============================================================
+# KTHREAD_LOADER — Contextual IOC Feed (HUNTING, NOT A BLOCKLIST)
+# Author: AfterPacket | TLP:WHITE | Static review: 2026-10-29
+# Report: ../reports/KTHREAD_LOADER_analysis_b1a84cfd.md
+# Descriptive source-cluster label; not botnet/actor attribution.
+# ==============================================================
+# Usage: retrospective hunting and investigation. Do not import this
+# mixed-role feed directly into a firewall or IP/domain deny list.
+# HIGH confidence means faithful extraction from source, NOT verified
+# current activity, C2, infrastructure ownership or malicious exclusivity.
+# No sample execution, DNS lookup or infrastructure contact performed.
+
+# [HASHES — LOADER SOURCE]
+b1a84cfd4176a472e319ee7733e55998ae69b9752fd26f8c853cefd836a477b9 # SHA-256
+ef38b770bef2edfe47529229264fde1e # MD5
+57e64e12b878922a9f8b30ab28e89fc012b25dce # SHA-1
+
+# [PAYLOAD DISTRIBUTION — OBSERVED IN SOURCE, HIGH EXTRACTION CONFIDENCE]
+44.210.140.205 # Retrieval host from SRV assignment, L3 / offset 0x000b; NOT proven C2
+hxxp://44.210.140.205/bins # Literal retrieval base, defanged
+# The script constructs SRV + '/' + BIN_NAME (L47).
+# Constructed candidate URLs below follow literal name assignments;
+# they are NOT observed successful downloads or child-binary identifications.
+hxxp://44.210.140.205/bins/kworker_u8
+hxxp://44.210.140.205/bins/ksoftirqd0
+hxxp://44.210.140.205/bins/bioset0
+hxxp://44.210.140.205/bins/kblockd0
+hxxp://44.210.140.205/bins/jbd2_sda1d
+hxxp://44.210.140.205/bins/rcuop_0
+hxxp://44.210.140.205/bins/ecryptfsd
+hxxp://44.210.140.205/bins/kswapd0
+hxxp://44.210.140.205/bins/devfreq_wq
+hxxp://44.210.140.205/bins/zswap_shrinkd
+hxxp://44.210.140.205/bins/edac_polld
+hxxp://44.210.140.205/bins/cfg80211d
+
+# [CAPTURE PROVENANCE — METADATA ONLY, NOT PROMOTED TO PAYLOAD HOST]
+# Address: 78.17.98.2
+# Supplied sidecar: 2026-10-28T21:33:08+00:00, SSH loader-fetch,
+# filename /bins/loader.sh. This records capture-source context only;
+# it does not establish a payload-distribution or C2 role for that address.
+
+# [PORT / PROTOCOL — CONTEXT ONLY]
+80 # TCP/HTTP inferred from literal http:// retrieval scheme; do NOT blanket-block HTTP
+
+# [HOST HUNT — SOURCE-DERIVED, CORRELATE; NAMES ALONE ARE NOT MALICIOUS]
+# DST="$WRITABLE_DIR/.$BIN_NAME"; hidden file in a writable directory.
+# Candidate directories: /dev/shm /tmp /var/system /mnt /var/tmp /run /dev
+# Correlate retrieval from the base above, hidden destination, chmod,
+# background invocation and script self-deletion (realpath "$0"; rm -f "$SELF").
+# Kernel-thread-like names can overlap legitimate names; no standalone name block.
+
+# [DISPOSITION / LIMITS]
+# No literal domains observed. No new automatic block, Firewalla entry,
+# broad port deny, or Suricata rule accompanies this contextual publication.
+# Ownership, tenancy, ASN/geo, current activity, successful execution,
+# child capabilities, persistence and C2 are unverified.

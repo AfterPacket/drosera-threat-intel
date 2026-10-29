@@ -22,7 +22,7 @@ previously unmatched shell loaders**, not the entire newer corpus.
 | YARA | **9 rules in 9 files** — one rule per file |
 | Sigma | **10 rules** |
 | Suricata | **6 rulesets, 31 SIDs** — unchanged; engine validation not run in this review |
-| Original family IOC feeds | **7** — unchanged |
+| IOC feeds | **9** — 7 original feeds plus 2 contextual loader feeds for investigation, not automatic blocking |
 | Blocklist | **46 entries: 41 IPv4 literals and 5 domains** — no additions |
 
 ### Newly analysed loaders
@@ -33,8 +33,8 @@ positive each in the 96-sample test corpus.
 
 | Cluster / sample | Analysis | Detection files | Encrypted sample |
 |---|---|---|---|
-| KTHREAD_LOADER · `b1a84cfd` | [Architecture mapping, hidden staging and self-cleanup](reports/KTHREAD_LOADER_analysis_b1a84cfd.md) | [YARA](yara/KTHREAD_LOADER_archmap.yar) · [Sigma](sigma/kthread_loader_hidden_download.yml) | [AES-256 ZIP](samples/b1a84cfd4176a472e319ee7733e55998ae69b9752fd26f8c853cefd836a477b9.zip) |
-| NET_BOT_LOADER · `39be6853` | [Tagged execution, conditional exit and 28 capture-linked child hashes](reports/NET_BOT_LOADER_analysis_39be6853.md) | [YARA](yara/NET_BOT_LOADER_staging.yar) · [Sigma](sigma/net_bot_loader_tagged_execution.yml) | [AES-256 ZIP](samples/39be6853a8204ce6455a373a6ffb4cb4672d4a62d90be69f7d6eeb66cda10b96.zip) |
+| KTHREAD_LOADER · `b1a84cfd` | [Architecture mapping, hidden staging and self-cleanup](reports/KTHREAD_LOADER_analysis_b1a84cfd.md) | [YARA](yara/KTHREAD_LOADER_archmap.yar) · [Sigma](sigma/kthread_loader_hidden_download.yml) · [Contextual IOCs](ioc/KTHREAD_LOADER_ioc.txt) | [AES-256 ZIP](samples/b1a84cfd4176a472e319ee7733e55998ae69b9752fd26f8c853cefd836a477b9.zip) |
+| NET_BOT_LOADER · `39be6853` | [Tagged execution, conditional exit and 28 capture-linked child hashes](reports/NET_BOT_LOADER_analysis_39be6853.md) | [YARA](yara/NET_BOT_LOADER_staging.yar) · [Sigma](sigma/net_bot_loader_tagged_execution.yml) · [Contextual IOCs](ioc/NET_BOT_LOADER_ioc.txt) | [AES-256 ZIP](samples/39be6853a8204ce6455a373a6ffb4cb4672d4a62d90be69f7d6eeb66cda10b96.zip) |
 
 **Observed:** all nine YARA files compile warning-free under YARA 4.5.4; all
 **864 rule/sample evaluations** and the unchanged old-rule baseline are recorded
@@ -276,7 +276,7 @@ attribute the abuse, not the tool.
 | `blocklist.txt` | **Master feed.** Raw IPs and domains, one per line. No comments, no blank lines, no wildcards — it is machine-read. |
 | `firewalla/drosera_block.txt` | The same indicators, annotated with family, role and confidence, for pasting into Firewalla MSP. |
 | `firewalla/drosera_port_policy.txt` | **Port and egress rules.** A Target List cannot express a port, so these are written to be created manually. Rule 1 blocks outbound IRC — the one control that survives this capture's C2-override evasion. |
-| `ioc/<FAMILY>_ioc.txt` | One IOC feed per family — hashes, IPs, domains, ports, protocol indicators, grep strings. |
+| `ioc/<FAMILY>_ioc.txt` | Nine feeds: seven original groups and two descriptive loader clusters. Hashes, role-labeled IPs, URLs, ports and host-hunting context; contextual loader feeds are not deny lists. |
 | `yara/<FAMILY>_<campaign>.yar` | **Exactly one rule per file** — YARAify rejects multi-rule uploads ("Multiple YARA rules found in a single file"). Families needing both a dropper and a payload rule ship two files. |
 | `suricata/<family>.rules` | One Suricata ruleset per family. |
 | `sigma/<family>_<detection>.yml` | Log-based detection, 10 rules: eight from the original capture and two additional loader detections. Includes the two original families with **no** YARA rule by design. |
@@ -375,7 +375,17 @@ validate the generated queries against your ingestion pipeline.
 suricata -T -c /etc/suricata/suricata.yaml
 ```
 
-**Confidence tags** used across the IOC files:
+**Contextual loader feeds:** [KTHREAD_LOADER](ioc/KTHREAD_LOADER_ioc.txt) publishes
+`44.210.140.205` and its source-derived retrieval paths;
+[NET_BOT_LOADER](ioc/NET_BOT_LOADER_ioc.txt) publishes `160.119.66.206` and 15 literal
+retrieval URLs. Metadata-only capture sources are separately labeled, not promoted
+to payload hosts. These are investigation/hunting feeds, **not automatic blocklists**.
+TCP/80 is retrieval context, not a recommendation to deny HTTP. Extraction confidence
+does not establish current activity, C2, ownership or malicious exclusivity.
+No legitimate header domains, decoys or shared-service apexes are added to deny lists.
+
+**Confidence tags** used across the original IOC files (the contextual loader feeds
+explicitly define HIGH as extraction confidence, not live maliciousness):
 
 | Tag | Meaning |
 |-----|---------|
@@ -405,9 +415,11 @@ take the next free block from this table and update it.
 
 ## Handling samples
 
-Everything in `samples/` is **live malware**. All 25 samples from the 2026-08-07
-capture are present as `samples/<sha256>.zip`, 4.5 MB total. MD5 and SHA-1 for
-each are in [`reports/CAPTURE_20260807_hashes.txt`](reports/CAPTURE_20260807_hashes.txt).
+Treat everything in `samples/` as **live malware**. There are **27 encrypted
+archives**: all 25 original samples plus the two additional loaders. MD5 and SHA-1
+for the original 25 are in
+[`reports/CAPTURE_20260807_hashes.txt`](reports/CAPTURE_20260807_hashes.txt);
+the additional loaders' hashes are in their linked analysis reports and contextual IOC feeds.
 
 - Archives are AES-256 encrypted with the password `infected`.
 - Extract and analyse only inside an isolated VM with no network path to anything you care about.
@@ -448,8 +460,8 @@ totals and family reports above remain scoped to August; `samples/` now contains
 
 | Descriptive cluster | New artifacts | Scope |
 |---|---|---|
-| KTHREAD_LOADER | [Report](reports/KTHREAD_LOADER_analysis_b1a84cfd.md), [YARA](yara/KTHREAD_LOADER_archmap.yar), [Sigma](sigma/kthread_loader_hidden_download.yml) | Architecture-to-kernel-thread-like names, hidden download and self-cleanup |
-| NET_BOT_LOADER | [Report](reports/NET_BOT_LOADER_analysis_39be6853.md), [YARA](yara/NET_BOT_LOADER_staging.yar), [Sigma](sigma/net_bot_loader_tagged_execution.yml) | net.<arch> retrieval, net_bot tagged execution, conditional early exit |
+| KTHREAD_LOADER | [Report](reports/KTHREAD_LOADER_analysis_b1a84cfd.md), [YARA](yara/KTHREAD_LOADER_archmap.yar), [Sigma](sigma/kthread_loader_hidden_download.yml), [Contextual IOCs](ioc/KTHREAD_LOADER_ioc.txt) | Architecture-to-kernel-thread-like names, hidden download and self-cleanup |
+| NET_BOT_LOADER | [Report](reports/NET_BOT_LOADER_analysis_39be6853.md), [YARA](yara/NET_BOT_LOADER_staging.yar), [Sigma](sigma/net_bot_loader_tagged_execution.yml), [Contextual IOCs](ioc/NET_BOT_LOADER_ioc.txt) | net.<arch> retrieval, net_bot tagged execution, conditional early exit |
 
 **Observed:** [validation and full hit table](reports/CAPTURE_20261029_triage.md)
 records nine YARA rules and ten Sigma rules. The latter all parse with pysigma
@@ -457,8 +469,11 @@ records nine YARA rules and ten Sigma rules. The latter all parse with pysigma
 field mapping. [Offline validation tool](tools/validate_static.py) never executes
 samples or contacts infrastructure.
 
-**Observed:** no new IP/domain block, firewall entry, IOC feed or Suricata rule
-was added. The blocklist remains 46 entries (41 IPv4 literals and five domains).
+**Observed — contextual IOC follow-up:** two loader IOC feeds now publish payload
+retrieval indicators and separately labeled capture-source context. Publishing
+contextual evidence is distinct from automatically blocking infrastructure.
+No new IP/domain block, firewall entry, port deny or Suricata rule was added.
+The blocklist remains 46 entries (41 IPv4 literals and five domains).
 The Mirai decoy `www.ikindalikemenbutonlyontuesday.com`, legitimate header values,
 and shared-service apexes remain excluded. No new SID was allocated; `9006xxx`
 remains reserved. New YARA logic is source-structural and untested beyond this set.

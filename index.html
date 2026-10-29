@@ -132,10 +132,12 @@ footer p{margin:0 0 6px}
         96 published samples or 96 detailed reports. Seven original capture groups are preserved below;
         the two additions are <strong>descriptive loader clusters, not newly attributed botnet families</strong>.</p>
       <ul>
-        <li><strong>9 YARA rules</strong> in 9 files; <strong>10 Sigma rules</strong>.</li>
+        <li><strong>9 YARA rules</strong> in 9 files; <strong>10 Sigma rules</strong>;
+          <strong>9 IOC feeds</strong> including two contextual loader feeds, not automatic deny lists.</li>
         <li><strong>6 Suricata rulesets / 31 SIDs</strong>, unchanged; engine validation was not run in this review.</li>
         <li><strong>41 IPs and 5 domains</strong> in the blocklist, unchanged. No new blocking entries were added:
-          staging literals and capture-source addresses alone do not establish dedicated malicious ownership.</li>
+          payload retrieval indicators are published for hunting; staging literals and capture-source addresses
+          alone do not establish dedicated malicious ownership.</li>
       </ul>
       <p class="desc"><strong>Observed:</strong> all nine YARA files compiled warning-free under YARA 4.5.4;
         864 rule/sample evaluations were recorded over 96 unique samples. Each new rule matched only its
@@ -177,6 +179,9 @@ footer p{margin:0 0 6px}
         <p class="desc"><strong>Inferred:</strong> the names and leading dot are intended to reduce visibility.
           <strong>Unverified:</strong> successful execution, child capabilities, C2, persistence,
           operator identity and botnet family. The label describes this source cluster, not attribution.</p>
+        <p class="desc"><strong>Payload retrieval IOC:</strong> <code>44.210.140.205</code>, base
+          <code>hxxp://44.210.140.205/bins</code>. Published as source-observed staging context,
+          not proven C2 or an automatic IP block. The metadata-only capture source is labeled separately.</p>
         <ul class="tags"><li>Architecture selection</li><li>Hidden-file staging</li>
           <li>Kernel-thread-like names</li><li>Self-deletion intent</li></ul>
         <p class="desc">Adds one encrypted sample, a static report, experimental source-structural YARA
@@ -184,6 +189,7 @@ footer p{margin:0 0 6px}
         <div class="dl">
           <a href="yara/KTHREAD_LOADER_archmap.yar">YARA</a> <span class="sep">·</span>
           <a href="sigma/kthread_loader_hidden_download.yml">Sigma</a> <span class="sep">·</span>
+          <a href="ioc/KTHREAD_LOADER_ioc.txt">Contextual IOCs</a> <span class="sep">·</span>
           <a href="reports/KTHREAD_LOADER_analysis_b1a84cfd.md">Full report →</a> <span class="sep">·</span>
           <a href="samples/b1a84cfd4176a472e319ee7733e55998ae69b9752fd26f8c853cefd836a477b9.zip">Encrypted sample ZIP</a>
           <span class="pw">AES-256 · pw: <code>infected</code></span>
@@ -209,6 +215,9 @@ footer p{margin:0 0 6px}
           explicitly linked to this loader. Those children are not newly published or claimed covered by
           the new loader rule. <strong>Inferred:</strong> sequential build attempts seek a working payload.
           <strong>Unverified:</strong> actual execution, child capabilities, C2 and actor or botnet attribution.</p>
+        <p class="desc"><strong>Payload retrieval IOC:</strong> <code>160.119.66.206</code>, serving
+          source-literal <code>/bins/net.&lt;arch&gt;</code> URLs. All 15 URLs are listed in the contextual
+          feed; current availability and C2 are unverified. Metadata-only capture context is labeled separately.</p>
         <ul class="tags"><li>15 architecture labels</li><li>Tagged execution</li>
           <li>Conditional early exit</li><li>28 capture-linked child hashes</li></ul>
         <p class="desc">Adds one encrypted sample, a static report, experimental source-structural YARA
@@ -216,6 +225,7 @@ footer p{margin:0 0 6px}
         <div class="dl">
           <a href="yara/NET_BOT_LOADER_staging.yar">YARA</a> <span class="sep">·</span>
           <a href="sigma/net_bot_loader_tagged_execution.yml">Sigma</a> <span class="sep">·</span>
+          <a href="ioc/NET_BOT_LOADER_ioc.txt">Contextual IOCs</a> <span class="sep">·</span>
           <a href="reports/NET_BOT_LOADER_analysis_39be6853.md">Full report →</a> <span class="sep">·</span>
           <a href="samples/39be6853a8204ce6455a373a6ffb4cb4672d4a62d90be69f7d6eeb66cda10b96.zip">Encrypted sample ZIP</a>
           <span class="pw">AES-256 · pw: <code>infected</code></span>

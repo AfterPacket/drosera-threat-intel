@@ -88,6 +88,13 @@ Unknown architectures retain the initial `ecryptfsd` default (L11).
 
 ### Offline infrastructure disposition
 
+**Observed — contextual IOC follow-up:** [KTHREAD_LOADER IOC feed](../ioc/KTHREAD_LOADER_ioc.txt)
+now publishes the source-observed retrieval host/base, explicitly constructed
+candidate payload URLs, loader hashes and host-hunting context. The sidecar-only
+capture source is labeled separately. This is an investigation feed, not a deny
+list; publishing retrieval evidence does not establish current activity or C2.
+The blocking exclusions below remain unchanged.
+
 | Indicator | Comparison with existing IOC/feed | Disposition and one-line reason |
 |---|---|---|
 | `44.210.140.205`; `hxxp://44.210.140.205/bins` | NEW | EXCLUDED from blocking: only a staging literal is demonstrated; ownership, tenancy and shared-hosting suitability are not verified offline |

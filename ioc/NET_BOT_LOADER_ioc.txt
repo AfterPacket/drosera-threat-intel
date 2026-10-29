@@ -1,0 +1,64 @@
+# ==============================================================
+# NET_BOT_LOADER — Contextual IOC Feed (HUNTING, NOT A BLOCKLIST)
+# Author: AfterPacket | TLP:WHITE | Static review: 2026-10-29
+# Report: ../reports/NET_BOT_LOADER_analysis_39be6853.md
+# Descriptive source-cluster label; not botnet/actor attribution.
+# ==============================================================
+# Usage: retrospective hunting and investigation. Do not import this
+# mixed-role feed directly into a firewall or IP/domain deny list.
+# HIGH confidence means faithful extraction from source, NOT verified
+# current activity, C2, infrastructure ownership or malicious exclusivity.
+# No sample execution, DNS lookup or infrastructure contact performed.
+
+# [HASHES — LOADER SOURCE]
+39be6853a8204ce6455a373a6ffb4cb4672d4a62d90be69f7d6eeb66cda10b96 # SHA-256
+9e3b46f7626b0408ec194c37d7dd9c06 # MD5
+182b94055cbf17b68cd32fca2828a7049320fc35 # SHA-1
+
+# [PAYLOAD DISTRIBUTION — OBSERVED IN SOURCE, HIGH EXTRACTION CONFIDENCE]
+160.119.66.206 # Retrieval host in 15 literal HTTP URLs; NOT proven C2
+# The following defanged URLs are source literals, not verified live endpoints.
+hxxp://160.119.66.206/bins/net.x86_64
+hxxp://160.119.66.206/bins/net.x86
+hxxp://160.119.66.206/bins/net.mips
+hxxp://160.119.66.206/bins/net.mpsl
+hxxp://160.119.66.206/bins/net.arm
+hxxp://160.119.66.206/bins/net.arm5
+hxxp://160.119.66.206/bins/net.arm6
+hxxp://160.119.66.206/bins/net.arm7
+hxxp://160.119.66.206/bins/net.ppc
+hxxp://160.119.66.206/bins/net.m68k
+hxxp://160.119.66.206/bins/net.sh4
+hxxp://160.119.66.206/bins/net.spc
+hxxp://160.119.66.206/bins/net.arc
+hxxp://160.119.66.206/bins/net.i686
+hxxp://160.119.66.206/bins/net.i486
+
+# [CAPTURE PROVENANCE — METADATA ONLY]
+# Address: 94.154.43.203
+# Supplied sidecar: 2026-09-10T17:33:34+00:00, telnet loader-fetch,
+# filename /bins/net_http.sh. Capture-source context does not independently
+# establish this address as a payload host or C2.
+# Address: 160.119.66.206
+# Supplied sidecar: 2026-09-14T03:32:07+00:00, telnet loader-fetch,
+# filename /bins/kla.sh. Its retrieval role above is separately supported
+# by literal URLs in source, not inferred solely from this sidecar.
+
+# [PORT / PROTOCOL — CONTEXT ONLY]
+80 # TCP/HTTP inferred from literal http:// retrieval scheme; do NOT blanket-block HTTP
+
+# [HOST HUNT — SOURCE-DERIVED, CORRELATE]
+# 30 wget/curl chains across 15 labels write net_bot, chmod 777 net_bot,
+# and invoke ./net_bot net.<arch>, with && exit conditional on success.
+# No uname/architecture test. Final rm -rf net_bot net_http.sh is bypassed
+# by an earlier successful exit; cleanup is NOT guaranteed.
+# Filename alone is not an attribution signal.
+# 28 distinct child ELF hashes are recorded in the linked report from
+# supplied lineage metadata. They are not newly published or claimed
+# covered by the loader YARA rule; net.spc has no child in those sidecars.
+
+# [DISPOSITION / LIMITS]
+# No literal domains observed. No new automatic block, Firewalla entry,
+# broad port deny, or Suricata rule accompanies this contextual publication.
+# Ownership, tenancy, ASN/geo, current activity, successful execution,
+# child capabilities, persistence and C2 are unverified.
