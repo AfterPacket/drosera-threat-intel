@@ -110,11 +110,12 @@ footer p{margin:0 0 6px}
   <div class="wrap">
     <h1>Drosera Threat Intel</h1>
     <p class="tagline">Static analysis and detection artifacts for malware captured live by the Drosera
-       honeypot. Every capture ships YARA, Suricata, Sigma, an IOC feed and a full written report.</p>
+       honeypot. Reports and detection coverage are evidence-specific: not every capture has
+       every rule type, and generic probes deliberately have no YARA rule.</p>
     <p class="tlp"><b>TLP:WHITE</b> — free to share. Maintained by AfterPacket.</p>
 
     <div class="stats-row">
-      <div class="stat"><span class="stat-value" id="stat-families">7</span><span class="stat-label">Families</span></div>
+      <div class="stat"><span class="stat-value" id="stat-samples">27</span><span class="stat-label">Published sample archives</span></div>
       <div class="stat"><span class="stat-value" id="stat-ips">41</span><span class="stat-label">IPs blocked</span></div>
       <div class="stat"><span class="stat-value" id="stat-domains">5</span><span class="stat-label">Domains blocked</span></div>
       <div class="stat"><span class="stat-value" id="stat-ports">0</span><span class="stat-label">Backdoor ports</span></div>
@@ -124,14 +125,102 @@ footer p{margin:0 0 6px}
 
 <main>
   <div class="wrap">
-    <div class="section-head">
-      <h2>Captures</h2>
+    <section class="card" aria-labelledby="review-heading">
+      <h2 id="review-heading">Static review — 2026-10-29</h2>
+      <p class="desc"><strong>27 published encrypted sample archives</strong>: the original 25 plus
+        two newly analysed shell loaders. <strong>96 unique samples tested</strong> does not mean
+        96 published samples or 96 detailed reports. Seven original capture groups are preserved below;
+        the two additions are <strong>descriptive loader clusters, not newly attributed botnet families</strong>.</p>
+      <ul>
+        <li><strong>9 YARA rules</strong> in 9 files; <strong>10 Sigma rules</strong>.</li>
+        <li><strong>6 Suricata rulesets / 31 SIDs</strong>, unchanged; engine validation was not run in this review.</li>
+        <li><strong>41 IPs and 5 domains</strong> in the blocklist, unchanged. No new blocking entries were added:
+          staging literals and capture-source addresses alone do not establish dedicated malicious ownership.</li>
+      </ul>
+      <p class="desc"><strong>Observed:</strong> all nine YARA files compiled warning-free under YARA 4.5.4;
+        864 rule/sample evaluations were recorded over 96 unique samples. Each new rule matched only its
+        intended loader in that corpus. All ten Sigma files parsed and converted in offline validation.</p>
+      <p class="desc"><strong>Unverified:</strong> broad benign-software false-positive rates, YARAify acceptance,
+        live SIEM behavior and infrastructure ownership. This was static-only analysis; samples were not executed
+        and their infrastructure was not contacted.</p>
+      <p class="desc">Do not block decoys or legitimate header domains. The Mirai decoy
+        <code>www.ikindalikemenbutonlyontuesday.com</code> remains excluded from the blocklist.</p>
+      <div class="dl"><a href="reports/CAPTURE_20261029_triage.md">Validation report and full hit table</a>
+        <span class="sep">·</span> <a href="drosera-detection-bundle.zip">Sample-free detection bundle</a>
+        <span class="sep">·</span> <a href="README.md">Repository overview</a></div>
+    </section>
+
+    <div class="section-head" style="margin-top:32px">
+      <h2>Captures and loader clusters</h2>
       <span class="count"><a href="blocklist.txt">Raw blocklist</a>
         <span class="sep">·</span> <a href="firewalla/drosera_block.txt">Firewalla list</a>
         <span class="sep">·</span> <a href="firewalla/drosera_port_policy.txt">Port policy</a></span>
     </div>
 
     <div class="samples">
+
+      <article class="card" id="kthread-loader">
+        <header class="card-head">
+          <span class="sev">LOADER CLUSTER</span>
+          <h3>KTHREAD_LOADER</h3>
+          <time datetime="2026-10-29">Reviewed 2026-10-29</time>
+        </header>
+        <div class="hash-row">
+          <span class="hash-label">SHA-256</span>
+          <span class="hash-val" id="h-kthread-loader">b1a84cfd4176a472e319ee7733e55998ae69b9752fd26f8c853cefd836a477b9</span>
+          <button class="copy" data-copy="h-kthread-loader" type="button">Copy</button>
+        </div>
+        <p class="desc"><strong>Observed in source:</strong> a POSIX shell loader maps
+          <code>uname -m</code> results to kernel-thread-like payload names, selects writable storage,
+          downloads to a hidden file, invokes it in the background and attempts to delete its own script.
+          It can reuse an existing nonempty destination without verifying its integrity.</p>
+        <p class="desc"><strong>Inferred:</strong> the names and leading dot are intended to reduce visibility.
+          <strong>Unverified:</strong> successful execution, child capabilities, C2, persistence,
+          operator identity and botnet family. The label describes this source cluster, not attribution.</p>
+        <ul class="tags"><li>Architecture selection</li><li>Hidden-file staging</li>
+          <li>Kernel-thread-like names</li><li>Self-deletion intent</li></ul>
+        <p class="desc">Adds one encrypted sample, a static report, experimental source-structural YARA
+          and a Sigma process-event detection. No new Suricata rule or blocking indicator was added.</p>
+        <div class="dl">
+          <a href="yara/KTHREAD_LOADER_archmap.yar">YARA</a> <span class="sep">·</span>
+          <a href="sigma/kthread_loader_hidden_download.yml">Sigma</a> <span class="sep">·</span>
+          <a href="reports/KTHREAD_LOADER_analysis_b1a84cfd.md">Full report →</a> <span class="sep">·</span>
+          <a href="samples/b1a84cfd4176a472e319ee7733e55998ae69b9752fd26f8c853cefd836a477b9.zip">Encrypted sample ZIP</a>
+          <span class="pw">AES-256 · pw: <code>infected</code></span>
+        </div>
+      </article>
+
+      <article class="card" id="net-bot-loader">
+        <header class="card-head">
+          <span class="sev">LOADER CLUSTER</span>
+          <h3>NET_BOT_LOADER</h3>
+          <time datetime="2026-10-29">Reviewed 2026-10-29</time>
+        </header>
+        <div class="hash-row">
+          <span class="hash-label">SHA-256</span>
+          <span class="hash-val" id="h-net-bot-loader">39be6853a8204ce6455a373a6ffb4cb4672d4a62d90be69f7d6eeb66cda10b96</span>
+          <button class="copy" data-copy="h-net-bot-loader" type="button">Copy</button>
+        </div>
+        <p class="desc"><strong>Observed in source:</strong> 30 wget/curl retrieval and execution chains
+          cover 15 architecture labels. Each writes <code>net_bot</code> and invokes it with a
+          <code>net.&lt;arch&gt;</code> argument. There is no architecture test: a chain exits the script
+          only when its commands, including the child, return success. An early exit bypasses final cleanup.</p>
+        <p class="desc"><strong>Observed in capture metadata:</strong> 28 distinct child ELF hashes are
+          explicitly linked to this loader. Those children are not newly published or claimed covered by
+          the new loader rule. <strong>Inferred:</strong> sequential build attempts seek a working payload.
+          <strong>Unverified:</strong> actual execution, child capabilities, C2 and actor or botnet attribution.</p>
+        <ul class="tags"><li>15 architecture labels</li><li>Tagged execution</li>
+          <li>Conditional early exit</li><li>28 capture-linked child hashes</li></ul>
+        <p class="desc">Adds one encrypted sample, a static report, experimental source-structural YARA
+          and a Sigma process-event detection. No new Suricata rule or blocking indicator was added.</p>
+        <div class="dl">
+          <a href="yara/NET_BOT_LOADER_staging.yar">YARA</a> <span class="sep">·</span>
+          <a href="sigma/net_bot_loader_tagged_execution.yml">Sigma</a> <span class="sep">·</span>
+          <a href="reports/NET_BOT_LOADER_analysis_39be6853.md">Full report →</a> <span class="sep">·</span>
+          <a href="samples/39be6853a8204ce6455a373a6ffb4cb4672d4a62d90be69f7d6eeb66cda10b96.zip">Encrypted sample ZIP</a>
+          <span class="pw">AES-256 · pw: <code>infected</code></span>
+        </div>
+      </article>
 
       <!-- ══════════════════════════════════════════════════════════════════
            CARD TEMPLATE — copy this block for each new capture.
