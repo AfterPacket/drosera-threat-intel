@@ -44,3 +44,5 @@ cdn-edge-updates.hostcloud-eu.net
 mgmt-panel.serverstats-daemon.com
 sync.softwaremirror.workers.dev
 glibc.malloc.top
+44.210.140.205
+160.119.66.206

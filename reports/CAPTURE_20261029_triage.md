@@ -53,7 +53,7 @@ is not a pass. New rule/report logic comparisons are in the per-loader reports.
 | 3 — intended hits | PASS within tested set | Each new rule hits exactly its intended loader; no other sample hit; seven harmless-text fixtures and 11 structural near-miss cases pass. No claim of generalization or broad clean-corpus FP rate |
 | 4 — Suricata runtime syntax | NOT RUN; no new artifact | Engine unavailable. All six original files unchanged. Static checks find 31 unique SIDs and exact agreement with registry; 9006 remains reserved |
 | 5 — Sigma | PASS, bounded | All ten files parse/required-field/UUID checks and convert via pysigma 2.0.1 + Splunk backend 3.0.0; 31 new-rule synthetic events pass a limited selection evaluator; no live SIEM execution |
-| 6 — blocklist | PASS unchanged-feed hygiene; ownership NOT CHECKED | 46 → 46 entries; byte-identical, LF, final newline, no duplicates/blanks/comments; known shared-service/decoy exclusions retained. No new indicators; no certification of every pre-existing IP's current tenancy |
+| 6 — blocklist | PASS exact two-host enforcement delta; ownership NOT CHECKED | Initially 46 unchanged entries; operator-approved follow-up adds exactly two payload-host IPs: 48 entries / 43 IPs / 5 unchanged domains. Raw/Firewalla parity, LF, final newline, no duplicates/blanks/comments; metadata-only/shared-service/decoy exclusions retained. Current tenancy and activity not certified |
 | 7 — samples | PASS | All 121 extracted instances rehashed; all 27 repository archives decrypt to their filename digest with AES-256. Two new archives reject wrong password; no original sample archive changed |
 | 8 — links | PASS active local links | README markdown destinations and active index.html hrefs exist; commented template placeholders excluded and recorded below |
 | 9 — diff / packaging review | PASS scoped review | Two reports, two YARA, two Sigma, two encrypted sample ZIPs, validator, this capture note, README and regenerated existing bundle; no extracted bytes or decoded payload committed |
@@ -207,7 +207,11 @@ two investigation feeds without changing automatic enforcement policies.
 | `README.md` | Links to new work and actual dated validation rather than an unsupported status |
 | `drosera-detection-bundle.zip` | Regenerate the existing sample-free bundle with current reports/rules/tools |
 
-## Contextual IOC publication follow-up — 2026-10-29
+## Contextual IOC publication follow-up — 2026-10-29 (before enforcement update)
+
+The publication/preservation results in this section record the contextual-only
+stage. The subsequent operator-approved enforcement section below supersedes
+the earlier decision to keep both retrieval hosts out of the blocking feeds.
 
 **Observed:** two investigation feeds now accompany the loader detections:
 
@@ -252,6 +256,43 @@ Git content and the bundle contains no samples or nested ZIPs.
 co-tenancy, C2, broad clean-software false positives and live deployment. No
 samples were executed and no sample infrastructure was contacted.
 
+## Operator-approved payload-host enforcement follow-up — 2026-10-29
+
+**Observed source evidence:** `44.210.140.205` is the KTHREAD retrieval host;
+`160.119.66.206` is the NET_BOT retrieval host in 15 literal URLs. The operator
+explicitly approved whole-IP destination blocking of these two hosts. This is a
+policy choice based on sample-source evidence, not new verification of current
+activity, C2, dedicated ownership or absence of legitimate co-tenants. IP reuse
+or co-tenancy may cause collateral impact; review before importing and reassess.
+
+**Observed publication changes:**
+- `blocklist.txt` and `firewalla/drosera_block.txt`: exactly those two IPv4 hosts
+  added, giving **48 unique entries: 43 IPs and five unchanged domains**.
+- `firewalla/drosera_port_policy.txt`: Rule 5 documents outbound destination-only
+  blocks for those two /32 hosts. Any-port scope is a policy choice; observed
+  retrieval is HTTP/TCP 80. No blanket HTTP deny or new inbound rule is added.
+- Both loader IOC feeds and reports now distinguish the included retrieval host
+  from the still-excluded metadata-only source (`78.17.98.2` / `94.154.43.203`).
+- README, index counters/descriptions and the 55-entry sample-free bundle are
+  synchronized. This supersedes the earlier contextual-only blocking disposition.
+
+**Observed limits:** no additional addresses, new domains, provider ranges or
+Suricata rules were added. YARA, Sigma, all six Suricata files/31 SIDs, seven
+original IOC feeds, 27 encrypted archives and the seven original index cards
+remain unchanged. No sample execution, sample-infrastructure contact or live
+firewall alteration was performed; deployment/application is operator-controlled.
+
+**Observed — enforcement follow-up checks:** raw/Firewalla sets are identical,
+with exactly the two approved additions and no removals, duplicates or new domains.
+All four original egress-policy rules and the existing HTTP guidance are preserved;
+Rule 5 adds only the two destination hosts. Sixty-four existing detector, original
+IOC-feed and archive files are byte-identical to the parent. Source/hash/URL,
+link, seven-card preservation, 31-SID registry and 55-entry canonical-bundle
+checks passed. The 96-sample detector regression was rerun: 864 evaluations,
+672 unchanged baseline cells, nine warning-free YARA files, ten Sigma conversions,
+seven benign-text fixtures, 11 near-miss cases and 31 Sigma synthetic events passed.
+Suricata runtime validation and live policy enforcement remain untested.
+
 ## Reproduction
 
 **Observed:** [tools/validate_static.py](../tools/validate_static.py) performs
@@ -286,8 +327,9 @@ selection is **inferred to fail**, not dynamically demonstrated.
 **Observed — initial publication, superseded in part by the contextual IOC follow-up:**
 loader staging literals and capture-source addresses were initially documented
 only in reports. They are now also published in two role-labeled investigation
-feeds; they remain excluded from automatic blocking pending dedicated-host,
-ownership and shared-infrastructure review. Domains
+feeds. The later operator-approved enforcement follow-up includes the two
+source-observed retrieval hosts in the blocking feeds despite unresolved current
+ownership/co-tenancy, while metadata-only capture sources remain excluded. Domains
 used as Mirai decoys or HTTP headers remain non-blocking context, specifically
 `www.ikindalikemenbutonlyontuesday.com`. No rule for generic probes, sudoers
 content, authorized keys or a generic /proc killer was added. No new Suricata

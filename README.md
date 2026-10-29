@@ -23,7 +23,7 @@ previously unmatched shell loaders**, not the entire newer corpus.
 | Sigma | **10 rules** |
 | Suricata | **6 rulesets, 31 SIDs** — unchanged; engine validation not run in this review |
 | IOC feeds | **9** — 7 original feeds plus 2 contextual loader feeds for investigation, not automatic blocking |
-| Blocklist | **46 entries: 41 IPv4 literals and 5 domains** — no additions |
+| Blocklist | **48 entries: 43 IPv4 literals and 5 domains** — two operator-approved payload-host additions |
 
 ### Newly analysed loaders
 
@@ -65,7 +65,9 @@ not the complete October loot or the current artifact totals above.
 | 2026-08-04 | [BOTKILL_PROCWIPE](#botkill_procwipe) | `2733d565138186645...` | Shell | 🟠 HIGH | IOC · Firewalla |
 | 2026-08-05 | [WEBROOT_PROBE](#webroot_probe) | `af77b643964afd79...` | Shell | 🟠 HIGH | Suricata · IOC · Firewalla |
 
-**41 IPs and 5 domains blocked.** String extraction over the ELF payloads is
+**43 IPs and 5 domains listed for blocking.** The original capture contributed
+41 IPs; the operator-approved loader follow-up adds `44.210.140.205` and
+`160.119.66.206` as payload-retrieval hosts, not proven C2. String extraction over the ELF payloads is
 complete; the domain feed is no longer partial.
 
 The MIRAI_OHSHIT payloads carry a compiled-in C2 set, identical across all seven
@@ -382,7 +384,16 @@ retrieval URLs. Metadata-only capture sources are separately labeled, not promot
 to payload hosts. These are investigation/hunting feeds, **not automatic blocklists**.
 TCP/80 is retrieval context, not a recommendation to deny HTTP. Extraction confidence
 does not establish current activity, C2, ownership or malicious exclusivity.
-No legitimate header domains, decoys or shared-service apexes are added to deny lists.
+
+**Operator-approved enforcement follow-up:** the two source-observed payload
+hosts, `44.210.140.205` and `160.119.66.206`, are now also in the raw blocklist
+and Firewalla target list. [Port policy Rule 5](firewalla/drosera_port_policy.txt)
+documents destination-specific outbound blocks, not blanket HTTP denial or new
+backdoor ports. Whole-IP blocking can affect legitimate co-tenants or reassigned
+addresses; ownership/current activity remain unverified. Review before deployment
+and periodically reassess. Metadata-only `78.17.98.2` and `94.154.43.203` remain
+excluded. No legitimate header domains, decoys or shared-service apexes are added
+to deny lists. Publishing these files does not apply rules to any live firewall.
 
 **Confidence tags** used across the original IOC files (the contextual loader feeds
 explicitly define HIGH as extraction confidence, not live maliciousness):
@@ -472,8 +483,11 @@ samples or contacts infrastructure.
 **Observed — contextual IOC follow-up:** two loader IOC feeds now publish payload
 retrieval indicators and separately labeled capture-source context. Publishing
 contextual evidence is distinct from automatically blocking infrastructure.
-No new IP/domain block, firewall entry, port deny or Suricata rule was added.
-The blocklist remains 46 entries (41 IPv4 literals and five domains).
+**Operator-approved enforcement follow-up:** exactly two retrieval-host IPs are
+now added to the raw/Firewalla blocklists, with destination-specific egress
+guidance in port policy Rule 5. The blocklist now has 48 entries (43 IPv4 literals
+and five domains). No new domain, CIDR range, blanket port deny or Suricata rule
+was added; current activity and co-tenancy remain unverified.
 The Mirai decoy `www.ikindalikemenbutonlyontuesday.com`, legitimate header values,
 and shared-service apexes remain excluded. No new SID was allocated; `9006xxx`
 remains reserved. New YARA logic is source-structural and untested beyond this set.

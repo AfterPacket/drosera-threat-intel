@@ -116,7 +116,7 @@ footer p{margin:0 0 6px}
 
     <div class="stats-row">
       <div class="stat"><span class="stat-value" id="stat-samples">27</span><span class="stat-label">Published sample archives</span></div>
-      <div class="stat"><span class="stat-value" id="stat-ips">41</span><span class="stat-label">IPs blocked</span></div>
+      <div class="stat"><span class="stat-value" id="stat-ips">43</span><span class="stat-label">IPs blocked</span></div>
       <div class="stat"><span class="stat-value" id="stat-domains">5</span><span class="stat-label">Domains blocked</span></div>
       <div class="stat"><span class="stat-value" id="stat-ports">0</span><span class="stat-label">Backdoor ports</span></div>
     </div>
@@ -135,9 +135,11 @@ footer p{margin:0 0 6px}
         <li><strong>9 YARA rules</strong> in 9 files; <strong>10 Sigma rules</strong>;
           <strong>9 IOC feeds</strong> including two contextual loader feeds, not automatic deny lists.</li>
         <li><strong>6 Suricata rulesets / 31 SIDs</strong>, unchanged; engine validation was not run in this review.</li>
-        <li><strong>41 IPs and 5 domains</strong> in the blocklist, unchanged. No new blocking entries were added:
-          payload retrieval indicators are published for hunting; staging literals and capture-source addresses
-          alone do not establish dedicated malicious ownership.</li>
+        <li><strong>43 IPs and 5 domains</strong> in the blocklist: two operator-approved payload-host
+          additions, <code>44.210.140.205</code> and <code>160.119.66.206</code>. Destination-specific
+          egress guidance is in port policy Rule 5; there is no blanket HTTP block. Whole-IP blocks can
+          affect legitimate co-tenants or reassigned addresses; current activity and ownership remain unverified.
+          Metadata-only capture sources, legitimate header domains and decoys remain excluded.</li>
       </ul>
       <p class="desc"><strong>Observed:</strong> all nine YARA files compiled warning-free under YARA 4.5.4;
         864 rule/sample evaluations were recorded over 96 unique samples. Each new rule matched only its
@@ -181,11 +183,13 @@ footer p{margin:0 0 6px}
           operator identity and botnet family. The label describes this source cluster, not attribution.</p>
         <p class="desc"><strong>Payload retrieval IOC:</strong> <code>44.210.140.205</code>, base
           <code>hxxp://44.210.140.205/bins</code>. Published as source-observed staging context,
-          not proven C2 or an automatic IP block. The metadata-only capture source is labeled separately.</p>
+          not proven C2. This host is now an operator-approved destination block; co-tenancy and current
+          activity remain unverified. The metadata-only capture source remains excluded from blocking.</p>
         <ul class="tags"><li>Architecture selection</li><li>Hidden-file staging</li>
           <li>Kernel-thread-like names</li><li>Self-deletion intent</li></ul>
         <p class="desc">Adds one encrypted sample, a static report, experimental source-structural YARA
-          and a Sigma process-event detection. No new Suricata rule or blocking indicator was added.</p>
+          and a Sigma process-event detection. The follow-up adds contextual IOCs and one payload-host
+          IP block. No new Suricata rule or blanket port deny was added.</p>
         <div class="dl">
           <a href="yara/KTHREAD_LOADER_archmap.yar">YARA</a> <span class="sep">·</span>
           <a href="sigma/kthread_loader_hidden_download.yml">Sigma</a> <span class="sep">·</span>
@@ -217,11 +221,13 @@ footer p{margin:0 0 6px}
           <strong>Unverified:</strong> actual execution, child capabilities, C2 and actor or botnet attribution.</p>
         <p class="desc"><strong>Payload retrieval IOC:</strong> <code>160.119.66.206</code>, serving
           source-literal <code>/bins/net.&lt;arch&gt;</code> URLs. All 15 URLs are listed in the contextual
-          feed; current availability and C2 are unverified. Metadata-only capture context is labeled separately.</p>
+          feed. This host is now an operator-approved destination block; current availability, co-tenancy
+          and C2 remain unverified. Metadata-only capture sources are not automatically blocked.</p>
         <ul class="tags"><li>15 architecture labels</li><li>Tagged execution</li>
           <li>Conditional early exit</li><li>28 capture-linked child hashes</li></ul>
         <p class="desc">Adds one encrypted sample, a static report, experimental source-structural YARA
-          and a Sigma process-event detection. No new Suricata rule or blocking indicator was added.</p>
+          and a Sigma process-event detection. The follow-up adds contextual IOCs and one payload-host
+          IP block. No new Suricata rule or blanket port deny was added.</p>
         <div class="dl">
           <a href="yara/NET_BOT_LOADER_staging.yar">YARA</a> <span class="sep">·</span>
           <a href="sigma/net_bot_loader_tagged_execution.yml">Sigma</a> <span class="sep">·</span>
