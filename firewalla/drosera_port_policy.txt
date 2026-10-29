@@ -101,6 +101,27 @@
 
 
 # ══════════════════════════════════════════════════════════════
+# RULE 5 — BLOCK TWO LOADER PAYLOAD DESTINATIONS (2026-10-29)
+# ══════════════════════════════════════════════════════════════
+# Direction : outbound (LAN -> WAN)
+# Targets   : 44.210.140.205/32 and 160.119.66.206/32 only
+# Ports     : any, destination-specific policy; observed retrieval is TCP/80
+# Scope     : protected devices/subnets selected by the operator
+# Action    : block + log/alarm; use the matching target-list entries
+#
+# KTHREAD_LOADER: literal base http://44.210.140.205/bins
+# NET_BOT_LOADER: 15 literal http://160.119.66.206/bins/net.<arch> URLs
+# Whole-IP blocks were explicitly approved by the operator based on these
+# source-observed retrieval roles. They are NOT verified C2 or listener ports.
+# Any-port scope is an enforcement choice, not evidence of additional services.
+# Current activity, ownership and co-tenancy remain unverified; reassignment
+# or legitimate co-tenants can cause collateral impact. Review before use and
+# periodically reassess. These files document policy, not an applied firewall.
+# Keep metadata-only 78.17.98.2 / 94.154.43.203, legitimate domains and decoys out.
+# No blanket HTTP/HTTPS deny and no new inbound rule is introduced.
+# Evidence: ../ioc/KTHREAD_LOADER_ioc.txt and ../ioc/NET_BOT_LOADER_ioc.txt
+#
+# ══════════════════════════════════════════════════════════════
 # NOT RECOMMENDED — port 80 / 443
 # ══════════════════════════════════════════════════════════════
 # Every payload in this capture was retrieved over plain HTTP on port 80,

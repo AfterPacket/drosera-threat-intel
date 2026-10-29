@@ -51,7 +51,12 @@ hxxp://44.210.140.205/bins/cfg80211d
 # Kernel-thread-like names can overlap legitimate names; no standalone name block.
 
 # [DISPOSITION / LIMITS]
-# No literal domains observed. No new automatic block, Firewalla entry,
-# broad port deny, or Suricata rule accompanies this contextual publication.
+# No literal domains observed. Operator-approved enforcement follow-up:
+# 44.210.140.205 is now in ../blocklist.txt and ../firewalla/drosera_block.txt.
+# See ../firewalla/drosera_port_policy.txt, Rule 5, for destination-only egress
+# blocking. Whole-IP blocking accepts potential co-tenancy/reassignment impact;
+# it does not establish C2/current activity. Metadata-only 78.17.98.2 remains out.
+# This mixed-role IOC feed is still NOT itself a firewall import list.
+# No broad port deny or new Suricata rule is introduced.
 # Ownership, tenancy, ASN/geo, current activity, successful execution,
 # child capabilities, persistence and C2 are unverified.

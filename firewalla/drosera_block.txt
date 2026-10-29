@@ -130,6 +130,25 @@ glibc.malloc.top
 # Used by /dodu and /gots. Distinct from /duba's 213.139.77.150.
 213.177.179.11
 
+# ══════════════════════════════════════════════════════════════
+# LOADER PAYLOAD HOSTS — operator-approved destination blocks, 2026-10-29
+# ══════════════════════════════════════════════════════════════
+# HIGH source-extraction confidence, NOT independently verified current activity,
+# ownership, dedicated malicious use, absence of co-tenants, or C2 attribution.
+# Operator explicitly selected whole-IP blocking of these two retrieval hosts;
+# legitimate co-tenants/reassignment can cause collateral impact. Review before
+# importing and periodically reassess. No broad provider ranges are added.
+#
+# KTHREAD_LOADER — SRV="http://44.210.140.205/bins" in loader source.
+# Evidence and constructed paths: ../ioc/KTHREAD_LOADER_ioc.txt
+44.210.140.205
+# NET_BOT_LOADER — 15 literal http://160.119.66.206/bins/net.<arch> URLs.
+# Evidence: ../ioc/NET_BOT_LOADER_ioc.txt
+160.119.66.206
+# Metadata-only 78.17.98.2 and 94.154.43.203 remain EXCLUDED.
+# Current totals: 48 unique entries = 43 IPv4 hosts + 5 unchanged domains.
+# See drosera_port_policy.txt for destination-specific outbound enforcement.
+
 # ── DO NOT BLOCK ──────────────────────────────────────────────
 # These appear in sample source but are legitimate shared
 # infrastructure. The gsocket sample abuses a real security tool;

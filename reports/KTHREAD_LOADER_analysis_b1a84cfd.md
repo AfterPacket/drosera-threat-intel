@@ -93,11 +93,16 @@ now publishes the source-observed retrieval host/base, explicitly constructed
 candidate payload URLs, loader hashes and host-hunting context. The sidecar-only
 capture source is labeled separately. This is an investigation feed, not a deny
 list; publishing retrieval evidence does not establish current activity or C2.
-The blocking exclusions below remain unchanged.
+**Operator-approved enforcement follow-up:** `44.210.140.205` is now included
+in the raw/Firewalla blocklists and destination-specific port policy Rule 5.
+This is a policy decision based on source-observed payload retrieval, not new
+verification of ownership, current activity or C2. Whole-IP blocking may affect
+legitimate co-tenants or reassigned addresses; review before use and reassess.
+The metadata-only capture-source address remains excluded.
 
 | Indicator | Comparison with existing IOC/feed | Disposition and one-line reason |
 |---|---|---|
-| `44.210.140.205`; `hxxp://44.210.140.205/bins` | NEW | EXCLUDED from blocking: only a staging literal is demonstrated; ownership, tenancy and shared-hosting suitability are not verified offline |
+| `44.210.140.205`; `hxxp://44.210.140.205/bins` | Source-observed payload retrieval | INCLUDED as operator-approved whole-IP destination block; ownership, co-tenancy and current activity remain unverified; not proven C2 |
 | `78.17.98.2` | NEW; sidecar only | EXCLUDED from blocking: a capture-source address is not proof of dedicated malicious ownership |
 | Domains | None observed in source | No domain inclusion proposed |
 
@@ -187,8 +192,10 @@ ingestion, broad clean-software false-positive rate, and YARAify acceptance.
 ## Exclusions and limits
 
 **Observed:** analysis was static only; no sample executed, no sample endpoint
-contacted. No new Suricata rule (engine unavailable), SID, firewall entry or
-blocklist entry ships. The staging IP is deliberately not substituted for C2.
+contacted. No new Suricata rule (engine unavailable) or SID ships. The follow-up
+adds one operator-approved payload-host block and destination-specific egress
+policy guidance; no live firewall is changed. The staging IP is deliberately not
+substituted for C2.
 No actor attribution, external VT result, ASN or geo claim is made.
 
 ## Hunting notes

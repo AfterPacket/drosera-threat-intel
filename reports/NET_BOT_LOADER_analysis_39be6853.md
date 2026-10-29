@@ -73,11 +73,16 @@ now publishes the source-observed retrieval host, all 15 literal retrieval URLs,
 loader hashes and host-hunting context. Capture-source sidecars are separately
 labeled; the metadata-only address is not promoted to a payload host. This is an
 investigation feed, not a deny list; current activity and C2 remain unverified.
-The blocking exclusions below remain unchanged.
+**Operator-approved enforcement follow-up:** `160.119.66.206` is now included
+in the raw/Firewalla blocklists and destination-specific port policy Rule 5.
+This is a policy decision based on source-observed payload retrieval, not new
+verification of ownership, current activity or C2. Whole-IP blocking may affect
+legitimate co-tenants or reassigned addresses; review before use and reassess.
+The metadata-only capture-source address remains excluded.
 
 | Indicator | Existing IOC/blocklist comparison | Disposition and one-line reason |
 |---|---|---|
-| `160.119.66.206`; its 15 `/bins/net.<suffix>` URLs | NEW | EXCLUDED from blocking: source proves a retrieval role, not dedicated malicious ownership or absence of legitimate co-tenants |
+| `160.119.66.206`; its 15 `/bins/net.<suffix>` URLs | Source-observed payload retrieval | INCLUDED as operator-approved whole-IP destination block; ownership, co-tenancy and current activity remain unverified; not proven C2 |
 | `94.154.43.203` | NEW; capture-source sidecar | EXCLUDED from blocking: source-address context alone does not clear shared-hosting/ownership tests |
 | Domains | None observed | No domain inclusion proposed |
 
@@ -191,8 +196,10 @@ representative clean-corpus false-positive rate and YARAify acceptance.
 contacted. Only the loader's encrypted archive is added; the 28 linked ELFs remain
 in the supplied loot, with hashes recorded above. No Suricata rule is shipped
 because engine syntax validation is unavailable. The contextual IOC follow-up
-publishes retrieval evidence without a SID allocation, firewall or blocklist
-addition. The staging literal is not claimed as verified command infrastructure.
+publishes retrieval evidence; the subsequent operator-approved enforcement
+follow-up adds one payload-host block and destination-specific egress guidance,
+without a new SID, blanket port deny or live firewall change. The staging literal
+is not claimed as verified command infrastructure.
 
 ## Hunting notes
 
