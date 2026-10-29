@@ -244,6 +244,11 @@ used as Mirai decoys or HTTP headers remain non-blocking context, specifically
 content, authorized keys or a generic /proc killer was added. No new Suricata
 artifact is shipped without engine validation.
 
+**Observed — README follow-up:** the opening overview and Analysis reports table
+now explicitly distinguish 27 published sample archives from the 96-sample
+validation corpus. Both new loader reports are listed alongside the original
+seven family reports, and the Sigma section reflects all ten current rules.
+
 ## Repository inconsistencies noticed
 
 **Observed:** the following existed at the baseline; only bundle freshness and
@@ -269,7 +274,8 @@ README validation/current-extension counts were addressed as part of this work:
 - README's old `yara -r yara/*.yar /path/to/scan` example is not a portable
   all-rule invocation: shell expansion supplies multiple source arguments to a
   CLI normally accepting one rule source. Use the validator or iterate individual
-  rule files. The historical command examples were not broadly rewritten.
+  rule files. **Correction — README follow-up:** the current README now iterates
+  individual rule files; the dated August reports' examples remain unchanged.
 - Active index cards lack per-family report links even though the commented
   template includes one. Existing links resolve; the site was not redesigned.
 

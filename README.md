@@ -1,17 +1,59 @@
 # Drosera Threat Intel
 
 Static analysis and detection artifacts for malware captured live by the **Drosera honeypot**.
-Every capture ships a YARA rule, Suricata rules, Sigma rules, an IOC feed, firewall block
-entries and a full written report.
+Publishes static-analysis reports, YARA and Sigma detections, Suricata rules, IOC feeds
+and firewall guidance where the evidence supports them. Not every sample warrants
+an artifact: generic probes and process-kill scripts deliberately have no YARA rule.
 
 **TLP:WHITE** — free to share and republish.
 Author: **AfterPacket** · Site: <https://afterpacket.github.io/drosera-threat-intel>
 
 ---
 
-## Samples
+## Current release — static review 2026-10-29
+
+**Observed:** 96 unique samples were hash-verified and scanned with every YARA
+rule, including all 25 original samples. Detailed new analysis covers **two
+previously unmatched shell loaders**, not the entire newer corpus.
+
+| Published artifact | Current total |
+|---|---|
+| Encrypted sample archives | **27** — original 25 plus the two newly analysed loaders |
+| YARA | **9 rules in 9 files** — one rule per file |
+| Sigma | **10 rules** |
+| Suricata | **6 rulesets, 31 SIDs** — unchanged; engine validation not run in this review |
+| Original family IOC feeds | **7** — unchanged |
+| Blocklist | **46 entries: 41 IPv4 literals and 5 domains** — no additions |
+
+### Newly analysed loaders
+
+**Observed:** these are descriptive source-cluster labels, not attribution to two
+new botnet families. Both new YARA rules are experimental and have one intended
+positive each in the 96-sample test corpus.
+
+| Cluster / sample | Analysis | Detection files | Encrypted sample |
+|---|---|---|---|
+| KTHREAD_LOADER · `b1a84cfd` | [Architecture mapping, hidden staging and self-cleanup](reports/KTHREAD_LOADER_analysis_b1a84cfd.md) | [YARA](yara/KTHREAD_LOADER_archmap.yar) · [Sigma](sigma/kthread_loader_hidden_download.yml) | [AES-256 ZIP](samples/b1a84cfd4176a472e319ee7733e55998ae69b9752fd26f8c853cefd836a477b9.zip) |
+| NET_BOT_LOADER · `39be6853` | [Tagged execution, conditional exit and 28 capture-linked child hashes](reports/NET_BOT_LOADER_analysis_39be6853.md) | [YARA](yara/NET_BOT_LOADER_staging.yar) · [Sigma](sigma/net_bot_loader_tagged_execution.yml) | [AES-256 ZIP](samples/39be6853a8204ce6455a373a6ffb4cb4672d4a62d90be69f7d6eeb66cda10b96.zip) |
+
+**Observed:** all nine YARA files compile warning-free under YARA 4.5.4; all
+**864 rule/sample evaluations** and the unchanged old-rule baseline are recorded
+in the [full validation report](reports/CAPTURE_20261029_triage.md).
+**Unverified:** broad clean-software false-positive rates and YARAify acceptance.
+
+- [Download the current sample-free detection bundle](drosera-detection-bundle.zip).
+- Sample ZIP password: **`infected`**. Extract only into private, nonsynced analysis space.
+- YARA files contain **one rule each**; submit the individual `.yar` when an upload form expects a rule file.
+- **Do not block decoys or legitimate header domains.** The Mirai decoy
+  `www.ikindalikemenbutonlyontuesday.com` remains excluded; no new domain/IP block
+  was introduced by this review.
+
+## Original samples and family findings
 
 ### Capture 2026-08-07 — 25 samples, 7 families
+
+The following table and family sections describe the **original August capture**,
+not the complete October loot or the current artifact totals above.
 
 | Date | Family | Lead SHA-256 | Type | Severity | Artifacts |
 |------|--------|--------------|------|----------|-----------|
@@ -274,7 +316,9 @@ them breaks legitimate traffic.
 **YARA** — scan a directory tree:
 
 ```bash
-yara -r yara/*.yar /path/to/scan
+for rule in yara/*.yar; do
+    yara -r "$rule" /path/to/scan
+done
 ```
 
 > **Observed validation, 2026-10-29:** all nine YARA files compile individually
@@ -296,7 +340,7 @@ All rules carry the YARAhub mandatory metadata (`yarahub_uuid`,
 sample the rule genuinely matches — ELF-conditioned rules reference ELF samples,
 not the shell droppers.
 
-**Sigma** — 8 log-based rules in `sigma/`, targeting Linux `process_creation`
+**Sigma** — 10 log-based rules in `sigma/`, targeting Linux `process_creation`
 and `file_event` telemetry. Convert to your SIEM's query language with
 [sigma-cli](https://github.com/SigmaHQ/sigma-cli):
 
@@ -314,12 +358,15 @@ sigma convert -t splunk -p sysmon_linux sigma/*.yml
 | `mirai_telnetcurl_dropper.yml` | all 7 fixed filenames, incl. the 2 uncaptured-build hunt strings |
 | `mirai_loader_dvrhelper.yml` | `dvrHelper tscan`, the `.f` write-exec probe |
 | `perlbot_shellbot_irc_c2.yml` | `#mot` / `MAD` operator constants — survive the C2 override |
+| `kthread_loader_hidden_download.yml` | Downloader image plus a selected payload path and hidden destination in the same command line |
+| `net_bot_loader_tagged_execution.yml` | `net_bot` process image plus a `net.<arch>` execution argument |
 
-**Validated 2026-08-08.** All 8 rules parse under **pysigma 1.5.0** and convert
-cleanly to Splunk SPL via **pysigma-backend-splunk 2.1.0** — every rule produces
-a working query. Also checked: YAML validity, required fields, unique UUIDv4
-ids, and that every selection referenced in a `condition` exists with no
-selection left unused.
+**Observed validation, 2026-10-29:** all **10 rules** parse under **pysigma 2.0.1**
+and convert to Splunk SPL through **pysigma-backend-splunk 3.0.0**. Required fields,
+UUIDv4 uniqueness and nonempty false-positive guidance were checked. The two new
+rules also passed **31 synthetic-event checks** with a limited selection evaluator.
+Conversion does not demonstrate real SIEM field mapping or query execution;
+validate the generated queries against your ingestion pipeline.
 
 **Suricata** — drop the `.rules` files into your rules directory and add them to
 `suricata.yaml`, then validate before reload:
@@ -371,7 +418,10 @@ each are in [`reports/CAPTURE_20260807_hashes.txt`](reports/CAPTURE_20260807_has
 
 ## Analysis reports
 
-Capture 2026-08-07, all 25 samples read directly from source:
+**Published analysis covers 27 sample archives:** the original 25 from capture
+2026-08-07, plus the two additional shell loaders reviewed on 2026-10-29.
+The tables below include both reviews. **96 unique samples were hash-verified
+and YARA-tested; that does not mean all 96 received detailed written analysis.**
 
 | Report | Contents |
 |--------|----------|
@@ -384,7 +434,9 @@ Capture 2026-08-07, all 25 samples read directly from source:
 | [GSOCKET_SSHIT](reports/GSOCKET_SSHIT_analysis_22585585.md) | 1 sample — 5× persistence, credential exfil |
 | [MIRAI_LOADER](reports/MIRAI_LOADER_analysis_246c3c37.md) | 1 sample — Android targeting, `tscan` |
 | [BOTKILL_PROCWIPE](reports/BOTKILL_PROCWIPE_analysis_41d9a2a0.md) | 2 samples — turf war, one corrupt on delivery |
-| [WEBROOT_PROBE](reports/WEBROOT_PROBE_analysis_af77b643.md) | 2 samples — 224 sightings, RCE precursor |
+| [WEBROOT_PROBE](reports/WEBROOT_PROBE_analysis_af77b643.md) | 2 original samples — 224 sightings, RCE precursor |
+| [KTHREAD_LOADER](reports/KTHREAD_LOADER_analysis_b1a84cfd.md) | 1 additional loader — architecture/name map, hidden staging, self-cleanup; reviewed 2026-10-29 |
+| [NET_BOT_LOADER](reports/NET_BOT_LOADER_analysis_39be6853.md) | 1 additional loader — net_bot tagged execution and 28 metadata-linked child hashes; reviewed 2026-10-29; child ELFs not fully analysed here |
 
 ## Additional static review — 2026-10-29
 
