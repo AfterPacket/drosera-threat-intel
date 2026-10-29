@@ -237,7 +237,7 @@ attribute the abuse, not the tool.
 | `ioc/<FAMILY>_ioc.txt` | One IOC feed per family — hashes, IPs, domains, ports, protocol indicators, grep strings. |
 | `yara/<FAMILY>_<campaign>.yar` | **Exactly one rule per file** — YARAify rejects multi-rule uploads ("Multiple YARA rules found in a single file"). Families needing both a dropper and a payload rule ship two files. |
 | `suricata/<family>.rules` | One Suricata ruleset per family. |
-| `sigma/<family>_<detection>.yml` | Log-based detection, 8 rules. Covers the two families that ship **no** YARA rule by design, plus host-side behaviour that file signatures cannot see. |
+| `sigma/<family>_<detection>.yml` | Log-based detection, 10 rules: eight from the original capture and two additional loader detections. Includes the two original families with **no** YARA rule by design. |
 | `reports/<FAMILY>_analysis_<sha256short>.md` | Full structured analysis report, one per family. |
 | `reports/CAPTURE_<date>_executive_summary.md` | Risk ranking, key findings, immediate actions. **Start here.** |
 | `reports/CAPTURE_<date>_capability_mitigation_framework.md` | Capability matrix, ATT&CK mapping, and mitigation controls rated for effectiveness against this corpus. |
@@ -250,7 +250,7 @@ attribute the abuse, not the tool.
 
 ## Consuming the feeds
 
-**Everything at once** — `drosera-detection-bundle.zip` (117 KB, 44 files) packs
+**Everything at once** — `drosera-detection-bundle.zip` packs
 every YARA rule, Suricata ruleset, Sigma rule, IOC feed, the Firewalla lists,
 `blocklist.txt`, all reports and this README. Plain zip, no password:
 
@@ -277,22 +277,17 @@ them breaks legitimate traffic.
 yara -r yara/*.yar /path/to/scan
 ```
 
-> **⚠ Rule syntax is currently UNVERIFIED.** These files have **not** been
-> compile-checked. Run `yara -r yara/*.yar /dev/null` on a host with YARA
-> before relying on them.
+> **Observed validation, 2026-10-29:** all nine YARA files compile individually
+> and together with zero errors/warnings under **YARA 4.5.4**, and all nine were
+> scanned against **96 hash-verified unique samples**, including the original 25.
+> All seven original rules' 672 rule/sample results are unchanged. Each new rule
+> matches only its intended loader in this corpus. This is not a broad
+> clean-software false-positive assessment or proof of YARAify acceptance.
+> Full hit table and limits: [additional review](reports/CAPTURE_20261029_triage.md).
+> Reproduce with `tools/validate_static.py` using an external decrypted corpus.
 >
-> A previous revision of this README claimed validation against YARA 4.5.5 with
-> zero errors and a clean corpus run. That claim could not be substantiated and
-> has been withdrawn.
->
-> *Why it is still unverified (checked 2026-08-08, so nobody re-treads this):*
-> `yara` is not installed and cannot readily be. `pip install yara-python`
-> finds **no wheel** for CPython 3.14 on Windows and falls back to a source
-> build, which fails in the Windows SDK — `specstrings.h` includes
-> `specstrings_strict.h`, which is absent from SDK 10.0.26100.0. Note also that
-> `import yara` from the repo root silently resolves to this repository's own
-> `yara/` **directory** as an empty namespace package, so an import succeeding
-> proves nothing. Verify on a Linux host or a box with a working MSVC/SDK pair.
+> The older unsupported YARA 4.5.5 claim remains withdrawn. The August reports'
+> historical "unverified" caveats describe their review date, not this new run.
 
 All rules carry the YARAhub mandatory metadata (`yarahub_uuid`,
 `yarahub_license`, `yarahub_reference_md5`, `yarahub_rule_matching_tlp`,
@@ -390,6 +385,34 @@ Capture 2026-08-07, all 25 samples read directly from source:
 | [MIRAI_LOADER](reports/MIRAI_LOADER_analysis_246c3c37.md) | 1 sample — Android targeting, `tscan` |
 | [BOTKILL_PROCWIPE](reports/BOTKILL_PROCWIPE_analysis_41d9a2a0.md) | 2 samples — turf war, one corrupt on delivery |
 | [WEBROOT_PROBE](reports/WEBROOT_PROBE_analysis_af77b643.md) | 2 samples — 224 sightings, RCE precursor |
+
+## Additional static review — 2026-10-29
+
+**Observed:** the supplied October loot contains 96 unique samples, including all
+25 originally published. This bounded review adds two previously uncovered
+**loader source clusters**, not two proven botnet families. The original capture
+totals and family reports above remain scoped to August; `samples/` now contains
+27 encrypted archives, not all 96 loot samples.
+
+| Descriptive cluster | New artifacts | Scope |
+|---|---|---|
+| KTHREAD_LOADER | [Report](reports/KTHREAD_LOADER_analysis_b1a84cfd.md), [YARA](yara/KTHREAD_LOADER_archmap.yar), [Sigma](sigma/kthread_loader_hidden_download.yml) | Architecture-to-kernel-thread-like names, hidden download and self-cleanup |
+| NET_BOT_LOADER | [Report](reports/NET_BOT_LOADER_analysis_39be6853.md), [YARA](yara/NET_BOT_LOADER_staging.yar), [Sigma](sigma/net_bot_loader_tagged_execution.yml) | net.<arch> retrieval, net_bot tagged execution, conditional early exit |
+
+**Observed:** [validation and full hit table](reports/CAPTURE_20261029_triage.md)
+records nine YARA rules and ten Sigma rules. The latter all parse with pysigma
+2.0.1 and convert through the Splunk backend 3.0.0; this does not prove live SIEM
+field mapping. [Offline validation tool](tools/validate_static.py) never executes
+samples or contacts infrastructure.
+
+**Observed:** no new IP/domain block, firewall entry, IOC feed or Suricata rule
+was added. The blocklist remains 46 entries (41 IPv4 literals and five domains).
+The Mirai decoy `www.ikindalikemenbutonlyontuesday.com`, legitimate header values,
+and shared-service apexes remain excluded. No new SID was allocated; `9006xxx`
+remains reserved. New YARA logic is source-structural and untested beyond this set.
+
+Corrections and limits are explicit in the new reports; existing family reports
+were not silently rewritten. The detection bundle is regenerated without samples.
 
 ## Reporting
 
