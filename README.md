@@ -59,8 +59,28 @@ simulated-exploit reporting stub rather than claiming a real CVE exploit.
 The [96-row review tracker](reports/DEEP_STATIC_BATCH1_coverage.csv) distinguishes
 existing reports, completed source review, partial ELF review and **50 still
 pending** samples. This is not completion of the corpus. No new archives,
-detectors or blocks are added; this report is separate from the packaged release
-and is not included in its existing detection bundle.
+detectors or blocks are added by that analysis follow-up. The sample-free bundle
+now includes these follow-up reports and the validation tools; the archive count
+still remains 27, not 96.
+
+### Automated checks and remaining gaps
+
+[Static repository validation](.github/workflows/validate.yml) runs on GitHub
+pull requests, pushes to `main`, and manual dispatch. It checks YARA compilation,
+Sigma parsing/Splunk conversion and small synthetic fixtures, feed syntax and
+raw/Firewalla parity, protected IOC exclusions, SID allocations, coverage-state
+accounting, website architecture display and canonical bundle consistency.
+A separate job runs **Suricata engine `-T`** using the Ubuntu runner package.
+
+**Configured is not validated:** a passing hosted workflow/Suricata run has not
+been verified. CI does not extract encrypted samples, replace private full-corpus
+testing, prove comprehensive detection coverage, establish IOC ownership, or
+perform live SIEM/broad benign-corpus false-positive testing. The nine YARA rules
+do **not** comprehensively cover the 96-sample corpus.
+
+See [automation, rebuild instructions and limits](reports/AUTOMATION_AND_LIMITS.md).
+Historical August report totals refer to that capture, not today's corpus/release;
+they are retained as historical evidence rather than silently relabeled as current.
 
 ## Original samples and family findings
 
@@ -457,8 +477,11 @@ the additional loaders' hashes are in their linked analysis reports and contextu
 
 **Published analysis covers 27 sample archives:** the original 25 from capture
 2026-08-07, plus the two additional shell loaders reviewed on 2026-10-29.
-The tables below include both reviews. **96 unique samples were hash-verified
-and YARA-tested; that does not mean all 96 received detailed written analysis.**
+The tables below include both loader reviews. The separate deep-analysis follow-up
+adds six completed source reviews and partial findings on 13 other ELF samples,
+without publishing new sample archives; 50 additional samples remain pending.
+**96 unique samples were hash-verified and YARA-tested; that does not mean all 96
+received detailed written analysis or comprehensive detector coverage.**
 
 | Report | Contents |
 |--------|----------|

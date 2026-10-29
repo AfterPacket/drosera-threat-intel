@@ -25,8 +25,11 @@ headers, symbol virtual addresses, raw configuration-pointer bytes and recovered
 strings. Virtual addresses below are specific to the named representative.
 
 No new encrypted archives, YARA/Sigma/Suricata rules, blocking targets or port
-policies are added in this batch. Existing detection-bundle contents and release
-counters are unchanged; this follow-up report is **not in that prior bundle**.
+policies were added in this batch. At batch-1 publication, detection-bundle contents
+and release counters were unchanged and this report was not in that prior bundle.
+The later [automation follow-up](AUTOMATION_AND_LIMITS.md) rebuilds the current
+sample-free bundle to include these reports/tools; this historical batch accounting
+must not be mistaken for the current bundle manifest.
 
 ## Work item 1 — five Perl source variants
 
