@@ -187,8 +187,10 @@ sample; `L` is loot-only. These columns are independent rules, not family verdic
 
 ## Changed-file review
 
-**Observed:** publication is limited to these files; all prior detector conditions,
-IOC/firewall feeds, blocklist bytes and sample archives are unchanged.
+**Observed — initial loader publication:** changes were limited to the files below;
+all prior detector conditions, original IOC/firewall feeds, blocklist bytes and
+original sample archives were preserved. The contextual IOC follow-up below adds
+two investigation feeds without changing automatic enforcement policies.
 
 | Path | One-line reason |
 |---|---|
@@ -204,6 +206,51 @@ IOC/firewall feeds, blocklist bytes and sample archives are unchanged.
 | `reports/CAPTURE_20261029_triage.md` | Scope, full 864-cell results, validation limits and unresolved inconsistencies |
 | `README.md` | Links to new work and actual dated validation rather than an unsupported status |
 | `drosera-detection-bundle.zip` | Regenerate the existing sample-free bundle with current reports/rules/tools |
+
+## Contextual IOC publication follow-up — 2026-10-29
+
+**Observed:** two investigation feeds now accompany the loader detections:
+
+| Feed | Payload retrieval evidence | Separate capture-source context |
+|---|---|---|
+| [KTHREAD_LOADER](../ioc/KTHREAD_LOADER_ioc.txt) | `44.210.140.205`, literal `/bins` base and 12 constructed candidate payload URLs from source assignments | `78.17.98.2`, supplied sidecar only; not promoted to a payload host |
+| [NET_BOT_LOADER](../ioc/NET_BOT_LOADER_ioc.txt) | `160.119.66.206` and all 15 literal `/bins/net.<arch>` URLs | `94.154.43.203` plus the separate sidecar occurrence of `160.119.66.206` |
+
+**Observed:** each feed includes loader hashes, evidence roles, defanged URLs,
+source-derived host context and explicit limits. HIGH refers to extraction
+confidence, not current maliciousness or ownership. TCP/80 is HTTP retrieval
+context, not a broad deny recommendation. These feeds must not be imported
+wholesale into firewall or IP/domain blocking lists.
+
+**Observed:** README, HTML index and both loader reports link the new feeds;
+there are now nine IOC feeds. The sample-free detection bundle is rebuilt with
+55 entries from canonical Git content, including both feeds and current reports
+and README. It intentionally excludes sample ZIPs and the website index, as in
+the existing bundle layout. The separate repository index remains the website entry point.
+Original YARA/Sigma/Suricata files, seven older IOC feeds, 27 sample archives,
+Firewalla lists, port policy, 41-IP/five-domain blocklist and SID registry are
+preserved. Original August reports retain their historical scope.
+
+**Observed — follow-up detector regression:** the offline validator was rerun on
+the same 96 unique samples: nine warning-free YARA files, 864 evaluations,
+672 unchanged old-rule baseline cells, one intended hit per new rule and zero
+new cross-sample hits. Seven benign-text fixtures, 11 near-miss tests, all ten
+Sigma parse/conversions and 31 synthetic Sigma events passed. These are bounded
+offline checks, not live engine/deployment validation.
+
+**Observed — publication checks:** all SHA-256/SHA-1/MD5 feed values were checked
+against the two extracted sample byte streams, without execution. All 15 NET_BOT
+URL literals and 12 constructed KTHREAD candidates match source; metadata-only
+capture addresses are not bare payload-host entries. All active index links and
+links in the changed Markdown files resolve locally. The seven original capture
+cards are unchanged. Sixty-seven existing detector, policy, original-feed and
+sample files were checked unchanged against the parent commit; all 31 Suricata
+SIDs remain unique and registry-consistent. All 55 ZIP entries match canonical
+Git content and the bundle contains no samples or nested ZIPs.
+
+**Unverified:** current endpoint availability, dedicated malicious ownership,
+co-tenancy, C2, broad clean-software false positives and live deployment. No
+samples were executed and no sample infrastructure was contacted.
 
 ## Reproduction
 
@@ -236,9 +283,11 @@ No old family finding or detection condition was silently overwritten.
 greps a value containing `9`; the new report documents why reliable endian
 selection is **inferred to fail**, not dynamically demonstrated.
 
-**Observed:** no domain/IP was added to any feed. Loader staging literals and
-capture-source addresses remain contextual indicators in reports, excluded from
-blocking pending dedicated-host/ownership/shared-infrastructure review. Domains
+**Observed — initial publication, superseded in part by the contextual IOC follow-up:**
+loader staging literals and capture-source addresses were initially documented
+only in reports. They are now also published in two role-labeled investigation
+feeds; they remain excluded from automatic blocking pending dedicated-host,
+ownership and shared-infrastructure review. Domains
 used as Mirai decoys or HTTP headers remain non-blocking context, specifically
 `www.ikindalikemenbutonlyontuesday.com`. No rule for generic probes, sudoers
 content, authorized keys or a generic /proc killer was added. No new Suricata
